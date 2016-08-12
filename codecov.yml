@@ -1,0 +1,13 @@
+codecov:
+  branch: master
+
+coverage:
+  range: "95...100"
+
+  ignore:
+    - "docs/*"
+    - "tests/*"
+
+comment:
+  layout: "header, diff, changes, sunburst, uncovered"
+  behavior: default
