@@ -9,25 +9,28 @@ from bigchaindb import crypto
 class Client:
     """Client for BigchainDB.
 
-    A Client is initialized with a keypair and is able to create, sign, and submit transactions to a Node
-    in the Federation. At the moment, a Client instance is bounded to a specific ``host`` in the Federation.
-    In the future, a Client might connect to >1 hosts.
+    A Client is initialized with a keypair and is able to create, sign, and
+    submit transactions to a Node in the Federation. At the moment, a Client
+    instance is bounded to a specific ``host`` in the Federation. In the
+    future, a Client might connect to >1 hosts.
     """
 
     def __init__(self, public_key=None, private_key=None, api_endpoint=None,
                  consensus_plugin=None):
         """Initialize the Client instance
 
-        There are three ways in which the Client instance can get its parameters.
-        The order by which the parameters are chosen are:
+        There are three ways in which the Client instance can get its
+        parameters. The order by which the parameters are chosen are:
 
             1. Setting them by passing them to the `__init__` method itself.
             2. Setting them as environment variables
             3. Reading them from the `config.json` file.
 
         Args:
-            public_key (str): the base58 encoded public key for the ED25519 curve.
-            private_key (str): the base58 encoded private key for the ED25519 curve.
+            public_key (str): the base58 encoded public key for the ED25519
+                curve.
+            private_key (str): the base58 encoded private key for the ED25519
+                curve.
             api_endpoint (str): a URL where rethinkdb is running.
                 format: scheme://hostname:port
             consensus_plugin (str): the registered name of your installed
@@ -38,7 +41,8 @@ class Client:
         config_utils.autoconfigure()
 
         self.public_key = public_key or bigchaindb.config['keypair']['public']
-        self.private_key = private_key or bigchaindb.config['keypair']['private']
+        self.private_key = (private_key or
+                            bigchaindb.config['keypair']['private'])
         self.api_endpoint = api_endpoint or bigchaindb.config['api_endpoint']
         self.consensus = config_utils.load_consensus_plugin(consensus_plugin)
 
@@ -111,4 +115,6 @@ def temp_client():
     """
 
     private_key, public_key = crypto.generate_key_pair()
-    return Client(private_key=private_key, public_key=public_key, api_endpoint=bigchaindb.config['api_endpoint'])
+    return Client(private_key=private_key,
+                  public_key=public_key,
+                  api_endpoint=bigchaindb.config['api_endpoint'])
