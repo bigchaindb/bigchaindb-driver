@@ -17,7 +17,6 @@ tests_require = [
     'pyflakes',
     'pylint',
     'pytest-cov',
-    'pytest-xdist',
 ]
 
 dev_require = [
