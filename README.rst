@@ -9,6 +9,9 @@ bigchaindb-driver
 .. image:: https://img.shields.io/travis/bigchaindb/bigchaindb-driver.svg
         :target: https://travis-ci.org/bigchaindb/bigchaindb-driver
 
+.. image:: https://img.shields.io/codecov/c/github/bigchaindb/bigchaindb-driver/master.svg
+    :target: https://codecov.io/github/bigchaindb/bigchaindb-driver?branch=master
+
 .. image:: https://readthedocs.org/projects/bigchaindb-driver/badge/?version=latest
         :target: https://bigchaindb-driver.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
