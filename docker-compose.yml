@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  bdbdriver:
+    build:
+      context: .
+    volumes:
+      - ./docs:/usr/src/app/docs
+      - ./tests:/usr/src/app/tests
+      - ./bigchaindb_driver:/usr/src/app/bigchaindb_driver
+      - ./setup.py:/usr/src/app/setup.py
