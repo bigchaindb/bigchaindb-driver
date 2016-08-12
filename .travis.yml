@@ -14,6 +14,8 @@ install: pip install -U tox
 # command to run tests, e.g. python setup.py test
 script: tox -e ${TOXENV}
 
+after_success: codecov
+
 # After you create the Github repo and add it to Travis, run the
 # travis_pypi_setup.py script to finish PyPI deployment setup
 # deploy:
