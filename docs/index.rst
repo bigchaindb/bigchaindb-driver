@@ -6,7 +6,9 @@
 Welcome to bigchaindb-driver's documentation!
 ======================================
 
-Contents:
+.. important:: **Development Status: Planning**
+    
+    *Implementation not yet released.*
 
 .. toctree::
    :maxdepth: 2

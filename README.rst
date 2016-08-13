@@ -23,7 +23,7 @@ bigchaindb-driver
 
 Python driver for BigchainDB
 
-
+* Development Status: Planning
 * Free software: Apache Software License 2.0
 * Documentation: https://bigchaindb-driver.readthedocs.io.
 
