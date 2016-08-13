@@ -1,6 +1,5 @@
-=================
-bigchaindb-driver
-=================
+BigchainDB Python Driver
+========================
 
 
 .. image:: https://img.shields.io/pypi/v/bigchaindb-driver.svg
