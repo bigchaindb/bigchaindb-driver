@@ -9,3 +9,15 @@ services:
       - ./tests:/usr/src/app/tests
       - ./bigchaindb_driver:/usr/src/app/bigchaindb_driver
       - ./setup.py:/usr/src/app/setup.py
+  bdocs:
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/app/
+    command: make -C docs html
+  vdocs:
+    image: nginx
+    ports:
+      - '35555:80'
+    volumes:
+      - ./docs/_build/html:/usr/share/nginx/html
