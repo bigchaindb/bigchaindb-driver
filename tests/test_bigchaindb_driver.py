@@ -9,7 +9,7 @@ Tests for `bigchaindb_driver` module.
 
 import pytest
 
-from bigchaindb import config_utils, util
+from bigchaindb import util
 from bigchaindb.exceptions import KeypairNotFoundException
 
 
@@ -30,18 +30,22 @@ def test_client_can_create_assets(client):
     #   in the federation that will create the real transaction. `signature`
     #   will be overwritten with the new signature. Note that this scenario is
     #   ignored by this test.
-    assert tx['transaction']['fulfillments'][0]['current_owners'][0] == client.public_key
-    assert tx['transaction']['conditions'][0]['new_owners'][0] == client.public_key
-    assert tx['transaction']['fulfillments'][0]['input'] is None
+    fulfillment = tx['transaction']['fulfillments'][0]
+    condition = tx['transaction']['conditions'][0]
+    assert fulfillment['current_owners'][0] == client.public_key
+    assert condition['new_owners'][0] == client.public_key
+    assert fulfillment['input'] is None
     assert util.validate_fulfillments(tx)
 
 
 @pytest.mark.usefixtures('mock_requests_post', 'mock_bigchaindb_sign')
 def test_client_can_transfer_assets(client):
     tx = client.transfer(client.public_key, 123)
-    assert tx['transaction']['fulfillments'][0]['current_owners'][0] == client.public_key
-    assert tx['transaction']['conditions'][0]['new_owners'][0] == client.public_key
-    assert tx['transaction']['fulfillments'][0]['input'] == 123
+    fulfillment = tx['transaction']['fulfillments'][0]
+    condition = tx['transaction']['conditions'][0]
+    assert fulfillment['current_owners'][0] == client.public_key
+    assert condition['new_owners'][0] == client.public_key
+    assert fulfillment['input'] == 123
 
 
 @pytest.mark.parametrize('pubkey,privkey', (
