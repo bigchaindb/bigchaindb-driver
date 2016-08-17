@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+from .bigchaindb_driver import Client   # noqa
+
 
 __author__ = 'BigchainDB'
 __email__ = 'dev@bigchaindb.com'
