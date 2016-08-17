@@ -3,7 +3,8 @@ version: '2'
 services:
   bigchaindb-driver:
     build:
-      context: ./compose/bigchaindb-driver
+      context: .
+      dockerfile: ./compose/bigchaindb-driver/Dockerfile
     volumes:
       - ./docs:/usr/src/app/docs
       - ./tests:/usr/src/app/tests
@@ -15,8 +16,7 @@ services:
       - "58585:8080"
       - "28015"
   bigchaindb-server:
-    build:
-      context: ./compose/bigchaindb-server
+    build: ./compose/bigchaindb-server
     volumes:
       - ./.bigchaindb:/root/.bigchaindb
     environment:

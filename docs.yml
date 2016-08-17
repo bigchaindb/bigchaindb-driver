@@ -3,13 +3,14 @@ version: '2'
 services:
   bdocs:
     build:
-      context: ./compose/bigchaindb-driver
+      context: .
+      dockerfile: ./compose/bigchaindb-driver/Dockerfile
     volumes:
       - .:/usr/src/app/
     command: make -C docs html
   vdocs:
     image: nginx
     ports:
-      - '35555:80'
+      - '55555:80'
     volumes:
       - ./docs/_build/html:/usr/share/nginx/html

@@ -17,6 +17,7 @@ tests_require = [
     'pyflakes',
     'pylint',
     'pytest-cov',
+    'pytest-sugar',
 ]
 
 dev_require = [
