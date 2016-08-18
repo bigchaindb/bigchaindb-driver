@@ -4,7 +4,7 @@
 test_bigchaindb_driver
 ----------------------------------
 
-Tests for `bigchaindb_driver` module.
+Tests for `driver` module.
 """
 
 import pytest
@@ -14,7 +14,7 @@ from bigchaindb_common.exceptions import KeypairNotFoundException
 
 
 def test_temp_client_returns_a_temp_client(bdb_api_endpoint):
-    from bigchaindb_driver.bigchaindb_driver import temp_client
+    from bigchaindb_driver.driver import temp_client
     client = temp_client(api_endpoint=bdb_api_endpoint)
     assert client.public_key
     assert client.private_key
@@ -54,7 +54,7 @@ def test_client_can_transfer_assets(client, transaction, bob_condition):
 ))
 def test_init_client_with_incomplete_keypair(pubkey, privkey,
                                              bdb_api_endpoint):
-    from bigchaindb_driver.bigchaindb_driver import Client
+    from bigchaindb_driver import Client
     with pytest.raises(KeypairNotFoundException):
         Client(api_endpoint=bdb_api_endpoint,
                public_key=pubkey,
