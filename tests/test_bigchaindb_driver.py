@@ -9,7 +9,7 @@ Tests for `bigchaindb_driver` module.
 
 import pytest
 
-from bigchaindb import util
+from bigchaindb_common.transaction import Transaction
 from bigchaindb_common.exceptions import KeypairNotFoundException
 
 
@@ -33,20 +33,20 @@ def test_client_can_create_assets(client):
     #   ignored by this test.
     fulfillment = tx['transaction']['fulfillments'][0]
     condition = tx['transaction']['conditions'][0]
-    assert fulfillment['current_owners'][0] == client.public_key
-    assert condition['new_owners'][0] == client.public_key
+    assert fulfillment['owners_before'][0] == client.public_key
+    assert condition['owners_after'][0] == client.public_key
     assert fulfillment['input'] is None
-    assert util.validate_fulfillments(tx)
+    tx_obj = Transaction.from_dict(tx)
+    assert tx_obj.fulfillments_valid()
 
 
 @pytest.mark.usefixtures('mock_requests_post', 'mock_bigchaindb_sign')
-def test_client_can_transfer_assets(client):
-    tx = client.transfer(client.public_key, 123)
+def test_client_can_transfer_assets(client, transaction, bob_condition):
+    tx = client.transfer(transaction, bob_condition)
     fulfillment = tx['transaction']['fulfillments'][0]
     condition = tx['transaction']['conditions'][0]
-    assert fulfillment['current_owners'][0] == client.public_key
-    assert condition['new_owners'][0] == client.public_key
-    assert fulfillment['input'] == 123
+    assert fulfillment['owners_before'][0] == client.public_key
+    assert condition['owners_after'][0] == bob_condition.owners_after[0]
 
 
 @pytest.mark.parametrize('pubkey,privkey', (
@@ -54,8 +54,6 @@ def test_client_can_transfer_assets(client):
 ))
 def test_init_client_with_incomplete_keypair(pubkey, privkey,
                                              bdb_api_endpoint):
-    # FIXME importing the config locally is needed in
-    # order to mock the latest config dict
     from bigchaindb_driver.bigchaindb_driver import Client
     with pytest.raises(KeypairNotFoundException):
         Client(api_endpoint=bdb_api_endpoint,

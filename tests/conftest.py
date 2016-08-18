@@ -3,6 +3,44 @@ from os import environ
 from pytest import fixture
 
 from bigchaindb import config_utils
+from bigchaindb_common.transaction import Condition, Fulfillment, Transaction
+from cryptoconditions import Ed25519Fulfillment
+
+
+@fixture
+def alice_privkey():
+    return 'CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP'
+
+
+@fixture
+def alice_pubkey():
+    return 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'
+
+
+@fixture
+def alice_keypair(alice_privkey, alice_pubkey):
+    return alice_privkey, alice_pubkey
+
+
+@fixture
+def bob_privkey():
+    return '4S1dzx3PSdMAfs59aBkQefPASizTs728HnhLNpYZWCad'
+
+
+@fixture
+def bob_pubkey():
+    return '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'
+
+
+@fixture
+def bob_keypair(bob_privkey, bob_pubkey):
+    return bob_privkey, bob_pubkey
+
+
+@fixture
+def keypair():
+    return ('CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP',
+            'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3')
 
 
 @fixture
@@ -31,9 +69,11 @@ def restore_config(node_config):
 
 
 @fixture
-def client(bdb_api_endpoint):
-    from bigchaindb_driver.bigchaindb_driver import temp_client
-    return temp_client(api_endpoint=bdb_api_endpoint)
+def client(bdb_api_endpoint, alice_privkey, alice_pubkey):
+    from bigchaindb_driver import Client
+    return Client(api_endpoint=bdb_api_endpoint,
+                  private_key=alice_privkey,
+                  public_key=alice_pubkey)
 
 
 @fixture
@@ -57,3 +97,26 @@ def mock_bigchaindb_sign(monkeypatch):
         return transaction
 
     monkeypatch.setattr('bigchaindb.util.sign_tx', mockreturn)
+
+
+@fixture
+def fulfillment(alice_pubkey):
+    return Fulfillment.gen_default([alice_pubkey])
+
+
+@fixture
+def condition(fulfillment):
+    return fulfillment.gen_condition()
+
+
+@fixture
+def transaction(fulfillment, condition):
+    return Transaction(Transaction.CREATE,
+                       fulfillments=[fulfillment],
+                       conditions=[condition])
+
+
+@fixture
+def bob_condition(bob_pubkey):
+    condition_uri = Ed25519Fulfillment(public_key=bob_pubkey).condition_uri
+    return Condition(condition_uri, owners_after=[bob_pubkey])
