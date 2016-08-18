@@ -9,7 +9,10 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-install_requires = ['bigchaindb>=0.5.1']
+install_requires = [
+    'bigchaindb>=0.5.1',
+    'bigchaindb-common>=0.0.2a1',
+]
 
 tests_require = [
     'coverage',
@@ -32,6 +35,9 @@ docs_require = [
     'sphinx_rtd_theme',
 ]
 
+dependency_links = [
+    'git+https://github.com/bigchaindb/bigchaindb-common.git@integrate-transaction-model#egg=bigchaindb_common-0.0.2a1',
+]
 
 setup(
     name='bigchaindb_driver',
@@ -65,4 +71,5 @@ setup(
         'dev': dev_require + tests_require + docs_require,
         'docs': docs_require,
     },
+    dependency_links=dependency_links,
 )

@@ -11,3 +11,4 @@ cryptography==1.4
 PyYAML==3.11
 pytest==2.9.2
 pytest-cov
+git+https://github.com/bigchaindb/bigchaindb-common.git@integrate-transaction-model#egg=bigchaindb_common-0.0.2a1
