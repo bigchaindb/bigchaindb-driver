@@ -1,9 +1,8 @@
 import requests
 
-import bigchaindb
 from bigchaindb import config_utils
-from bigchaindb import exceptions
-from bigchaindb import crypto
+from bigchaindb_common import crypto
+from bigchaindb_common.exceptions import KeypairNotFoundException
 
 
 class Client:
@@ -15,7 +14,7 @@ class Client:
     future, a Client might connect to >1 hosts.
     """
 
-    def __init__(self, public_key=None, private_key=None, api_endpoint=None,
+    def __init__(self, *, public_key, private_key, api_endpoint,
                  consensus_plugin=None):
         """Initialize the Client instance
 
@@ -37,17 +36,13 @@ class Client:
                 consensus plugin. The `core` plugin is built into BigchainDB;
                 others must be installed via pip.
         """
+        if not public_key or not private_key:
+            raise KeypairNotFoundException()
 
-        config_utils.autoconfigure()
-
-        self.public_key = public_key or bigchaindb.config['keypair']['public']
-        self.private_key = (private_key or
-                            bigchaindb.config['keypair']['private'])
-        self.api_endpoint = api_endpoint or bigchaindb.config['api_endpoint']
+        self.public_key = public_key
+        self.private_key = private_key
+        self.api_endpoint = api_endpoint
         self.consensus = config_utils.load_consensus_plugin(consensus_plugin)
-
-        if not self.public_key or not self.private_key:
-            raise exceptions.KeypairNotFoundException()
 
     def create(self, payload=None):
         """Issue a transaction to create an asset.
@@ -107,7 +102,7 @@ class Client:
         return res.json()
 
 
-def temp_client():
+def temp_client(*, api_endpoint):
     """Create a new temporary client.
 
     Return:
@@ -117,4 +112,4 @@ def temp_client():
     private_key, public_key = crypto.generate_key_pair()
     return Client(private_key=private_key,
                   public_key=public_key,
-                  api_endpoint=bigchaindb.config['api_endpoint'])
+                  api_endpoint=api_endpoint)

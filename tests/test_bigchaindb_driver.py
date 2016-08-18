@@ -10,14 +10,15 @@ Tests for `bigchaindb_driver` module.
 import pytest
 
 from bigchaindb import util
-from bigchaindb.exceptions import KeypairNotFoundException
+from bigchaindb_common.exceptions import KeypairNotFoundException
 
 
-def test_temp_client_returns_a_temp_client():
+def test_temp_client_returns_a_temp_client(bdb_api_endpoint):
     from bigchaindb_driver.bigchaindb_driver import temp_client
-    client = temp_client()
+    client = temp_client(api_endpoint=bdb_api_endpoint)
     assert client.public_key
     assert client.private_key
+    assert client.api_endpoint == bdb_api_endpoint
 
 
 @pytest.mark.usefixtures('restore_config', 'mock_requests_post')
@@ -51,12 +52,12 @@ def test_client_can_transfer_assets(client):
 @pytest.mark.parametrize('pubkey,privkey', (
     (None, None), ('pubkey', None), (None, 'privkey'),
 ))
-def test_init_client_with_incomplete_keypair(pubkey, privkey, monkeypatch):
+def test_init_client_with_incomplete_keypair(pubkey, privkey,
+                                             bdb_api_endpoint):
     # FIXME importing the config locally is needed in
     # order to mock the latest config dict
-    from bigchaindb import config
     from bigchaindb_driver.bigchaindb_driver import Client
-    keypair = {'public': pubkey, 'private': privkey}
-    monkeypatch.setitem(config, 'keypair', keypair)
     with pytest.raises(KeypairNotFoundException):
-        Client()
+        Client(api_endpoint=bdb_api_endpoint,
+               public_key=pubkey,
+               private_key=privkey)
