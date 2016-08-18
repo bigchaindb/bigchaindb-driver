@@ -5,19 +5,20 @@ from bigchaindb_common.transaction import Data, Fulfillment, Transaction
 from bigchaindb_common.exceptions import KeypairNotFoundException
 
 
-class Client:
-    """Client for BigchainDB.
+class BigchainDB:
+    """BigchainDB driver class.
 
-    A Client is initialized with a keypair and is able to create, sign, and
-    submit transactions to a Node in the Federation. At the moment, a Client
-    instance is bounded to a specific ``host`` in the Federation. In the
-    future, a Client might connect to >1 hosts.
+    A BigchainDB driver is initialized with a keypair and is able to create,
+    sign, and submit transactions to a Node in the Federation. At the moment,
+    a BigchainDB driver instance is bounded to a specific ``host`` in the
+    Federation. In the future, a BigchainDB driver instance might connect to
+    >1 hosts.
     """
 
     def __init__(self, *, public_key, private_key, api_endpoint):
-        """Initialize the Client instance
+        """Initialize the BigchainDB instance
 
-        There are three ways in which the Client instance can get its
+        There are three ways in which the BigchainDB instance can get its
         parameters. The order by which the parameters are chosen are:
 
             1. Setting them by passing them to the `__init__` method itself.
@@ -87,13 +88,13 @@ class Client:
         return res.json()
 
 
-def temp_client(*, api_endpoint):
-    """Create a new temporary client.
+def temp_driver(*, api_endpoint):
+    """Create a new temporary driver.
 
     Return:
-        A client initialized with a keypair generated on the fly.
+        A driver initialized with a keypair generated on the fly.
     """
     private_key, public_key = crypto.generate_key_pair()
-    return Client(private_key=private_key,
-                  public_key=public_key,
-                  api_endpoint=api_endpoint)
+    return BigchainDB(private_key=private_key,
+                      public_key=public_key,
+                      api_endpoint=api_endpoint)

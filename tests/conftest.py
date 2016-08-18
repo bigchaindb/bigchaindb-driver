@@ -69,11 +69,11 @@ def restore_config(node_config):
 
 
 @fixture
-def client(bdb_api_endpoint, alice_privkey, alice_pubkey):
-    from bigchaindb_driver import Client
-    return Client(api_endpoint=bdb_api_endpoint,
-                  private_key=alice_privkey,
-                  public_key=alice_pubkey)
+def driver(bdb_api_endpoint, alice_privkey, alice_pubkey):
+    from bigchaindb_driver import BigchainDB
+    return BigchainDB(api_endpoint=bdb_api_endpoint,
+                      private_key=alice_privkey,
+                      public_key=alice_pubkey)
 
 
 @fixture
