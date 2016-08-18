@@ -6,12 +6,12 @@ from bigchaindb_common.transaction import Transaction
 from bigchaindb_common.exceptions import KeypairNotFoundException
 
 
-def test_temp_driver_returns_a_temp_driver(bdb_api_endpoint):
+def test_temp_driver_returns_a_temp_driver(bdb_node):
     from bigchaindb_driver.driver import temp_driver
-    driver = temp_driver(api_endpoint=bdb_api_endpoint)
+    driver = temp_driver(node=bdb_node)
     assert driver.public_key
     assert driver.private_key
-    assert driver.api_endpoint == bdb_api_endpoint
+    assert driver.node == bdb_node
 
 
 @pytest.mark.usefixtures('restore_config', 'mock_requests_post')
@@ -46,9 +46,9 @@ def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     (None, None), ('pubkey', None), (None, 'privkey'),
 ))
 def test_init_driver_with_incomplete_keypair(pubkey, privkey,
-                                             bdb_api_endpoint):
+                                             bdb_node):
     from bigchaindb_driver import BigchainDB
     with pytest.raises(KeypairNotFoundException):
-        BigchainDB(api_endpoint=bdb_api_endpoint,
+        BigchainDB(node=bdb_node,
                    public_key=pubkey,
                    private_key=privkey)

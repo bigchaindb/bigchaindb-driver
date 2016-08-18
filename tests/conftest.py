@@ -49,7 +49,7 @@ def bdb_host():
 
 
 @fixture
-def bdb_api_endpoint(bdb_host):
+def bdb_node(bdb_host):
     return 'http://{}:9984/api/v1'.format(bdb_host)
 
 
@@ -69,9 +69,9 @@ def restore_config(node_config):
 
 
 @fixture
-def driver(bdb_api_endpoint, alice_privkey, alice_pubkey):
+def driver(bdb_node, alice_privkey, alice_pubkey):
     from bigchaindb_driver import BigchainDB
-    return BigchainDB(api_endpoint=bdb_api_endpoint,
+    return BigchainDB(node=bdb_node,
                       private_key=alice_privkey,
                       public_key=alice_pubkey)
 

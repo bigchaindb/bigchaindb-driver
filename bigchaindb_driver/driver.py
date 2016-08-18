@@ -15,7 +15,7 @@ class BigchainDB:
     >1 hosts.
     """
 
-    def __init__(self, *, public_key, private_key, api_endpoint):
+    def __init__(self, *, public_key, private_key, node):
         """Initialize the BigchainDB instance
 
         There are three ways in which the BigchainDB instance can get its
@@ -30,7 +30,7 @@ class BigchainDB:
                 curve.
             private_key (str): the base58 encoded private key for the ED25519
                 curve.
-            api_endpoint (str): a URL where rethinkdb is running.
+            node (str): The URL of a BigchainDB node to connect to.
                 format: scheme://hostname:port
         """
         if not public_key or not private_key:
@@ -38,7 +38,7 @@ class BigchainDB:
 
         self.public_key = public_key
         self.private_key = private_key
-        self.api_endpoint = api_endpoint
+        self.node = node
 
     def create(self, payload=None):
         """Issue a transaction to create an asset.
@@ -84,11 +84,11 @@ class BigchainDB:
         Return:
             The transaction pushed to the Federation.
         """
-        res = requests.post(self.api_endpoint + '/transactions/', json=tx)
+        res = requests.post(self.node + '/transactions/', json=tx)
         return res.json()
 
 
-def temp_driver(*, api_endpoint):
+def temp_driver(*, node):
     """Create a new temporary driver.
 
     Return:
@@ -97,4 +97,4 @@ def temp_driver(*, api_endpoint):
     private_key, public_key = crypto.generate_key_pair()
     return BigchainDB(private_key=private_key,
                       public_key=public_key,
-                      api_endpoint=api_endpoint)
+                      node=node)
