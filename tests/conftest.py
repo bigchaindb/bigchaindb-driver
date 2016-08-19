@@ -2,7 +2,6 @@ from os import environ
 
 from pytest import fixture
 
-from bigchaindb import config_utils
 from bigchaindb_common.transaction import Condition, Fulfillment, Transaction
 from cryptoconditions import Ed25519Fulfillment
 
@@ -51,21 +50,6 @@ def bdb_host():
 @fixture
 def bdb_node(bdb_host):
     return 'http://{}:9984/api/v1'.format(bdb_host)
-
-
-@fixture
-def node_config():
-    return {
-        'keypair': {
-            'private': '31Lb1ZGKTyHnmVK3LUMrAUrPNfd4sE2YyBt3UA4A25aA',
-            'public': '4XYfCbabAWVUCbjTmRTFEu2sc3dFEdkse4r6X498B1s8'
-        }
-    }
-
-
-@fixture
-def restore_config(node_config):
-    config_utils.set_config(node_config)
 
 
 @fixture

@@ -14,7 +14,7 @@ def test_temp_driver_returns_a_temp_driver(bdb_node):
     assert driver.node == bdb_node
 
 
-@pytest.mark.usefixtures('restore_config', 'mock_requests_post')
+@pytest.mark.usefixtures('mock_requests_post')
 def test_driver_can_create_assets(driver):
     tx = driver.create()
 
