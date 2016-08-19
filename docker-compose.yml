@@ -1,25 +1,25 @@
 version: '2'
 
 services:
-  bigchaindb-driver:
+  driver:
     build:
       context: .
-      dockerfile: ./compose/bigchaindb-driver/Dockerfile
+      dockerfile: ./compose/driver/Dockerfile
     volumes:
       - ./docs:/usr/src/app/docs
       - ./tests:/usr/src/app/tests
       - ./bigchaindb_driver:/usr/src/app/bigchaindb_driver
       - ./setup.py:/usr/src/app/setup.py
-  rethinkdb-server:
+  rethinkdb:
     image: rethinkdb
     ports:
       - "58585:8080"
       - "28015"
   bigchaindb-server:
-    build: ./compose/bigchaindb-server
+    build: ./compose/server
     volumes:
       - ./.bigchaindb:/root/.bigchaindb
     environment:
-      BIGCHAINDB_DATABASE_HOST: rethinkdb-server
+      BIGCHAINDB_DATABASE_HOST: rethinkdb
       BIGCHAINDB_CONFIG_PATH: /root/.bigchaindb
     command: bigchaindb start

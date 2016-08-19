@@ -1,4 +1,4 @@
-from .bigchaindb_driver import Client   # noqa
+from .driver import BigchainDB   # noqa
 
 
 __author__ = 'BigchainDB'
