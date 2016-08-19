@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-from pytest import raises
-from pytest import mark
+from pytest import mark, raises
 
 from bigchaindb_common.transaction import Transaction
 from bigchaindb_common.exceptions import KeypairNotFoundException
