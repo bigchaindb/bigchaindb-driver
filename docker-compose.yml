@@ -15,7 +15,7 @@ services:
     ports:
       - "58585:8080"
       - "28015"
-  bigchaindb-server:
+  server:
     build: ./compose/server
     volumes:
       - ./.bigchaindb:/root/.bigchaindb
