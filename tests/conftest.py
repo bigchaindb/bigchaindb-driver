@@ -37,12 +37,6 @@ def bob_keypair(bob_privkey, bob_pubkey):
 
 
 @fixture
-def keypair():
-    return ('CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP',
-            'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3')
-
-
-@fixture
 def bdb_host():
     return environ.get('BDB_HOST', 'localhost')
 
