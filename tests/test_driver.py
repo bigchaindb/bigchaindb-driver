@@ -33,6 +33,33 @@ def test_driver_can_create_assets(driver):
     assert tx_obj.fulfillments_valid()
 
 
+# FIXME This test can be removed once the following are taken care of
+#
+# * server is ready with new transaction model
+#       see https://github.com/bigchaindb/bigchaindb/issues/342
+#
+# * common lib is ready
+#       see https://github.com/bigchaindb/bigchaindb-common/pull/4
+def test_create_ignoring_fulfillment_owners_before_and_payload_hash(driver):
+    tx = driver.create()
+    fulfillment = tx['transaction']['fulfillments'][0]
+    condition = tx['transaction']['conditions'][0]
+    assert condition['owners_after'][0] == driver.public_key
+    assert fulfillment['input'] is None
+
+
+@mark.skip(reason='new transaction model not ready - bigchaindb/issues/342')
+def test_create(driver):
+    tx = driver.create()
+    fulfillment = tx['transaction']['fulfillments'][0]
+    condition = tx['transaction']['conditions'][0]
+    assert fulfillment['owners_before'][0] == driver.public_key
+    assert condition['owners_after'][0] == driver.public_key
+    assert fulfillment['input'] is None
+    tx_obj = Transaction.from_dict(tx)
+    assert tx_obj.fulfillments_valid()
+
+
 @mark.usefixtures('mock_requests_post', 'mock_bigchaindb_sign')
 def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     tx = driver.transfer(transaction, bob_condition)
