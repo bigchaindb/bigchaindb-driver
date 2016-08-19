@@ -59,7 +59,7 @@ def test_create(driver):
     assert tx_obj.fulfillments_valid()
 
 
-@mark.usefixtures('mock_requests_post', 'mock_bigchaindb_sign')
+@mark.usefixtures('mock_requests_post')
 def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     tx = driver.transfer(transaction, bob_condition)
     fulfillment = tx['transaction']['fulfillments'][0]
