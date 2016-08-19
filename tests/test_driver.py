@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import pytest
+from pytest import raises
+from pytest import mark
 
 from bigchaindb_common.transaction import Transaction
 from bigchaindb_common.exceptions import KeypairNotFoundException
@@ -14,10 +15,9 @@ def test_temp_driver_returns_a_temp_driver(bdb_node):
     assert driver.node == bdb_node
 
 
-@pytest.mark.usefixtures('mock_requests_post')
+@mark.usefixtures('mock_requests_post')
 def test_driver_can_create_assets(driver):
     tx = driver.create()
-
     # XXX: `CREATE` operations require the node that receives the transaction
     #   to modify the data in the transaction itself.
     #   `current_owner` will be overwritten with the public key of the node
@@ -33,7 +33,7 @@ def test_driver_can_create_assets(driver):
     assert tx_obj.fulfillments_valid()
 
 
-@pytest.mark.usefixtures('mock_requests_post', 'mock_bigchaindb_sign')
+@mark.usefixtures('mock_requests_post', 'mock_bigchaindb_sign')
 def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     tx = driver.transfer(transaction, bob_condition)
     fulfillment = tx['transaction']['fulfillments'][0]
@@ -42,13 +42,13 @@ def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     assert condition['owners_after'][0] == bob_condition.owners_after[0]
 
 
-@pytest.mark.parametrize('pubkey,privkey', (
+@mark.parametrize('pubkey,privkey', (
     (None, None), ('pubkey', None), (None, 'privkey'),
 ))
 def test_init_driver_with_incomplete_keypair(pubkey, privkey,
                                              bdb_node):
     from bigchaindb_driver import BigchainDB
-    with pytest.raises(KeypairNotFoundException):
+    with raises(KeypairNotFoundException):
         BigchainDB(node=bdb_node,
                    public_key=pubkey,
                    private_key=privkey)
