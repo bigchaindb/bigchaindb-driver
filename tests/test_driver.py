@@ -84,3 +84,9 @@ def test_init_driver_with_incomplete_keypair(pubkey, privkey,
         BigchainDB(node=bdb_node,
                    public_key=pubkey,
                    private_key=privkey)
+
+
+def test_retrieve(driver, persisted_transaction):
+    txid = persisted_transaction['id']
+    tx = driver.retrieve(txid)
+    assert tx

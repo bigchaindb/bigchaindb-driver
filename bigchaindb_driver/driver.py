@@ -42,6 +42,11 @@ class BigchainDB:
         self.node = node
         self.transport = transport_class(node)
 
+    def retrieve(self, txid):
+        path = '/transactions' + '/' + txid
+        response = self.transport.forward_request(method='GET', path=path)
+        return response.json()
+
     def create(self, payload=None):
         """Issue a transaction to create an asset.
 
