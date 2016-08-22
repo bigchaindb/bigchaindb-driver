@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from pytest import mark, raises
+from responses import RequestsMock
 
 from bigchaindb_common.transaction import Transaction
 from bigchaindb_common.exceptions import KeypairNotFoundException
@@ -14,7 +15,7 @@ def test_temp_driver_returns_a_temp_driver(bdb_node):
     assert driver.node == bdb_node
 
 
-@mark.usefixtures('mock_requests_post')
+@mark.skip(reason='new transaction model not ready - bigchaindb/issues/342')
 def test_driver_can_create_assets(driver):
     tx = driver.create()
     # XXX: `CREATE` operations require the node that receives the transaction
@@ -59,9 +60,14 @@ def test_create(driver):
     assert tx_obj.fulfillments_valid()
 
 
-@mark.usefixtures('mock_requests_post')
 def test_driver_can_transfer_assets(driver, transaction, bob_condition):
-    tx = driver.transfer(transaction, bob_condition)
+    transfer_transaction = transaction.transfer([bob_condition])
+    signed_transaction = transfer_transaction.sign([driver.private_key])
+    json = signed_transaction.to_dict()
+    url = driver.node + '/transactions/'
+    with RequestsMock() as requests_mock:
+        requests_mock.add('POST', url, json=json)
+        tx = driver.transfer(transaction, bob_condition)
     fulfillment = tx['transaction']['fulfillments'][0]
     condition = tx['transaction']['conditions'][0]
     assert fulfillment['owners_before'][0] == driver.public_key
