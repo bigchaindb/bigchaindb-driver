@@ -21,6 +21,7 @@ tests_require = [
     'pylint',
     'pytest-cov',
     'pytest-sugar',
+    'responses',
 ]
 
 dev_require = [

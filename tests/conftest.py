@@ -1,5 +1,6 @@
 from os import environ
 
+import requests
 from pytest import fixture
 
 from bigchaindb_common.transaction import Condition, Fulfillment, Transaction
@@ -90,3 +91,11 @@ def transaction(fulfillment, condition):
 def bob_condition(bob_pubkey):
     condition_uri = Ed25519Fulfillment(public_key=bob_pubkey).condition_uri
     return Condition(condition_uri, owners_after=[bob_pubkey])
+
+
+@fixture
+def persisted_transaction(alice_privkey, driver, transaction):
+    signed_transaction = transaction.sign([alice_privkey])
+    json = signed_transaction.to_dict()
+    response = requests.post(driver.node + '/transactions/', json=json)
+    return response.json()

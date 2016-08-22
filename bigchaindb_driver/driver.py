@@ -1,8 +1,8 @@
-import requests
-
 from bigchaindb_common import crypto
 from bigchaindb_common.transaction import Data, Fulfillment, Transaction
 from bigchaindb_common.exceptions import KeypairNotFoundException
+
+from .transport import Transport
 
 
 class BigchainDB:
@@ -15,7 +15,8 @@ class BigchainDB:
     >1 hosts.
     """
 
-    def __init__(self, *, public_key, private_key, node):
+    def __init__(self, *, public_key, private_key,
+                 node, transport_class=Transport):
         """Initialize the BigchainDB instance
 
         There are three ways in which the BigchainDB instance can get its
@@ -39,6 +40,12 @@ class BigchainDB:
         self.public_key = public_key
         self.private_key = private_key
         self.node = node
+        self.transport = transport_class(node)
+
+    def retrieve(self, txid):
+        path = '/transactions' + '/' + txid
+        response = self.transport.forward_request(method='GET', path=path)
+        return response.json()
 
     def create(self, payload=None):
         """Issue a transaction to create an asset.
@@ -84,8 +91,9 @@ class BigchainDB:
         Return:
             The transaction pushed to the Federation.
         """
-        res = requests.post(self.node + '/transactions/', json=tx)
-        return res.json()
+        response = self.transport.forward_request(
+            method='POST', path='/transactions/', json=tx)
+        return response.json()
 
 
 def temp_driver(*, node):

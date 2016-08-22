@@ -13,7 +13,7 @@ before_install:
 
 install:
   - sudo apt-get install rethinkdb
-  - pip install "git+https://github.com/sbellem/bigchaindb.git@setup-no-pinning"
+  - pip install "git+https://github.com/bigchaindb/bigchaindb.git"
   - pip install -U codecov tox
 
 before_script:
