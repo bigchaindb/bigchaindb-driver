@@ -11,6 +11,7 @@ with open('HISTORY.rst') as history_file:
 
 install_requires = [
     'bigchaindb-common>=0.0.2a1',
+    'requests>=2.11.0',
 ]
 
 tests_require = [

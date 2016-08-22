@@ -70,14 +70,6 @@ def mock_requests_post(monkeypatch):
 
 
 @fixture
-def mock_bigchaindb_sign(monkeypatch):
-    def mockreturn(transaction, private_key, bigchain):
-        return transaction
-
-    monkeypatch.setattr('bigchaindb.util.sign_tx', mockreturn)
-
-
-@fixture
 def fulfillment(alice_pubkey):
     return Fulfillment.gen_default([alice_pubkey])
 
