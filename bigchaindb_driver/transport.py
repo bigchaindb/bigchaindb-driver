@@ -7,7 +7,7 @@ class Transport:
 
     def __init__(self, *nodes):
         """Initializes an instance of
-        :class:`bigchaindb_driver.transport.Transport`.
+        :class:`~bigchaindb_driver.transport.Transport`.
 
         Args:
             nodes: nodes
@@ -25,7 +25,7 @@ class Transport:
         """Gets a connection from the pool.
 
         Returns:
-            A :class:`bigchaindb_driver.connection.Connection` instance.
+            A :class:`~bigchaindb_driver.connection.Connection` instance.
         """
         return self.pool.get_connection()
 

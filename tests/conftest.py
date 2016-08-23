@@ -1,3 +1,4 @@
+from collections import namedtuple
 from os import environ
 
 import requests
@@ -19,7 +20,10 @@ def alice_pubkey():
 
 @fixture
 def alice_keypair(alice_privkey, alice_pubkey):
-    return alice_privkey, alice_pubkey
+    keypair = namedtuple('alice_keypair', ['pubkey', 'privkey'])
+    keypair.vk = alice_pubkey
+    keypair.sk = alice_privkey
+    return keypair
 
 
 @fixture
@@ -50,7 +54,7 @@ def bdb_node(bdb_host):
 @fixture
 def driver(bdb_node, alice_privkey, alice_pubkey):
     from bigchaindb_driver import BigchainDB
-    return BigchainDB(node=bdb_node,
+    return BigchainDB(bdb_node,
                       private_key=alice_privkey,
                       public_key=alice_pubkey)
 
@@ -97,5 +101,5 @@ def bob_condition(bob_pubkey):
 def persisted_transaction(alice_privkey, driver, transaction):
     signed_transaction = transaction.sign([alice_privkey])
     json = signed_transaction.to_dict()
-    response = requests.post(driver.node + '/transactions/', json=json)
+    response = requests.post(driver.nodes[0] + '/transactions/', json=json)
     return response.json()
