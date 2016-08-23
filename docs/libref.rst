@@ -29,6 +29,15 @@ Library Reference
 
     .. automethod:: __init__
 
+.. autoclass:: RoundRobinPicker
+    :members:
+
+    .. automethod:: __init__
+
+.. autoclass:: AbstractPicker
+    :members:
+
+
 ``connection``
 --------------
 .. automodule:: bigchaindb_driver.connection
