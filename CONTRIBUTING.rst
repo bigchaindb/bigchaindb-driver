@@ -57,34 +57,37 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `bigchaindb_driver` for local development.
+Ready to contribute? Here's how to set up `bigchaindb_driver` for local
+development.
 
 1. Fork the `bigchaindb_driver` repo on GitHub.
-2. Clone your fork locally::
+2. Clone your fork locally and enter into the project::
 
     $ git clone git@github.com:your_name_here/bigchaindb_driver.git
-
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
-
-    $ mkvirtualenv bigchaindb_driver
     $ cd bigchaindb_driver/
-    $ python setup.py develop
 
-4. Create a branch for local development::
+3. Create a branch for local development::
 
     $ git checkout -b name-of-your-bugfix-or-feature
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass flake8
+   and the tests. For the tests, you'll need to  start the RethinkDB and
+   BigchainDB servers::
 
-    $ flake8 bigchaindb_driver tests
-    $ python setup.py test or py.test
-    $ tox
+    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d server
 
-   To get flake8 and tox, just pip install them into your virtualenv.
+6.flake8 check::
 
-6. Commit your changes and push your branch to GitHub::
+    $ docker-compose run --rm driver flake8 bigchaindb_driver tests
+
+7 To run the tests::
+    
+    $ docker-compose run --rm driver py.test -v
+
+8.. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
@@ -101,8 +104,8 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.6, 2.7, 3.3, 3.4 and 3.5, and for PyPy. Check
-   https://travis-ci.org/bigchaindb/bigchaindb_driver/pull_requests
+3. The pull request should work for Python 3.5, and pass the flake8 check.
+   Check https://travis-ci.org/bigchaindb/bigchaindb_driver/pull_requests
    and make sure that the tests pass for all supported Python versions.
 
 Tips
@@ -110,5 +113,11 @@ Tips
 
 To run a subset of tests::
 
-$ py.test tests.test_bigchaindb_driver
+    $ docker-compose run --rm driver py.test -v tests/test_driver.py
 
+.. important:: When running tests, unless you are targeting a test that does
+    not require a connection with the BigchainDB server, you need to run the
+    BigchainDB and RethinkDB servers::
+    
+    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d server

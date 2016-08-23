@@ -16,9 +16,7 @@ install_requires = [
 
 tests_require = [
     'coverage',
-    'pep8',
-    'pyflakes',
-    'pylint',
+    'flake8',
     'pytest-cov',
     'pytest-sugar',
     'responses',
