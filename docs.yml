@@ -4,7 +4,7 @@ services:
   bdocs:
     build:
       context: .
-      dockerfile: ./compose/bigchaindb-driver/Dockerfile
+      dockerfile: ./compose/driver/Dockerfile
     volumes:
       - .:/usr/src/app/
     command: make -C docs html

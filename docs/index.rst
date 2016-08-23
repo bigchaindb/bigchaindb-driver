@@ -16,6 +16,8 @@ BigchainDB Python Driver
    readme
    installation
    usage
+   libref
+   aboutthedocs
    contributing
    authors
    history
