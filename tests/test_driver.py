@@ -23,7 +23,7 @@ def test_driver_init_without_nodes(alice_keypair):
 
 @mark.skip(reason='new transaction model not ready - bigchaindb/issues/342')
 def test_driver_can_create_assets(driver):
-    tx = driver.create()
+    tx = driver.transactions.create()
     # XXX: `CREATE` operations require the node that receives the transaction
     #   to modify the data in the transaction itself.
     #   `current_owner` will be overwritten with the public key of the node
@@ -47,7 +47,7 @@ def test_driver_can_create_assets(driver):
 # * common lib is ready
 #       see https://github.com/bigchaindb/bigchaindb-common/pull/4
 def test_create_ignoring_fulfillment_owners_before_and_payload_hash(driver):
-    tx = driver.create()
+    tx = driver.transactions.create()
     fulfillment = tx['transaction']['fulfillments'][0]
     condition = tx['transaction']['conditions'][0]
     assert condition['owners_after'][0] == driver.public_key
@@ -56,7 +56,7 @@ def test_create_ignoring_fulfillment_owners_before_and_payload_hash(driver):
 
 @mark.skip(reason='new transaction model not ready - bigchaindb/issues/342')
 def test_create(driver):
-    tx = driver.create()
+    tx = driver.transactions.create()
     fulfillment = tx['transaction']['fulfillments'][0]
     condition = tx['transaction']['conditions'][0]
     assert fulfillment['owners_before'][0] == driver.public_key
@@ -73,7 +73,7 @@ def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     url = driver.nodes[0] + '/transactions/'
     with RequestsMock() as requests_mock:
         requests_mock.add('POST', url, json=json)
-        tx = driver.transfer(transaction, bob_condition)
+        tx = driver.transactions.transfer(transaction, bob_condition)
     fulfillment = tx['transaction']['fulfillments'][0]
     condition = tx['transaction']['conditions'][0]
     assert fulfillment['owners_before'][0] == driver.public_key
@@ -92,5 +92,5 @@ def test_init_driver_with_incomplete_keypair(pubkey, privkey,
 
 def test_retrieve(driver, persisted_transaction):
     txid = persisted_transaction['id']
-    tx = driver.retrieve(txid)
+    tx = driver.transactions.retrieve(txid)
     assert tx
