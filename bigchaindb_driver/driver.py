@@ -5,6 +5,9 @@ from bigchaindb_common.exceptions import KeypairNotFoundException
 from .transport import Transport
 
 
+DEFAULT_NODE = 'http://localhost:9984/api/v1'
+
+
 class BigchainDB:
     """BigchainDB driver class.
 
@@ -16,28 +19,34 @@ class BigchainDB:
     ``>1`` nodes.
 
     """
-    def __init__(self, *, public_key, private_key,
-                 node, transport_class=Transport):
+    def __init__(self,
+                 *nodes,
+                 public_key,
+                 private_key,
+                 transport_class=Transport):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
         Args:
+            *nodes: BigchainDB nodes to connect to. Currently, the full URL
+                must be given In the absence of any node, the default of the
+                :attr:`transport_class` will be used, e.g.:
+                ``'http://localhost:9984/api/v1'``.
             public_key (str): the base58 encoded public key for the ED25519
                 curve.
             private_key (str): the base58 encoded private key for the ED25519
                 curve.
-            node (str): The URL of a BigchainDB node to connect to.
-                format: scheme://hostname:port
             transport_class: Transport class to use. Defaults to
                 :class:`~bigchaindb_driver.transport.Transport`.
 
         """
+        self.nodes = nodes if nodes else (DEFAULT_NODE,)
+        self.transport = transport_class(*nodes)
+
         if not public_key or not private_key:
             raise KeypairNotFoundException()
 
         self.public_key = public_key
         self.private_key = private_key
-        self.node = node
-        self.transport = transport_class(node)
 
     def retrieve(self, txid):
         """Retrives the transaction with the given id.
@@ -109,7 +118,7 @@ class BigchainDB:
         return response.json()
 
 
-def temp_driver(*, node):
+def temp_driver(node):
     """Create a new temporary driver.
 
     Returns:
@@ -117,6 +126,4 @@ def temp_driver(*, node):
 
     """
     private_key, public_key = crypto.generate_key_pair()
-    return BigchainDB(private_key=private_key,
-                      public_key=public_key,
-                      node=node)
+    return BigchainDB(node, private_key=private_key, public_key=public_key)

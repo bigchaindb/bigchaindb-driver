@@ -9,10 +9,16 @@ from bigchaindb_common.exceptions import KeypairNotFoundException
 
 def test_temp_driver_returns_a_temp_driver(bdb_node):
     from bigchaindb_driver.driver import temp_driver
-    driver = temp_driver(node=bdb_node)
+    driver = temp_driver(bdb_node)
     assert driver.public_key
     assert driver.private_key
-    assert driver.node == bdb_node
+    assert driver.nodes[0] == bdb_node
+
+
+def test_driver_init_without_nodes(alice_keypair):
+    from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
+    bdb = BigchainDB(public_key=alice_keypair.vk, private_key=alice_keypair.sk)
+    assert bdb.nodes == (DEFAULT_NODE,)
 
 
 @mark.skip(reason='new transaction model not ready - bigchaindb/issues/342')
@@ -64,7 +70,7 @@ def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     transfer_transaction = transaction.transfer([bob_condition])
     signed_transaction = transfer_transaction.sign([driver.private_key])
     json = signed_transaction.to_dict()
-    url = driver.node + '/transactions/'
+    url = driver.nodes[0] + '/transactions/'
     with RequestsMock() as requests_mock:
         requests_mock.add('POST', url, json=json)
         tx = driver.transfer(transaction, bob_condition)
@@ -81,9 +87,7 @@ def test_init_driver_with_incomplete_keypair(pubkey, privkey,
                                              bdb_node):
     from bigchaindb_driver import BigchainDB
     with raises(KeypairNotFoundException):
-        BigchainDB(node=bdb_node,
-                   public_key=pubkey,
-                   private_key=privkey)
+        BigchainDB(bdb_node, public_key=pubkey, private_key=privkey)
 
 
 def test_retrieve(driver, persisted_transaction):
