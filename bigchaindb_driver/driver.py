@@ -47,6 +47,46 @@ class BigchainDB:
 
         self.public_key = public_key
         self.private_key = private_key
+        self.transactions = TransactionsEndpoint(self)
+
+
+class NamespacedDriver:
+    """Base class for creating endpoints (namespaced objects) that can be
+    added under the :class:`~bigchaindb_driver.driver.BigchainDB` driver.
+
+    """
+    def __init__(self, driver):
+        """Initializes an instance of
+        :class:`~bigchaindb_driver.driver.NamespacedDriver` with the given
+        driver instance.
+
+        Args:
+            driver (BigchainDB): Instance of
+                :class:`~bigchaindb_driver.driver.BigchainDB`.
+        """
+        self.driver = driver
+
+    @property
+    def transport(self):
+        return self.driver.transport
+
+    @property
+    def public_key(self):
+        return self.driver.public_key
+
+    @property
+    def private_key(self):
+        return self.driver.private_key
+
+
+class TransactionsEndpoint(NamespacedDriver):
+    """Endpoint for transactions.
+
+    Attributes:
+        path (str): The path of the endpoint.
+
+    """
+    path = '/transactions/'
 
     def retrieve(self, txid):
         """Retrives the transaction with the given id.
@@ -58,7 +98,7 @@ class BigchainDB:
             dict: The transaction with the given id.
 
         """
-        path = '/transactions' + '/' + txid
+        path = self.path + txid
         response = self.transport.forward_request(method='GET', path=path)
         return response.json()
 
@@ -114,7 +154,7 @@ class BigchainDB:
 
         """
         response = self.transport.forward_request(
-            method='POST', path='/transactions/', json=transaction)
+            method='POST', path=self.path, json=transaction)
         return response.json()
 
 
