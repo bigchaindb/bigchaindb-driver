@@ -4,7 +4,6 @@ from pytest import mark, raises
 from responses import RequestsMock
 
 from bigchaindb_common.transaction import Transaction
-from bigchaindb_common.exceptions import KeypairNotFoundException
 
 
 def test_temp_driver_returns_a_temp_driver(bdb_node):
@@ -86,6 +85,7 @@ def test_driver_can_transfer_assets(driver, transaction, bob_condition):
 def test_init_driver_with_incomplete_keypair(pubkey, privkey,
                                              bdb_node):
     from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.exceptions import KeypairNotFoundException
     with raises(KeypairNotFoundException):
         BigchainDB(bdb_node, public_key=pubkey, private_key=privkey)
 

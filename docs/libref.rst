@@ -63,3 +63,8 @@ Library Reference
 
 ``exceptions``
 --------------
+
+.. automodule:: bigchaindb_driver.exceptions
+
+.. autoclass:: KeypairNotFoundException
+    :members:
