@@ -60,6 +60,11 @@ Library Reference
     .. automethod:: __init__
 
 
+``crypto``
+----------
+.. automodule:: bigchaindb_driver.crypto
+    :members:
+
 
 ``exceptions``
 --------------
