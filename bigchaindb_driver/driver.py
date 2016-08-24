@@ -20,9 +20,9 @@ class BigchainDB:
 
     Attributes:
         nodes (Tuple[str]): URLs of nodes to connect to.
-        private_key (str): Signing key used to sign transactions.
-        public_key (str): Verifying key associated with the
-            :attr:`private_key`.
+        signing_key (str): Private key used to sign transactions.
+        verifying_key (str): Public key associated with the
+            :attr:`signing_key`.
         transport (:class:`~bigchaindb_driver.transport.Transport`): Object
             responsible to forward requests to a
             :class:`~bigchaindb_driver.connection.Connection`) instance (node).
@@ -32,8 +32,8 @@ class BigchainDB:
     """
     def __init__(self,
                  *nodes,
-                 public_key,
-                 private_key,
+                 verifying_key,
+                 signing_key,
                  transport_class=Transport):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
@@ -42,9 +42,9 @@ class BigchainDB:
                 must be given In the absence of any node, the default of the
                 :attr:`transport_class` will be used, e.g.:
                 ``'http://localhost:9984/api/v1'``.
-            public_key (str): the base58 encoded public key for the ED25519
+            verifying_key (str): the base58 encoded public key for the ED25519
                 curve.
-            private_key (str): the base58 encoded private key for the ED25519
+            signing_key (str): the base58 encoded private key for the ED25519
                 curve.
             transport_class: Transport class to use. Defaults to
                 :class:`~bigchaindb_driver.transport.Transport`.
@@ -53,11 +53,11 @@ class BigchainDB:
         self.nodes = nodes if nodes else (DEFAULT_NODE,)
         self.transport = transport_class(*nodes)
 
-        if not public_key or not private_key:
+        if not verifying_key or not signing_key:
             raise KeypairNotFoundException()
 
-        self.public_key = public_key
-        self.private_key = private_key
+        self.verifying_key = verifying_key
+        self.signing_key = signing_key
         self.transactions = TransactionsEndpoint(self)
 
 
@@ -82,12 +82,12 @@ class NamespacedDriver:
         return self.driver.transport
 
     @property
-    def public_key(self):
-        return self.driver.public_key
+    def verifying_key(self):
+        return self.driver.verifying_key
 
     @property
-    def private_key(self):
-        return self.driver.private_key
+    def signing_key(self):
+        return self.driver.signing_key
 
 
 class TransactionsEndpoint(NamespacedDriver):
@@ -123,7 +123,7 @@ class TransactionsEndpoint(NamespacedDriver):
             dict: The transaction pushed to the Federation.
 
         """
-        fulfillment = Fulfillment.gen_default([self.public_key])
+        fulfillment = Fulfillment.gen_default([self.verifying_key])
         condition = fulfillment.gen_condition()
         data = Data(payload=payload)
         transaction = Transaction(
@@ -132,7 +132,7 @@ class TransactionsEndpoint(NamespacedDriver):
             conditions=[condition],
             data=data,
         )
-        signed_transaction = transaction.sign([self.private_key])
+        signed_transaction = transaction.sign([self.signing_key])
         return self._push(signed_transaction.to_dict())
 
     def transfer(self, transaction, *conditions):
@@ -151,7 +151,7 @@ class TransactionsEndpoint(NamespacedDriver):
 
         """
         transfer_transaction = transaction.transfer(list(conditions))
-        signed_transaction = transfer_transaction.sign([self.private_key])
+        signed_transaction = transfer_transaction.sign([self.signing_key])
         return self._push(signed_transaction.to_dict())
 
     def _push(self, transaction):
@@ -176,5 +176,7 @@ def temp_driver(node):
         BigchainDB: A driver initialized with a keypair generated on the fly.
 
     """
-    private_key, public_key = crypto.generate_key_pair()
-    return BigchainDB(node, private_key=private_key, public_key=public_key)
+    signing_key, verifying_key = crypto.generate_key_pair()
+    return BigchainDB(node,
+                      signing_key=signing_key,
+                      verifying_key=verifying_key)
