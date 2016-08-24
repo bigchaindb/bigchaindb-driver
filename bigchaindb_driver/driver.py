@@ -1,6 +1,6 @@
-from bigchaindb_common import crypto
 from bigchaindb_common.transaction import Data, Fulfillment, Transaction
 
+from .crypto import generate_keypair
 from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
 
@@ -197,7 +197,7 @@ def temp_driver(node):
         BigchainDB: A driver initialized with a keypair generated on the fly.
 
     """
-    signing_key, verifying_key = crypto.generate_key_pair()
+    signing_key, verifying_key = generate_keypair()
     return BigchainDB(node,
                       signing_key=signing_key,
                       verifying_key=verifying_key)
