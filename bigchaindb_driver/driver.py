@@ -18,6 +18,17 @@ class BigchainDB:
     :class:`~bigchaindb_driver.BigchainDB` driver instance might connect to
     ``>1`` nodes.
 
+    Attributes:
+        nodes (Tuple[str]): URLs of nodes to connect to.
+        private_key (str): Signing key used to sign transactions.
+        public_key (str): Verifying key associated with the
+            :attr:`private_key`.
+        transport (:class:`~bigchaindb_driver.transport.Transport`): Object
+            responsible to forward requests to a
+            :class:`~bigchaindb_driver.connection.Connection`) instance (node).
+        transactions (:class:`~bigchaindb_driver.driver.TransactionsEndpoint`):
+            Used to make operations on the `'/transactions'` endpoint.
+
     """
     def __init__(self,
                  *nodes,
