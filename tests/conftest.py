@@ -55,8 +55,8 @@ def bdb_node(bdb_host):
 def driver(bdb_node, alice_privkey, alice_pubkey):
     from bigchaindb_driver import BigchainDB
     return BigchainDB(bdb_node,
-                      private_key=alice_privkey,
-                      public_key=alice_pubkey)
+                      signing_key=alice_privkey,
+                      verifying_key=alice_pubkey)
 
 
 @fixture
