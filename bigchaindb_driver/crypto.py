@@ -6,7 +6,7 @@ from cryptoconditions import crypto
 CryptoKeypair = namedtuple('CryptoKeypair', ('signing_key', 'verifying_key'))
 
 
-def generate_key_pair():
+def generate_keypair():
     """Generates a cryptographic key pair.
 
     Returns:
