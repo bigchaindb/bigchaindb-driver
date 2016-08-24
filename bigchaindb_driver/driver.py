@@ -1,7 +1,7 @@
 from bigchaindb_common import crypto
 from bigchaindb_common.transaction import Data, Fulfillment, Transaction
-from bigchaindb_common.exceptions import KeypairNotFoundException
 
+from .exceptions import KeypairNotFoundException
 from .transport import Transport
 
 
