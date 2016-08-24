@@ -66,7 +66,23 @@ def test_create(driver):
     assert tx_obj.fulfillments_valid()
 
 
-def test_driver_can_transfer_assets(driver, transaction, bob_condition):
+def test_transactions_create_without_signing_key(bdb_node, alice_pubkey):
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.exceptions import InvalidSigningKey
+    driver = BigchainDB(bdb_node)
+    with raises(InvalidSigningKey):
+        driver.transactions.create(verifying_key=alice_pubkey)
+
+
+def test_transactions_create_without_verifying_key(bdb_node, alice_privkey):
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.exceptions import InvalidVerifyingKey
+    driver = BigchainDB(bdb_node)
+    with raises(InvalidVerifyingKey):
+        driver.transactions.create(signing_key=alice_privkey)
+
+
+def test_transactions_transfer_assets(driver, transaction, bob_condition):
     transfer_transaction = transaction.transfer([bob_condition])
     signed_transaction = transfer_transaction.sign([driver.signing_key])
     json = signed_transaction.to_dict()
@@ -80,15 +96,12 @@ def test_driver_can_transfer_assets(driver, transaction, bob_condition):
     assert condition['owners_after'][0] == bob_condition.owners_after[0]
 
 
-@mark.parametrize('pubkey,privkey', (
-    (None, None), ('pubkey', None), (None, 'privkey'),
-))
-def test_init_driver_with_incomplete_keypair(pubkey, privkey,
-                                             bdb_node):
+def test_transactions_transfer_without_signing_key(bdb_node):
     from bigchaindb_driver import BigchainDB
-    from bigchaindb_driver.exceptions import KeypairNotFoundException
-    with raises(KeypairNotFoundException):
-        BigchainDB(bdb_node, verifying_key=pubkey, signing_key=privkey)
+    from bigchaindb_driver.exceptions import InvalidSigningKey
+    driver = BigchainDB(bdb_node)
+    with raises(InvalidSigningKey):
+        driver.transactions.transfer(None)
 
 
 def test_retrieve(driver, persisted_transaction):

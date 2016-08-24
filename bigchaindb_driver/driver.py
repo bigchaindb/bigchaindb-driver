@@ -1,7 +1,7 @@
 from bigchaindb_common import crypto
 from bigchaindb_common.transaction import Data, Fulfillment, Transaction
 
-from .exceptions import KeypairNotFoundException
+from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
 
 
@@ -32,8 +32,8 @@ class BigchainDB:
     """
     def __init__(self,
                  *nodes,
-                 verifying_key,
-                 signing_key,
+                 verifying_key=None,
+                 signing_key=None,
                  transport_class=Transport):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
@@ -52,9 +52,6 @@ class BigchainDB:
         """
         self.nodes = nodes if nodes else (DEFAULT_NODE,)
         self.transport = transport_class(*nodes)
-
-        if not verifying_key or not signing_key:
-            raise KeypairNotFoundException()
 
         self.verifying_key = verifying_key
         self.signing_key = signing_key
@@ -113,16 +110,32 @@ class TransactionsEndpoint(NamespacedDriver):
         response = self.transport.forward_request(method='GET', path=path)
         return response.json()
 
-    def create(self, payload=None):
+    def create(self, payload=None, verifying_key=None, signing_key=None):
         """Issue a transaction to create an asset.
 
         Args:
             payload (dict): the payload for the transaction.
+            signing_key (str): Private key used to sign transactions.
+            verifying_key (str): Public key associated with the
+                :attr:`signing_key`.
 
-        Return:
+        Returns:
             dict: The transaction pushed to the Federation.
 
+        Raises:
+            :class:`~bigchaindb_driver.exceptions.InvalidSigningKey`: If
+                neither ``signing_key`` nor ``self.signing_key`` have been set.
+            :class:`~bigchaindb_driver.exceptions.InvalidVerifyingKey`: If
+                neither ``verifying_key`` nor ``self.verifying_key`` have
+                been set.
+
         """
+        signing_key = signing_key if signing_key else self.signing_key
+        if not signing_key:
+            raise InvalidSigningKey
+        verifying_key = verifying_key if verifying_key else self.verifying_key
+        if not verifying_key:
+            raise InvalidVerifyingKey
         fulfillment = Fulfillment.gen_default([self.verifying_key])
         condition = fulfillment.gen_condition()
         data = Data(payload=payload)
@@ -135,7 +148,7 @@ class TransactionsEndpoint(NamespacedDriver):
         signed_transaction = transaction.sign([self.signing_key])
         return self._push(signed_transaction.to_dict())
 
-    def transfer(self, transaction, *conditions):
+    def transfer(self, transaction, *conditions, signing_key=None):
         """Issue a transaction to transfer an asset.
 
         Args:
@@ -145,13 +158,21 @@ class TransactionsEndpoint(NamespacedDriver):
                 transfer.
             conditions (Condition): Zero or more instances of
                 :class:`bigchaindb_common.transaction.Condition`.
+            signing_key (str): Private key used to sign transactions.
 
         Returns:
             dict: The transaction pushed to the Federation.
 
+        Raises:
+            :class:`~bigchaindb_driver.exceptions.InvalidSigningKey`: If
+                neither ``signing_key`` nor ``self.signing_key`` have been set.
+
         """
+        signing_key = signing_key if signing_key else self.signing_key
+        if not signing_key:
+            raise InvalidSigningKey
         transfer_transaction = transaction.transfer(list(conditions))
-        signed_transaction = transfer_transaction.sign([self.signing_key])
+        signed_transaction = transfer_transaction.sign([signing_key])
         return self._push(signed_transaction.to_dict())
 
     def _push(self, transaction):

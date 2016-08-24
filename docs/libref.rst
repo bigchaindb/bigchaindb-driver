@@ -67,4 +67,7 @@ Library Reference
 .. automodule:: bigchaindb_driver.exceptions
 
 .. autoclass:: KeypairNotFoundException
-    :members:
+ 
+.. autoclass:: InvalidSigningKey
+
+.. autoclass:: InvalidVerifyingKey
