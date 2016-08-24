@@ -11,6 +11,18 @@ Library Reference
 
     .. automethod:: __init__
 
+.. automodule:: bigchaindb_driver.driver
+
+.. autoclass:: TransactionsEndpoint
+    :members:
+
+    .. automethod:: __init__
+
+.. autoclass:: NamespacedDriver
+    :members:
+
+    .. automethod:: __init__
+
 ``transport``
 -------------
 .. automodule:: bigchaindb_driver.transport
