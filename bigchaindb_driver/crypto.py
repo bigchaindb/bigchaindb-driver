@@ -16,4 +16,5 @@ def generate_keypair():
         :attr:`~bigchaindb_driver.crypto.CryptoKeypair.verifying_key`.
 
     """
-    return CryptoKeypair(*crypto.ed25519_generate_key_pair())
+    return CryptoKeypair(
+        *(k.decode() for k in crypto.ed25519_generate_key_pair()))
