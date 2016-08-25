@@ -136,7 +136,7 @@ class TransactionsEndpoint(NamespacedDriver):
         verifying_key = verifying_key if verifying_key else self.verifying_key
         if not verifying_key:
             raise InvalidVerifyingKey
-        fulfillment = Fulfillment.gen_default([self.verifying_key])
+        fulfillment = Fulfillment.gen_default([verifying_key])
         condition = fulfillment.gen_condition()
         data = Data(payload=payload)
         transaction = Transaction(
@@ -145,7 +145,7 @@ class TransactionsEndpoint(NamespacedDriver):
             conditions=[condition],
             data=data,
         )
-        signed_transaction = transaction.sign([self.signing_key])
+        signed_transaction = transaction.sign([signing_key])
         return self._push(signed_transaction.to_dict())
 
     def transfer(self, transaction, *conditions, signing_key=None):
