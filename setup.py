@@ -35,7 +35,7 @@ docs_require = [
 ]
 
 dependency_links = [
-    'git+https://github.com/bigchaindb/bigchaindb-common.git@integrate-transaction-model#egg=bigchaindb_common-0.0.1a2',
+    'git+https://github.com/bigchaindb/bigchaindb-common.git@0.0.1a2#egg=bigchaindb_common-0.0.1a2',
 ]
 
 setup(
