@@ -40,7 +40,7 @@ dependency_links = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.0.1a1',
+    version='0.0.1dev1',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + history,
     author="BigchainDB",
@@ -57,7 +57,7 @@ setup(
     zip_safe=False,
     keywords='bigchaindb_driver',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
