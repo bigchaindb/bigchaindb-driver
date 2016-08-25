@@ -5,16 +5,24 @@ Installation
 ============
 
 
-Stable release
---------------
+Development release
+-------------------
 
-To install bigchaindb-driver, run this command in your terminal:
+To install bigchaindb-driver, run this very simple command in your terminal:
+
+.. code-block:: console
+
+    $ pip install --no-binary :all: --no-cache-dir --process-dependency-links bigchaindb_driver
+
+This is the preferred method to install bigchaindb-driver, meanwhile it is
+under heavy development. Once stabilized, the even simpler command
+
 
 .. code-block:: console
 
     $ pip install bigchaindb_driver
 
-This is the preferred method to install bigchaindb-driver, as it will always install the most recent stable release. 
+will work. 
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
