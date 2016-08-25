@@ -35,12 +35,12 @@ docs_require = [
 ]
 
 dependency_links = [
-    'git+https://github.com/bigchaindb/bigchaindb-common.git@integrate-transaction-model#egg=bigchaindb_common-0.0.1a2',
+    'git+https://github.com/bigchaindb/bigchaindb-common.git@0.0.1a2#egg=bigchaindb_common-0.0.1a2',
 ]
 
 setup(
     name='bigchaindb_driver',
-    version='0.0.2.dev3',
+    version='0.0.2.dev4',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + history,
     author="BigchainDB",
