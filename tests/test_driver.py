@@ -39,7 +39,7 @@ def test_driver_can_create_assets(driver):
     assert tx_obj.fulfillments_valid()
 
 
-# FIXME This test can be removed once the following are taken care of
+# FIXME The next two tests can be removed once the following are taken care of
 #
 # * server is ready with new transaction model
 #       see https://github.com/bigchaindb/bigchaindb/issues/342
@@ -51,6 +51,15 @@ def test_create_ignoring_fulfillment_owners_before_and_payload_hash(driver):
     fulfillment = tx['transaction']['fulfillments'][0]
     condition = tx['transaction']['conditions'][0]
     assert condition['owners_after'][0] == driver.verifying_key
+    assert fulfillment['input'] is None
+
+
+def test_create_with_different_keypair(driver, bob_pubkey, bob_privkey):
+    tx = driver.transactions.create(verifying_key=bob_pubkey,
+                                    signing_key=bob_privkey)
+    fulfillment = tx['transaction']['fulfillments'][0]
+    condition = tx['transaction']['conditions'][0]
+    assert condition['owners_after'][0] == bob_pubkey
     assert fulfillment['input'] is None
 
 
