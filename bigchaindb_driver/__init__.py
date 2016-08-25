@@ -3,4 +3,4 @@ from .driver import BigchainDB   # noqa
 
 __author__ = 'BigchainDB'
 __email__ = 'dev@bigchaindb.com'
-__version__ = '0.0.1dev1'
+__version__ = '0.0.2dev1'
