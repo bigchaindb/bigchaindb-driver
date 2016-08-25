@@ -6,7 +6,7 @@
 BigchainDB Python Driver
 ========================
 
-.. important:: **Development Status: Planning**
+.. important:: **Development Status: Pre-Alpha**
     
     *Implementation not yet released.*
 

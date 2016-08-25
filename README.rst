@@ -22,7 +22,7 @@ BigchainDB Python Driver
 
 Python driver for BigchainDB
 
-* Development Status: Planning
+* Development Status: Pre-ALpha
 * Free software: Apache Software License 2.0
 * Documentation: https://bigchaindb-driver.readthedocs.io.
 
@@ -30,7 +30,8 @@ Python driver for BigchainDB
 Features
 --------
 
-* TODO
+* Minimal support for `CREATE`, `TRANSFER`, and `GET` operations on the
+  `/transactions` endpoint.
 
 Credits
 -------
