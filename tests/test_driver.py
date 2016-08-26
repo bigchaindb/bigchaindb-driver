@@ -122,3 +122,9 @@ class TestTransactionsEndpoint:
         sleep(1.2)
         tx = driver.transactions.retrieve(txid)
         assert tx['id'] == txid
+
+    def test_retrieve_not_found(self, driver):
+        from bigchaindb_driver.exceptions import NotFoundError
+        txid = 'dummy_id'
+        with raises(NotFoundError):
+            driver.transactions.retrieve(txid)

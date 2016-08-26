@@ -1,4 +1,11 @@
+from collections import namedtuple
+
 from requests import Session
+
+from .exceptions import HTTP_EXCEPTIONS, TransportError
+
+
+HttpResponse = namedtuple('HttpResponse', ('status_code', 'headers', 'data'))
 
 
 class Connection:
@@ -26,5 +33,15 @@ class Connection:
 
         """
         url = self.node_url + path if path else self.node_url
-        return self.session.request(
+        response = self.session.request(
             method=method, url=url, json=json, **kwargs)
+        text = response.text
+        try:
+            json = response.json()
+        except ValueError:
+            json = None
+        if not (200 <= response.status_code < 300):
+            exc_cls = HTTP_EXCEPTIONS.get(response.status_code, TransportError)
+            raise exc_cls(response.status_code, text, json)
+        data = json if json else text
+        return HttpResponse(response.status_code, response.headers, data)

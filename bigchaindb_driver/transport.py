@@ -43,4 +43,5 @@ class Transport:
 
         """
         connection = self.get_connection()
-        return connection.request(method=method, path=path, json=json)
+        response = connection.request(method=method, path=path, json=json)
+        return response.data

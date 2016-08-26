@@ -107,8 +107,7 @@ class TransactionsEndpoint(NamespacedDriver):
 
         """
         path = self.path + txid
-        response = self.transport.forward_request(method='GET', path=path)
-        return response.json()
+        return self.transport.forward_request(method='GET', path=path)
 
     def create(self, payload=None, verifying_key=None, signing_key=None):
         """Issue a transaction to create an asset.
@@ -185,9 +184,8 @@ class TransactionsEndpoint(NamespacedDriver):
             dict: The transaction pushed to the Federation.
 
         """
-        response = self.transport.forward_request(
+        return self.transport.forward_request(
             method='POST', path=self.path, json=transaction)
-        return response.json()
 
 
 def temp_driver(node):
