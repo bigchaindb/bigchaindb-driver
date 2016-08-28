@@ -109,6 +109,19 @@ class TransactionsEndpoint(NamespacedDriver):
         path = self.path + txid
         return self.transport.forward_request(method='GET', path=path)
 
+    def status(self, txid):
+        """Retrieves the status of the transaction with the given id.
+
+        Args:
+            txid (str): Id of the transaction to retrieve the status for.
+
+        Returns:
+            dict: The transaction with the given id.
+
+        """
+        path = self.path + txid + '/status'
+        return self.transport.forward_request(method='GET', path=path)
+
     def create(self, payload=None, verifying_key=None, signing_key=None):
         """Issue a transaction to create an asset.
 
