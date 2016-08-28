@@ -97,7 +97,7 @@ class TransactionsEndpoint(NamespacedDriver):
     path = '/transactions/'
 
     def retrieve(self, txid):
-        """Retrives the transaction with the given id.
+        """Retrieves the transaction with the given id.
 
         Args:
             txid (str): Id of the transaction to retrieve.
