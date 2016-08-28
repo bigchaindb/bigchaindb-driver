@@ -71,8 +71,16 @@ Library Reference
 
 .. automodule:: bigchaindb_driver.exceptions
 
+.. autoclass:: BigchaindbException
+
+.. autoclass:: TransportError
+
+.. autoclass:: ConnectionError
+
+.. autoclass:: NotFoundError
+
 .. autoclass:: KeypairNotFoundException
- 
+
 .. autoclass:: InvalidSigningKey
 
 .. autoclass:: InvalidVerifyingKey

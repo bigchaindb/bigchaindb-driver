@@ -52,7 +52,13 @@ def bdb_node(bdb_host):
 
 
 @fixture
-def driver(bdb_node, alice_privkey, alice_pubkey):
+def driver(bdb_node):
+    from bigchaindb_driver import BigchainDB
+    return BigchainDB(bdb_node)
+
+
+@fixture
+def alice_driver(bdb_node, alice_privkey, alice_pubkey):
     from bigchaindb_driver import BigchainDB
     return BigchainDB(bdb_node,
                       signing_key=alice_privkey,
@@ -98,8 +104,9 @@ def bob_condition(bob_pubkey):
 
 
 @fixture
-def persisted_transaction(alice_privkey, driver, transaction):
+def persisted_transaction(alice_privkey, alice_driver, transaction):
     signed_transaction = transaction.sign([alice_privkey])
     json = signed_transaction.to_dict()
-    response = requests.post(driver.nodes[0] + '/transactions/', json=json)
+    response = requests.post(
+        alice_driver.nodes[0] + '/transactions/', json=json)
     return response.json()
