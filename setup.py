@@ -19,6 +19,7 @@ tests_require = [
     'flake8',
     'pytest-cov',
     'pytest-sugar',
+    'pytest-xdist',
     'responses',
 ]
 

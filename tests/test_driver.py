@@ -128,3 +128,12 @@ class TestTransactionsEndpoint:
         txid = 'dummy_id'
         with raises(NotFoundError):
             driver.transactions.retrieve(txid)
+
+    def test_status(self, driver, persisted_transaction):
+        txid = persisted_transaction['id']
+        # FIXME The sleep, or some other approach is required to wait for the
+        # transaction to be available as some processing is being done by the
+        # server.
+        sleep(1.2)
+        status = driver.transactions.status(txid)
+        assert status['status'] == 'valid'
