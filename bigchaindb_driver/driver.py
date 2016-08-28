@@ -96,32 +96,6 @@ class TransactionsEndpoint(NamespacedDriver):
     """
     path = '/transactions/'
 
-    def retrieve(self, txid):
-        """Retrieves the transaction with the given id.
-
-        Args:
-            txid (str): Id of the transaction to retrieve.
-
-        Returns:
-            dict: The transaction with the given id.
-
-        """
-        path = self.path + txid
-        return self.transport.forward_request(method='GET', path=path)
-
-    def status(self, txid):
-        """Retrieves the status of the transaction with the given id.
-
-        Args:
-            txid (str): Id of the transaction to retrieve the status for.
-
-        Returns:
-            dict: The transaction with the given id.
-
-        """
-        path = self.path + txid + '/status'
-        return self.transport.forward_request(method='GET', path=path)
-
     def create(self, payload=None, verifying_key=None, signing_key=None):
         """Issue a transaction to create an asset.
 
@@ -159,6 +133,32 @@ class TransactionsEndpoint(NamespacedDriver):
         )
         signed_transaction = transaction.sign([signing_key])
         return self._push(signed_transaction.to_dict())
+
+    def retrieve(self, txid):
+        """Retrieves the transaction with the given id.
+
+        Args:
+            txid (str): Id of the transaction to retrieve.
+
+        Returns:
+            dict: The transaction with the given id.
+
+        """
+        path = self.path + txid
+        return self.transport.forward_request(method='GET', path=path)
+
+    def status(self, txid):
+        """Retrieves the status of the transaction with the given id.
+
+        Args:
+            txid (str): Id of the transaction to retrieve the status for.
+
+        Returns:
+            dict: The transaction with the given id.
+
+        """
+        path = self.path + txid + '/status'
+        return self.transport.forward_request(method='GET', path=path)
 
     def transfer(self, transaction, *conditions, signing_key=None):
         """Issue a transaction to transfer an asset.
