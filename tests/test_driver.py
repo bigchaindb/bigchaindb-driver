@@ -30,7 +30,7 @@ class TestTransactionsEndpoint:
         tx = alice_driver.transactions.create()
         # XXX: `CREATE` operations require the node that receives the
         # transaction to modify the data in the transaction itself.
-        # `current_owner` will be overwritten with the public key of the node
+        # `owners_before` will be overwritten with the public key of the node
         # in the federation that will create the real transaction. `signature`
         # will be overwritten with the new signature. Note that this scenario
         # is ignored by this test.
@@ -93,19 +93,20 @@ class TestTransactionsEndpoint:
         with raises(InvalidVerifyingKey):
             driver.transactions.create(signing_key=alice_privkey)
 
-    def test_transfer_assets(self, alice_driver, transaction, bob_condition):
+    def test_transfer_assets(self, alice_driver, transaction, bob_pubkey):
         driver = alice_driver
-        transfer_transaction = transaction.transfer([bob_condition])
+        inputs = transaction.to_inputs()
+        transfer_transaction = Transaction.transfer(inputs, [bob_pubkey])
         signed_transaction = transfer_transaction.sign([driver.signing_key])
         json = signed_transaction.to_dict()
         url = driver.nodes[0] + '/transactions/'
         with RequestsMock() as requests_mock:
             requests_mock.add('POST', url, json=json)
-            tx = driver.transactions.transfer(transaction, bob_condition)
+            tx = driver.transactions.transfer(transaction, bob_pubkey)
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == driver.verifying_key
-        assert condition['owners_after'][0] == bob_condition.owners_after[0]
+        assert condition['owners_after'][0] == bob_pubkey
 
     def test_transfer_without_signing_key(self, bdb_node):
         from bigchaindb_driver import BigchainDB

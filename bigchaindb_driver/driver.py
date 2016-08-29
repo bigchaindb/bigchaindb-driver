@@ -1,4 +1,4 @@
-from bigchaindb_common.transaction import Data, Fulfillment, Transaction
+from bigchaindb_common.transaction import Transaction
 
 from .crypto import generate_keypair
 from .exceptions import InvalidVerifyingKey, InvalidSigningKey
@@ -122,14 +122,12 @@ class TransactionsEndpoint(NamespacedDriver):
         verifying_key = verifying_key if verifying_key else self.verifying_key
         if not verifying_key:
             raise InvalidVerifyingKey
-        fulfillment = Fulfillment.gen_default([verifying_key])
-        condition = fulfillment.gen_condition()
-        data = Data(payload=payload)
-        transaction = Transaction(
-            'CREATE',
-            fulfillments=[fulfillment],
-            conditions=[condition],
-            data=data,
+        # TODO: In the future, we should adjust this to let the user of the
+        #       driver define both `owners_before` and `owners_after`.
+        transaction = Transaction.create(
+            owners_before=[verifying_key],
+            owners_after=[verifying_key],
+            payload=payload
         )
         signed_transaction = transaction.sign([signing_key])
         return self._push(signed_transaction.to_dict())
@@ -160,16 +158,16 @@ class TransactionsEndpoint(NamespacedDriver):
         path = self.path + txid + '/status'
         return self.transport.forward_request(method='GET', path=path)
 
-    def transfer(self, transaction, *conditions, signing_key=None):
+    # TODO: A transfer-tx needs to support adding a payload
+    # TODO: A transfer-tx can require multiple signing_keys
+    def transfer(self, transaction, *owners_after, signing_key=None):
         """Issue a transaction to transfer an asset.
 
         Args:
-            new_owner (str): the public key of the new owner
             transaction (Transaction): An instance of
                 :class:`bigchaindb_common.transaction.Transaction` to
                 transfer.
-            conditions (Condition): Zero or more instances of
-                :class:`bigchaindb_common.transaction.Condition`.
+            owners_after (str): Zero or more public keys of the new owners.
             signing_key (str): Private key used to sign transactions.
 
         Returns:
@@ -183,7 +181,11 @@ class TransactionsEndpoint(NamespacedDriver):
         signing_key = signing_key if signing_key else self.signing_key
         if not signing_key:
             raise InvalidSigningKey
-        transfer_transaction = transaction.transfer(list(conditions))
+        inputs = transaction.to_inputs()
+        transfer_transaction = Transaction.transfer(
+            inputs,
+            list(owners_after)
+        )
         signed_transaction = transfer_transaction.sign([signing_key])
         return self._push(signed_transaction.to_dict())
 
