@@ -137,3 +137,9 @@ class TestTransactionsEndpoint:
         sleep(1.2)
         status = driver.transactions.status(txid)
         assert status['status'] == 'valid'
+
+    def test_status_not_found(self, driver):
+        from bigchaindb_driver.exceptions import NotFoundError
+        txid = 'dummy_id'
+        with raises(NotFoundError):
+            driver.transactions.status(txid)

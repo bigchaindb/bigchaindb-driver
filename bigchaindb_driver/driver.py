@@ -154,7 +154,7 @@ class TransactionsEndpoint(NamespacedDriver):
             txid (str): Id of the transaction to retrieve the status for.
 
         Returns:
-            dict: The transaction with the given id.
+            dict: A dict containing a 'status' item for the transaction.
 
         """
         path = self.path + txid + '/status'
