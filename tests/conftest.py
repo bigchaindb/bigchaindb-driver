@@ -80,14 +80,15 @@ def mock_requests_post(monkeypatch):
 
 
 @fixture
-def transaction(alice_pubkey):
+def alice_transaction(alice_pubkey):
     return Transaction.create(owners_before=[alice_pubkey],
                               owners_after=[alice_pubkey])
 
 
 @fixture
-def persisted_transaction(alice_privkey, alice_driver, transaction):
-    signed_transaction = transaction.sign([alice_privkey])
+def persisted_alice_transaction(alice_privkey, alice_driver,
+                                alice_transaction):
+    signed_transaction = alice_transaction.sign([alice_privkey])
     json = signed_transaction.to_dict()
     response = requests.post(
         alice_driver.nodes[0] + '/transactions/', json=json)
