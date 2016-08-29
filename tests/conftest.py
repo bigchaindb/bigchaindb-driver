@@ -47,8 +47,13 @@ def bdb_host():
 
 
 @fixture
-def bdb_node(bdb_host):
-    return 'http://{}:9984/api/v1'.format(bdb_host)
+def bdb_port():
+    return environ.get('BDB_PORT', '9984')
+
+
+@fixture
+def bdb_node(bdb_host, bdb_port):
+    return 'http://{host}:{port}/api/v1'.format(host=bdb_host, port=bdb_port)
 
 
 @fixture
