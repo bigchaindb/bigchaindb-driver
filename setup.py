@@ -15,12 +15,15 @@ install_requires = [
 ]
 
 tests_require = [
-    'coverage',
-    'flake8',
+    'tox>=2.3.1',
+    'coverage>=4.1',
+    'flake8>=2.6.0',
+    'pytest>=3.0.1',
     'pytest-cov',
     'pytest-sugar',
     'pytest-xdist',
     'responses',
+    'bigchaindb',
 ]
 
 dev_require = [
@@ -41,7 +44,7 @@ dependency_links = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.0.2.dev8',
+    version='0.0.2.dev9',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + history,
     author="BigchainDB",
