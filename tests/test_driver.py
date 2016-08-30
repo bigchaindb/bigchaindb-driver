@@ -30,7 +30,7 @@ class TestTransactionsEndpoint:
         tx = alice_driver.transactions.create()
         # XXX: `CREATE` operations require the node that receives the
         # transaction to modify the data in the transaction itself.
-        # `current_owner` will be overwritten with the public key of the node
+        # `owners_before` will be overwritten with the public key of the node
         # in the federation that will create the real transaction. `signature`
         # will be overwritten with the new signature. Note that this scenario
         # is ignored by this test.
@@ -93,19 +93,21 @@ class TestTransactionsEndpoint:
         with raises(InvalidVerifyingKey):
             driver.transactions.create(signing_key=alice_privkey)
 
-    def test_transfer_assets(self, alice_driver, transaction, bob_condition):
+    def test_transfer_assets(self, alice_driver, alice_transaction,
+                             bob_pubkey, bob_privkey):
         driver = alice_driver
-        transfer_transaction = transaction.transfer([bob_condition])
+        inputs = alice_transaction.to_inputs()
+        transfer_transaction = Transaction.transfer(inputs, [bob_pubkey])
         signed_transaction = transfer_transaction.sign([driver.signing_key])
         json = signed_transaction.to_dict()
         url = driver.nodes[0] + '/transactions/'
         with RequestsMock() as requests_mock:
             requests_mock.add('POST', url, json=json)
-            tx = driver.transactions.transfer(transaction, bob_condition)
+            tx = driver.transactions.transfer(alice_transaction, bob_privkey)
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == driver.verifying_key
-        assert condition['owners_after'][0] == bob_condition.owners_after[0]
+        assert condition['owners_after'][0] == bob_pubkey
 
     def test_transfer_without_signing_key(self, bdb_node):
         from bigchaindb_driver import BigchainDB
@@ -114,8 +116,8 @@ class TestTransactionsEndpoint:
         with raises(InvalidSigningKey):
             driver.transactions.transfer(None)
 
-    def test_retrieve(self, driver, persisted_transaction):
-        txid = persisted_transaction['id']
+    def test_retrieve(self, driver, persisted_alice_transaction):
+        txid = persisted_alice_transaction['id']
         # FIXME The sleep, or some other approach is required to wait for the
         # transaction to be available as some processing is being done by the
         # server.
@@ -129,8 +131,8 @@ class TestTransactionsEndpoint:
         with raises(NotFoundError):
             driver.transactions.retrieve(txid)
 
-    def test_status(self, driver, persisted_transaction):
-        txid = persisted_transaction['id']
+    def test_status(self, driver, persisted_alice_transaction):
+        txid = persisted_alice_transaction['id']
         # FIXME The sleep, or some other approach is required to wait for the
         # transaction to be available as some processing is being done by the
         # server.

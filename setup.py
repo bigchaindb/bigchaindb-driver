@@ -10,7 +10,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'bigchaindb_common>=0.0.1a2',
+    'bigchaindb_common>=0.0.1a3',
     'requests>=2.11.0',
 ]
 
@@ -36,7 +36,7 @@ docs_require = [
 ]
 
 dependency_links = [
-    'git+https://github.com/bigchaindb/bigchaindb-common.git@0.0.1a2#egg=bigchaindb_common-0.0.1a2',
+    'git+https://github.com/bigchaindb/bigchaindb-common.git@0.0.1a3#egg=bigchaindb_common-0.0.1a3',
 ]
 
 setup(

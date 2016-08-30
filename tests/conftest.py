@@ -4,8 +4,7 @@ from os import environ
 import requests
 from pytest import fixture
 
-from bigchaindb_common.transaction import Condition, Fulfillment, Transaction
-from cryptoconditions import Ed25519Fulfillment
+from bigchaindb_common.transaction import Transaction
 
 
 @fixture
@@ -86,31 +85,15 @@ def mock_requests_post(monkeypatch):
 
 
 @fixture
-def fulfillment(alice_pubkey):
-    return Fulfillment.gen_default([alice_pubkey])
+def alice_transaction(alice_pubkey):
+    return Transaction.create(owners_before=[alice_pubkey],
+                              owners_after=[alice_pubkey])
 
 
 @fixture
-def condition(fulfillment):
-    return fulfillment.gen_condition()
-
-
-@fixture
-def transaction(fulfillment, condition):
-    return Transaction(Transaction.CREATE,
-                       fulfillments=[fulfillment],
-                       conditions=[condition])
-
-
-@fixture
-def bob_condition(bob_pubkey):
-    condition_uri = Ed25519Fulfillment(public_key=bob_pubkey).condition_uri
-    return Condition(condition_uri, owners_after=[bob_pubkey])
-
-
-@fixture
-def persisted_transaction(alice_privkey, alice_driver, transaction):
-    signed_transaction = transaction.sign([alice_privkey])
+def persisted_alice_transaction(alice_privkey, alice_driver,
+                                alice_transaction):
+    signed_transaction = alice_transaction.sign([alice_privkey])
     json = signed_transaction.to_dict()
     response = requests.post(
         alice_driver.nodes[0] + '/transactions/', json=json)
