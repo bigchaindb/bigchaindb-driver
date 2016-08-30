@@ -10,7 +10,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'bigchaindb_common>=0.0.1a3',
+    'bigchaindb_common>=0.0.1.a4',
     'requests>=2.11.0',
 ]
 
@@ -36,12 +36,12 @@ docs_require = [
 ]
 
 dependency_links = [
-    'git+https://github.com/bigchaindb/bigchaindb-common.git@0.0.1a3#egg=bigchaindb_common-0.0.1a3',
+    'git+https://github.com/bigchaindb/bigchaindb-common.git@0.0.1.a4#egg=bigchaindb_common-0.0.1.a4',
 ]
 
 setup(
     name='bigchaindb_driver',
-    version='0.0.2.dev7',
+    version='0.0.2.dev8',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + history,
     author="BigchainDB",
