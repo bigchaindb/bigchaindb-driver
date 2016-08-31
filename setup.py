@@ -10,7 +10,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'bigchaindb_common>=0.0.1.a4',
+    'bigchaindb_common>=0.0.2.dev1',
     'requests>=2.11.0',
 ]
 
@@ -36,10 +36,6 @@ docs_require = [
     'sphinx-autobuild',
     'sphinxcontrib-napoleon>=0.4.4',
     'sphinx_rtd_theme',
-]
-
-dependency_links = [
-    'git+https://github.com/bigchaindb/bigchaindb-common.git@0.0.1.a4#egg=bigchaindb_common-0.0.1.a4',
 ]
 
 setup(
@@ -74,5 +70,4 @@ setup(
         'dev': dev_require + tests_require + docs_require,
         'docs': docs_require,
     },
-    dependency_links=dependency_links,
 )
