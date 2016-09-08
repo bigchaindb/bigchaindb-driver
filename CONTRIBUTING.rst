@@ -84,7 +84,7 @@ development.
     $ docker-compose run --rm driver flake8 bigchaindb_driver tests
 
 7 To run the tests::
-    
+
     $ docker-compose run --rm driver py.test -v
 
 8.. Commit your changes and push your branch to GitHub::
@@ -111,6 +111,17 @@ Before you submit a pull request, check that it meets these guidelines:
 Tips
 ----
 
+Dependency on Bigchaindb
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, the `BigchainDB server Dockerfile <https://github.com/bigchaindb/bigchaindb-driver/blob/master/compose/server/Dockerfile>`_
+and `.travis.yml <https://github.com/bigchaindb/bigchaindb-driver/blob/master/.travis.yml>`_
+are set to depend from BigchainDB's master branch to more easily track changes
+against BigchainDB's API.
+
+Tests
+~~~~~
+
 To run a subset of tests::
 
     $ docker-compose run --rm driver py.test -v tests/test_driver.py
@@ -118,6 +129,6 @@ To run a subset of tests::
 .. important:: When running tests, unless you are targeting a test that does
     not require a connection with the BigchainDB server, you need to run the
     BigchainDB and RethinkDB servers::
-    
+
     $ docker-compose up -d rethinkdb
     $ docker-compose up -d server
