@@ -5,18 +5,18 @@ from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
 
 
-DEFAULT_NODE = 'http://localhost:9984/api/v1'
-
-
 class BigchainDB:
-    """BigchainDB driver class.
+    """BigchainDB driver class connected to one or more BigchainDB nodes.
 
-    A :class:`~bigchaindb_driver.BigchainDB` driver is initialized with a
-    keypair and is able to create, sign, and submit transactions to a Node in
-    the Federation. At the moment, a BigchainDB driver instance is bounded to
-    a specific ``node`` in the Federation. In the future, a
-    :class:`~bigchaindb_driver.BigchainDB` driver instance might connect to
-    ``>1`` nodes.
+    The BigchainDB API is exposed from :class:`~bigchaindb_driver.BigchainDB`
+    through a number of attribute namespaces:
+        - ``.transactions``: create, sign, and submit transactions
+
+    A custom :class:`~bigchaindb_driver.transport.Transport` object can be
+    given to modify the behaviour of how to send requests (and where to, if
+    multiple nodes are given). By default, requests are sent to the given nodes
+    based on a simple round-robin algorithm (see
+    :class:`~bigchaindb_driver.pool.RoundRobinPicker`.
     """
     def __init__(self,
                  *nodes,
@@ -42,10 +42,11 @@ class BigchainDB:
                 use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
         """
-        self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._verifying_key = verifying_key
         self._signing_key = signing_key
         self._transport = transport_class(*nodes)
+        self._nodes = self._transport.nodes
+
         self._transactions = TransactionsEndpoint(self)
 
     @property
