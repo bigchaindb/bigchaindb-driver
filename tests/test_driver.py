@@ -16,11 +16,41 @@ def test_temp_driver_returns_a_temp_driver(bdb_node):
     assert driver.nodes[0] == bdb_node
 
 
+def test_driver_init_basic(bdb_node):
+    from bigchaindb_driver.driver import BigchainDB
+    driver = BigchainDB(bdb_node)
+    assert driver.verifying_key is None
+    assert driver.signing_key is None
+    assert driver.nodes[0] == bdb_node
+    assert driver.transactions
+
+
 def test_driver_init_without_nodes(alice_keypair):
     from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
-    bdb = BigchainDB(verifying_key=alice_keypair.vk,
-                     signing_key=alice_keypair.sk)
-    assert bdb.nodes == (DEFAULT_NODE,)
+    driver = BigchainDB(verifying_key=alice_keypair.vk,
+                        signing_key=alice_keypair.sk)
+    assert driver.nodes == (DEFAULT_NODE,)
+
+
+def test_driver_raises_with_bad_keys(alice_keypair):
+    from bigchaindb_driver.driver import BigchainDB
+    from bigchaindb_driver.exceptions import (
+        InvalidSigningKey,
+        InvalidVerifyingKey,
+    )
+
+    with raises(InvalidVerifyingKey):
+        BigchainDB(verifying_key=0, signing_key=alice_keypair.sk)
+    with raises(InvalidSigningKey):
+        BigchainDB(verifying_key=alice_keypair.vk, signing_key=0)
+
+    # A verifying key is necessary when binding a signing_key
+    with raises(InvalidVerifyingKey):
+        BigchainDB(signing_key=alice_keypair.sk)
+    # But not the other way around
+    driver = BigchainDB(verifying_key=alice_keypair.vk)
+    assert driver.verifying_key == alice_keypair.vk
+    assert driver.signing_key is None
 
 
 class TestTransactionsEndpoint:
