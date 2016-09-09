@@ -17,18 +17,6 @@ class BigchainDB:
     a specific ``node`` in the Federation. In the future, a
     :class:`~bigchaindb_driver.BigchainDB` driver instance might connect to
     ``>1`` nodes.
-
-    Attributes:
-        nodes (Tuple[str]): URLs of nodes to connect to.
-        signing_key (str): Private key used to sign transactions.
-        verifying_key (str): Public key associated with the
-            :attr:`signing_key`.
-        transport (:class:`~bigchaindb_driver.transport.Transport`): Object
-            responsible to forward requests to a
-            :class:`~bigchaindb_driver.connection.Connection`) instance (node).
-        transactions (:class:`~bigchaindb_driver.driver.TransactionsEndpoint`):
-            Used to make operations on the `'/transactions'` endpoint.
-
     """
     def __init__(self,
                  *nodes,
@@ -50,18 +38,50 @@ class BigchainDB:
                 :class:`~bigchaindb_driver.transport.Transport`.
 
         """
-        self.nodes = nodes if nodes else (DEFAULT_NODE,)
-        self.transport = transport_class(*nodes)
+        self._nodes = nodes if nodes else (DEFAULT_NODE,)
+        self._verifying_key = verifying_key
+        self._signing_key = signing_key
+        self._transport = transport_class(*nodes)
+        self._transactions = TransactionsEndpoint(self)
 
-        self.verifying_key = verifying_key
-        self.signing_key = signing_key
-        self.transactions = TransactionsEndpoint(self)
+    @property
+    def nodes(self):
+        """(Tuple[str], read-only): URLs of connected nodes."""
+        return self._nodes
+
+    @property
+    def verifying_key(self):
+        """(str|None, read-only): Public key associated with the
+        :attr:`signing_key`, if bounded during initialization.
+        """
+        return self._verifying_key
+
+    @property
+    def signing_key(self):
+        """(str|None, read-only): Private key used to sign transactions, if
+        bounded during initialization.
+        """
+        return self._signing_key
+
+    @property
+    def transport(self):
+        """(:class:`~bigchaindb_driver.transport.Transport`, read-only):
+        Object responsible for forwarding requests to a
+        :class:`~bigchaindb_driver.connection.Connection`) instance (node).
+        """
+        return self._transport
+
+    @property
+    def transactions(self):
+        """(:class:`~bigchaindb_driver.driver.TransactionsEndpoint`, read-only):
+            Exposes functionalities of the `'/transactions'` endpoint.
+        """
+        return self._transactions
 
 
 class NamespacedDriver:
-    """Base class for creating endpoints (namespaced objects) that can be
-    added under the :class:`~bigchaindb_driver.driver.BigchainDB` driver.
-
+    """Base class for creating endpoints (namespaced objects) that can be added
+    under the :class:`~bigchaindb_driver.driver.BigchainDB` driver.
     """
     def __init__(self, driver):
         """Initializes an instance of
