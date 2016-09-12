@@ -71,7 +71,7 @@ Library Reference
 
 .. automodule:: bigchaindb_driver.exceptions
 
-.. autoclass:: DriverException
+.. autoclass:: BigchaindbException
 
 .. autoclass:: TransportError
 

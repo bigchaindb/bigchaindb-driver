@@ -1,24 +1,24 @@
 """Exceptions used by :mod:`bigchaindb_driver`."""
 
 
-class DriverException(Exception):
-    """Base exception for all BigchainDB driver exceptions."""
+class BigchaindbException(Exception):
+    """Base exception for all Bigchaindb exceptions."""
 
 
-class KeypairNotFoundException(DriverException):
+class KeypairNotFoundException(BigchaindbException):
     """Raised if an operation cannot proceed because the keypair was not given.
     """
 
 
-class InvalidSigningKey(DriverException):
+class InvalidSigningKey(BigchaindbException):
     """Raised if a signing key is invalid. E.g.: :obj:`None`."""
 
 
-class InvalidVerifyingKey(DriverException):
+class InvalidVerifyingKey(BigchaindbException):
     """Raised if a verifying key is invalid. E.g.: :obj:`None`."""
 
 
-class TransportError(DriverException):
+class TransportError(BigchaindbException):
     """Base exception for transport related errors.
 
     This is mainly for cases where the status code denotes an HTTP error, and
