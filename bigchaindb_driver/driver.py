@@ -13,7 +13,8 @@ class BigchainDB:
     through a number of attribute namespaces:
         - ``.transactions``: create, sign, and submit transactions
 
-    A custom :class:`~bigchaindb_driver.transport.Transport` object can be
+    A custom class subclassing
+    :class:`~bigchaindb_driver.transport.AbstractTransport`'s interface can be
     given to modify the behaviour of how to send requests (and where to, if
     multiple nodes are given). By default, requests are sent to the given nodes
     based on a simple round-robin algorithm (see
