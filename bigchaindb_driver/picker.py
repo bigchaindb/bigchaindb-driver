@@ -17,6 +17,12 @@ class AbstractPicker(ABC):
         """
 
     @abstractmethod
+    def __iter__(self):
+        """Pickers must implement the iterator protocol"""
+
+    @abstractmethod
+    def __next__(self):
+        """Pickers must implement the iterator protocol"""
 
     @abstractmethod
     def pick(self):
@@ -55,6 +61,12 @@ class RoundRobinPicker(AbstractPicker):
                                    'RoundRobinPicker'))
 
         self._connection_iter = cycle(connections)
+
+    def __iter__(self):
+        return self._connection_iter
+
+    def __next__(self):
+        return next(self._connection_iter)
 
     def pick(self):
         """Select the next connection in the given connections (repeating from
