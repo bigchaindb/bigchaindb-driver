@@ -32,27 +32,6 @@ def test_driver_init_without_nodes(alice_keypair):
     assert driver.nodes == (DEFAULT_NODE,)
 
 
-def test_driver_raises_with_bad_keys(alice_keypair):
-    from bigchaindb_driver.driver import BigchainDB
-    from bigchaindb_driver.exceptions import (
-        InvalidSigningKey,
-        InvalidVerifyingKey,
-    )
-
-    with raises(InvalidVerifyingKey):
-        BigchainDB(verifying_key=0, signing_key=alice_keypair.sk)
-    with raises(InvalidSigningKey):
-        BigchainDB(verifying_key=alice_keypair.vk, signing_key=0)
-
-    # A verifying key is necessary when binding a signing_key
-    with raises(InvalidVerifyingKey):
-        BigchainDB(signing_key=alice_keypair.sk)
-    # But not the other way around
-    driver = BigchainDB(verifying_key=alice_keypair.vk)
-    assert driver.verifying_key == alice_keypair.vk
-    assert driver.signing_key is None
-
-
 class TestTransactionsEndpoint:
 
     @mark.skip(reason='transaction model not ready; see bigchaindb/issues/342')

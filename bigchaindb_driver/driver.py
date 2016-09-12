@@ -37,8 +37,8 @@ class BigchainDB:
                  transport_class=Transport):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
-        If a :attr:`verifying_key` and :attr:`signing_key` are given, this
-        instance will be bound to the given keypair and be applied as defaults
+        If a :attr:`verifying_key` or :attr:`signing_key` are given, this
+        instance will be bound to the keys and applied them as defaults
         whenever a verifying and/or signing key are needed.
 
         Args:
@@ -50,28 +50,10 @@ class BigchainDB:
                 key for the ED25519 curve to bind this driver with.
             signing_key (str, keyword, optional): the base58 encoded private
                 key for the ED25519 curve to bind this driver with.
-                Must be given with :attr:`verifying_key`.
             transport_class (Transport, keyword, optional): Transport class to
                 use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
-
-        Raises:
-            :class:`~bigchaindb_driver.exceptions.InvalidVerifyingKey: if the
-                given :attr:`verifying_key` was not valid, or a
-                :attr:`signing_key` was given without a :attr:`verifying_key`
-            :class:`~bigchaindb_driver.exceptions.InvalidSigningKey: if the
-                given :attr:`signing_key` was not valid
         """
-        if verifying_key is not None and not isinstance(verifying_key, str):
-                raise InvalidVerifyingKey("'verifying_key' must be a string")
-
-        if signing_key is not None:
-            if not isinstance(signing_key, str):
-                raise InvalidSigningKey("'signing_key must be a string")
-            if verifying_key is None:
-                raise InvalidVerifyingKey(("'verifying_key' must be given if"
-                                           "'signing_key' is given"))
-
         self.nodes = nodes if nodes else (DEFAULT_NODE,)
         self.transport = transport_class(*nodes)
 
