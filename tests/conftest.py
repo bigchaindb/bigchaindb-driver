@@ -70,6 +70,22 @@ def alice_driver(bdb_node, alice_privkey, alice_pubkey):
 
 
 @fixture
+def alice_transaction(alice_pubkey):
+    return Transaction.create(owners_before=[alice_pubkey],
+                              owners_after=[alice_pubkey])
+
+
+@fixture
+def persisted_alice_transaction(alice_privkey, alice_driver,
+                                alice_transaction):
+    signed_transaction = alice_transaction.sign([alice_privkey])
+    json = signed_transaction.to_dict()
+    response = requests.post(
+        alice_driver.node_urls[0] + '/transactions/', json=json)
+    return response.json()
+
+
+@fixture
 def mock_requests_post(monkeypatch):
     class MockResponse:
         def __init__(self, json):
@@ -85,16 +101,18 @@ def mock_requests_post(monkeypatch):
 
 
 @fixture
-def alice_transaction(alice_pubkey):
-    return Transaction.create(owners_before=[alice_pubkey],
-                              owners_after=[alice_pubkey])
+def mock_connection():
+    from .utils import create_mock_connection
+    return create_mock_connection()
 
 
 @fixture
-def persisted_alice_transaction(alice_privkey, alice_driver,
-                                alice_transaction):
-    signed_transaction = alice_transaction.sign([alice_privkey])
-    json = signed_transaction.to_dict()
-    response = requests.post(
-        alice_driver.node_urls[0] + '/transactions/', json=json)
-    return response.json()
+def mock_picker():
+    from .utils import create_mock_picker
+    return create_mock_picker()
+
+
+@fixture
+def mock_pool():
+    from .utils import create_mock_pool
+    return create_mock_pool()
