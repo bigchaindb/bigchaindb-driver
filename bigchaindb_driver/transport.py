@@ -21,14 +21,14 @@ class AbstractTransport(ABC):
         """
 
     @abstractmethod
-    def forward_request(self, method, path=None, json=None):
+    def forward_request(self, method, path=None, *, json=None):
         """Forward a request to the connected nodes
 
         Args:
             method (str): HTTP method name (e.g.: ``'GET'``)
             path (str, optional): Path to be appended to the base url of a
                 node.
-            json (dict, optional): Payload to be sent with the request
+            json (dict, keyword, optional): Payload to be sent with the request
 
         Returns:
             dict|str: JSON or text result of the request
@@ -59,7 +59,7 @@ class Transport(AbstractTransport):
         self.nodes = nodes if nodes else (DEFAULT_NODE,)
         self.pool = pool_cls.connect(*self.nodes)
 
-    def forward_request(self, method, path=None, json=None):
+    def forward_request(self, method, path=None, *, json=None):
         """Forwards an http request to a connection.
 
         See

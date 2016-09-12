@@ -21,14 +21,14 @@ class AbstractConnection(ABC):
         """
 
     @abstractmethod
-    def request(self, method, path, json):
-        """Forward a request to the connected nodes
+    def request(self, method, path, *, json):
+        """Forward a request to the connected node
 
         Args:
             method (str): HTTP method name (e.g.: ``'GET'``)
             path (str, optional): Path to be appended to the base url of a
-                node.
-            json (dict, optional): Payload to be sent with the request
+                node for the request.
+            json (dict, keyword, optional): Payload to be sent with the request
 
         Returns:
             :class:`~bigchaindb_driver.connection.HttpResponse`: a namedtuple
@@ -61,7 +61,7 @@ class Connection(AbstractConnection):
         self.node_url = node_url
         self.session = Session()
 
-    def request(self, method, path=None, json=None, **kwargs):
+    def request(self, method, path=None, *, json=None, **kwargs):
         """Performs an HTTP request through the connection.
 
         See :meth:`~bigchaindb_driver.connection.AbstractConnection.request`
