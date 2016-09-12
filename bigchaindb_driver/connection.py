@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections import namedtuple
 
 from requests import Session
@@ -8,29 +9,26 @@ from .exceptions import HTTP_EXCEPTIONS, TransportError
 HttpResponse = namedtuple('HttpResponse', ('status_code', 'headers', 'data'))
 
 
-class Connection:
-    """A Connection object to make HTTP requests."""
+class AbstractConnection(ABC):
+    """Abstract interface for Connection classes"""
 
+    @abstractmethod
     def __init__(self, node_url):
-        """Initializes a :class:`~bigchaindb_driver.connection.Connection`
-        instance.
+        """Initialize a Connnection class to the given node
 
         Args:
-            node_url (str):  URL of the node to connect to
+            node_url (str): URL of the node to connect to
         """
-        self.node_url = node_url
-        self.session = Session()
 
-    def request(self, method, *, path=None, json=None, **kwargs):
-        """Performs an HTTP requests for the specified arguments.
+    @abstractmethod
+    def request(self, method, path, json):
+        """Forward a request to the connected nodes
 
         Args:
-            method (str): HTTP method (e.g.: `'GET`')
-            path (str, keyword, optional): API endpoint path
-                (e.g.: `'/transactions'`)
-            json (dict, keyword, optional): JSON data to send along with the
-                request
-            kwargs: keyword arguments passed to the request
+            method (str): HTTP method name (e.g.: ``'GET'``)
+            path (str, optional): Path to be appended to the base url of a
+                node.
+            json (dict, optional): Payload to be sent with the request
 
         Returns:
             :class:`~bigchaindb_driver.connection.HttpResponse`: a namedtuple
@@ -46,6 +44,31 @@ class Connection:
             :class:`~bigchaindb_driver.exceptions.TransportError`: either a
             TransportError or a subclass of TransportError based on the
             response.
+        """
+
+
+class Connection(AbstractConnection):
+    """A Connection object to make HTTP requests."""
+
+    def __init__(self, node_url):
+        """Initializes a :class:`~bigchaindb_driver.connection.Connection`
+        instance. Upon the first request, a long-lived session with the given
+        :attr:`node_url` is created.
+
+        See :meth:`~bigchaindb_driver.connection.AbstractConnection.__init__`
+        for the arguments.
+        """
+        self.node_url = node_url
+        self.session = Session()
+
+    def request(self, method, path=None, json=None, **kwargs):
+        """Performs an HTTP request through the connection.
+
+        See :meth:`~bigchaindb_driver.connection.AbstractConnection.request`
+        for the arguments, returns, and exceptions.
+
+        Any other keyword arguments passed will be passed to
+        :meth:`requests.Session.request`.
         """
         url = self.node_url + path if path else self.node_url
         response = self.session.request(
