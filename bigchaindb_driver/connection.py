@@ -11,13 +11,12 @@ HttpResponse = namedtuple('HttpResponse', ('status_code', 'headers', 'data'))
 class Connection:
     """A Connection object to make HTTP requests."""
 
-    def __init__(self, *, node_url):
+    def __init__(self, node_url):
         """Initializes a :class:`~bigchaindb_driver.connection.Connection`
         instance.
 
         Args:
-            node_url (str):  Url of the node to connect to.
-
+            node_url (str):  URL of the node to connect to
         """
         self.node_url = node_url
         self.session = Session()
@@ -26,11 +25,27 @@ class Connection:
         """Performs an HTTP requests for the specified arguments.
 
         Args:
-            method (str): HTTP method (e.g.: `'GET`'.
-            path (str): API endpoint path (e.g.: `'/transactions'`.
-            json (dict): JSON data to send along with the request.
-            kwargs: Optional keyword arguments.
+            method (str): HTTP method (e.g.: `'GET`')
+            path (str, keyword, optional): API endpoint path
+                (e.g.: `'/transactions'`)
+            json (dict, keyword, optional): JSON data to send along with the
+                request
+            kwargs: keyword arguments passed to the request
 
+        Returns:
+            :class:`~bigchaindb_driver.connection.HttpResponse`: a namedtuple
+            of the response's status code, headers, and data::
+
+                (
+                    'status_code': int,
+                    'headers': dict,
+                    'data': dict|str
+                )
+
+        Raises:
+            :class:`~bigchaindb_driver.exceptions.TransportError`: either a
+            TransportError or a subclass of TransportError based on the
+            response.
         """
         url = self.node_url + path if path else self.node_url
         response = self.session.request(
