@@ -1,18 +1,23 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractclassmethod, abstractmethod
 
 from .picker import RoundRobinPicker
 
 
+class AbstractPool(ABC):
+    """Abstract interface for Pool classes"""
 
+    @abstractmethod
+    def get_connection(self):
+        """Get a connection from the pool
 
-
+        Returns:
+            Connection: an instance of the subclass of
+            :class:`~bigchaindb_driver.connection.AbstractConnection` used by
+            the Pool.
         """
 
 
-        """
-
-
-class Pool:
+class Pool(AbstractPool):
     """Pool of connections."""
 
     def __init__(self, connections, picker_class=RoundRobinPicker):
@@ -31,10 +36,8 @@ class Pool:
         instance from the pool.
 
         Returns:
-            A :class:`~bigchaindb_driver.connection.Connection` instance.
-
+            Connection: an instance of
+            :class:`~bigchaindb_driver.connection.AbstractConnection` used by
+            the Pool that is connected to a node.
         """
-        if len(self.connections) > 1:
-            return self.picker.pick(self.connections)
-
-        return self.connections[0]
+        return self.picker.pick()
