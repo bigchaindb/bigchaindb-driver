@@ -7,7 +7,13 @@ DEFAULT_NODE = 'http://localhost:9984/api/v1'
 
 
 class AbstractTransport(ABC):
-    """Abstract interface for Transport classes"""
+    """Abstract interface for Transport classes
+
+    Attributes:
+        node_urls (:obj:`tuple` of :obj:`str`): Set of connected node URLs
+        pool (Pool): Pool instance managing the connections
+    """
+
 
     @abstractmethod
     def __init__(self, *node_urls, pool_cls):

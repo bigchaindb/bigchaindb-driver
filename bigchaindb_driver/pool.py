@@ -5,7 +5,13 @@ from .picker import RoundRobinPicker
 
 
 class AbstractPool(ABC):
-    """Abstract interface for Pool classes"""
+    """Abstract interface for Pool classes
+
+    Attributes:
+        connections (:obj:`list` of Connections): Set of Connections to nodes
+        picker (Picker): Picker instance for selecting Connections
+    """
+
 
     @abstractclassmethod
     def connect(cls, *node_urls, connection_cls, picker_cls):

@@ -10,7 +10,13 @@ HttpResponse = namedtuple('HttpResponse', ('status_code', 'headers', 'data'))
 
 
 class AbstractConnection(ABC):
-    """Abstract interface for Connection classes"""
+    """Abstract interface for Connection classes
+
+    Attributes:
+        node_url (str): URL of this connection
+        session (:class:`~requests.Session`): Long-lived connection to
+            :attr:`node_url`
+    """
 
     @abstractmethod
     def __init__(self, node_url):

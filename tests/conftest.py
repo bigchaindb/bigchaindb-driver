@@ -101,6 +101,12 @@ def mock_requests_post(monkeypatch):
 
 
 @fixture
+def mock_pool():
+    from .utils import create_mock_pool
+    return create_mock_pool()
+
+
+@fixture
 def mock_connection():
     from .utils import create_mock_connection
     return create_mock_connection()
@@ -110,9 +116,3 @@ def mock_connection():
 def mock_picker():
     from .utils import create_mock_picker
     return create_mock_picker()
-
-
-@fixture
-def mock_pool():
-    from .utils import create_mock_pool
-    return create_mock_pool()
