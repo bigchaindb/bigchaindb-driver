@@ -16,7 +16,7 @@ class AbstractTransport(ABC):
 
 
     @abstractmethod
-    def __init__(self, *node_urls, pool_cls):
+    def __init__(self, *node_urls, pool_cls, **kwargs):
         """Initialize a Transport class with the nodes it should connect to.
 
         Args:
@@ -24,6 +24,9 @@ class AbstractTransport(ABC):
             pool_cls (Pool, keyword): a subclass of
                 :class:`~bigchaindb_driver.pool.AbstractPool` to use as the
                 underlying connection manager for this Transport instance
+            **kwargs: Any other keyword arguments passed will be passed to
+                the instantiation of :attr:`pool_cls` through its
+                :meth:`~bigchaindb_driver.pool.AbstractPool.connect` factory
         """
 
     @abstractmethod
@@ -50,7 +53,7 @@ class Transport(AbstractTransport):
     :class:`~bigchaindb_driver.pool.RoundRobinPicker`).
     """
 
-    def __init__(self, *node_urls, pool_cls=Pool):
+    def __init__(self, *node_urls, pool_cls=Pool, **kwargs):
         """Initializes an instance of
         :class:`~bigchaindb_driver.transport.Transport`.
 
@@ -63,7 +66,7 @@ class Transport(AbstractTransport):
             - :attr:`pool_cls`: :class:`~bigchaindb_driver.pool.Pool`
         """
         self.node_urls = node_urls if node_urls else (DEFAULT_NODE,)
-        self.pool = pool_cls.connect(*self.node_urls)
+        self.pool = pool_cls.connect(*self.node_urls, **kwargs)
 
     def forward_request(self, method, path=None, *, json=None):
         """Forwards an http request to a connection.

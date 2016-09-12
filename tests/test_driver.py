@@ -33,6 +33,28 @@ def test_driver_init_without_nodes(alice_keypair):
     assert driver.node_urls == (DEFAULT_NODE,)
 
 
+def test_driver_init_with_custom_transports(mock_transport, mock_pool,
+                                            mock_connection, mock_picker):
+    from bigchaindb_driver.driver import BigchainDB
+    mock_transport.return_value = mock_transport
+    mock_pool.return_value = mock_pool
+    mock_pool.connect.return_value = mock_pool
+    mock_connection.return_value = mock_connection
+    mock_picker.return_value = mock_picker
+
+    driver = BigchainDB(transport_cls=mock_transport)
+    assert driver.transport == mock_transport
+
+    driver = BigchainDB(pool_cls=mock_pool)
+    assert driver.transport.pool == mock_pool
+
+    driver = BigchainDB(connection_cls=mock_connection)
+    assert driver.transport.pool.connections[0] == mock_connection
+
+    driver = BigchainDB(picker_cls=mock_picker)
+    assert driver.transport.pool.picker == mock_picker
+
+
 class TestTransactionsEndpoint:
 
     @mark.skip(reason='transaction model not ready; see bigchaindb/issues/342')

@@ -101,6 +101,12 @@ def mock_requests_post(monkeypatch):
 
 
 @fixture
+def mock_transport():
+    from .utils import create_mock_transport
+    return create_mock_transport()
+
+
+@fixture
 def mock_pool():
     from .utils import create_mock_pool
     return create_mock_pool()

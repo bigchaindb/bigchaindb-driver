@@ -24,7 +24,8 @@ class BigchainDB:
                  *node_urls,
                  verifying_key=None,
                  signing_key=None,
-                 transport_class=Transport):
+                 transport_cls=Transport,
+                 **kwargs):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
         If a :attr:`verifying_key` or :attr:`signing_key` are given, this
@@ -34,19 +35,40 @@ class BigchainDB:
         Args:
             *node_urls (str): BigchainDB nodes to connect to. Currently, the
                 full URL must be given. In the absence of any node, the default
-                of the :attr:`transport_class` will be used, e.g.:
+                of the :attr:`transport_cls` will be used, e.g.:
                 ``'http://localhost:9984/api/v1'``.
             verifying_key (str, keyword, optional): the base58 encoded public
                 key for the ED25519 curve to bind this driver with.
             signing_key (str, keyword, optional): the base58 encoded private
                 key for the ED25519 curve to bind this driver with.
-            transport_class (Transport, keyword, optional): Transport class to
-                use.
+            transport_cls (Transport, keyword, optional): a subclass of
+                :class:`~bigchaindb_driver.transport.AbstractTransport` to
+                use as the request manager.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
+            **kwargs: Any other keyword arguments passed will be passed to
+                the instantiation of :attr:`transport_cls`. A few useful
+                arguments:
+                    - ``pool_cls`` (Pool): a subclass of
+                        :class:`~bigchaindb_driver.pool.AbstractPool` to use as
+                        the underlying connection manager for
+                        :attr:`transport_cls`
+                    - ``connection_cls`` (Connection): a subclass of
+                        :class:`~bigchaindb_driver.connection.AbstractConnection`
+                        the ``pool_cls`` should use for its connections
+                    - ``picker_cls`` (Picker): a subclass of
+                        :class:`~bigchaindb_driver.picker.AbstractPicker` the
+                        ``pool_cls`` should use when selecting a connection
+
+        Raises:
+            :class:`~bigchaindb_driver.exceptions.InvalidVerifyingKey: if the
+                given :attr:`verifying_key` was not valid, or a
+                :attr:`signing_key` was given without a :attr:`verifying_key`
+            :class:`~bigchaindb_driver.exceptions.InvalidSigningKey: if the
+                given :attr:`signing_key` was not valid
         """
         self._verifying_key = verifying_key
         self._signing_key = signing_key
-        self._transport = transport_class(*node_urls)
+        self._transport = transport_cls(*node_urls, **kwargs)
         self._node_urls = self._transport.node_urls
 
         self._transactions = TransactionsEndpoint(self)
