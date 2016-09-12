@@ -8,12 +8,12 @@ class AbstractPool(ABC):
     """Abstract interface for Pool classes"""
 
     @abstractclassmethod
-    def connect(cls, *nodes, connection_cls, picker_cls):
+    def connect(cls, *node_urls, connection_cls, picker_cls):
         """Factory for creating an instance of a Pool connected to the given
         nodes
 
         Args:
-            *nodes (str): URLs of the nodes to connect to
+            *node_urls (str): URLs of the nodes to connect to
             connection_cls (Connection, keyword): a subclass of
                 :class:`~bigchaindb_driver.connection.AbstractConnection` the
                 pool should use for connections to nodes
@@ -65,7 +65,7 @@ class Pool(AbstractPool):
         return self.picker.pick()
 
     @classmethod
-    def connect(cls, *nodes, connection_cls=Connection,
+    def connect(cls, *node_urls, connection_cls=Connection,
                 picker_cls=RoundRobinPicker):
         """Factory for creating a Pool connected to the given nodes.
 
@@ -78,6 +78,6 @@ class Pool(AbstractPool):
             - :attr:`picker_cls`:
                 :class:`~bigchaindb_driver.picker.RoundRobinPicker`
         """
-        connections = [connection_cls(node) for node in nodes]
-        picker = picker_cls(connections)
+        connections = [connection_cls(node) for node in node_urls]
+        picker = picker_cls(*connections)
         return Pool(connections, picker)

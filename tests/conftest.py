@@ -96,5 +96,5 @@ def persisted_alice_transaction(alice_privkey, alice_driver,
     signed_transaction = alice_transaction.sign([alice_privkey])
     json = signed_transaction.to_dict()
     response = requests.post(
-        alice_driver.nodes[0] + '/transactions/', json=json)
+        alice_driver.node_urls[0] + '/transactions/', json=json)
     return response.json()

@@ -10,11 +10,11 @@ class AbstractTransport(ABC):
     """Abstract interface for Transport classes"""
 
     @abstractmethod
-    def __init__(self, *nodes, pool_cls):
+    def __init__(self, *node_urls, pool_cls):
         """Initialize a Transport class with the nodes it should connect to.
 
         Args:
-            *nodes (str): URLs of the nodes to connect to.
+            *node_urls (str): URLs of the nodes to connect to.
             pool_cls (Pool, keyword): a subclass of
                 :class:`~bigchaindb_driver.pool.AbstractPool` to use as the
                 underlying connection manager for this Transport instance
@@ -27,7 +27,7 @@ class AbstractTransport(ABC):
         Args:
             method (str): HTTP method name (e.g.: ``'GET'``)
             path (str, optional): Path to be appended to the base url of a
-                node.
+                node for the request.
             json (dict, keyword, optional): Payload to be sent with the request
 
         Returns:
@@ -38,13 +38,13 @@ class AbstractTransport(ABC):
 class Transport(AbstractTransport):
     """Default Transport class.
 
-    Initializes a pool of lasting sessions to the given nodes and in the case
+    Initializes a pool of lasting sessions to the given nodes. In the case
     of multiple connected nodes, selects a single node for each request through
     the given picker (by default, a round robin algorithm; see
     :class:`~bigchaindb_driver.pool.RoundRobinPicker`).
     """
 
-    def __init__(self, *nodes, pool_cls=Pool):
+    def __init__(self, *node_urls, pool_cls=Pool):
         """Initializes an instance of
         :class:`~bigchaindb_driver.transport.Transport`.
 
@@ -52,12 +52,12 @@ class Transport(AbstractTransport):
         arguments.
 
         By default, sets arguments to be:
-            - :attr:`nodes`: the default API endpoint of a locally running
+            - :attr:`node_urls`: the default API endpoint of a locally running
                 BigchainDB instance (``http://localhost:9984/api/v1``)
             - :attr:`pool_cls`: :class:`~bigchaindb_driver.pool.Pool`
         """
-        self.nodes = nodes if nodes else (DEFAULT_NODE,)
-        self.pool = pool_cls.connect(*self.nodes)
+        self.node_urls = node_urls if node_urls else (DEFAULT_NODE,)
+        self.pool = pool_cls.connect(*self.node_urls)
 
     def forward_request(self, method, path=None, *, json=None):
         """Forwards an http request to a connection.

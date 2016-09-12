@@ -21,7 +21,7 @@ class BigchainDB:
     :class:`~bigchaindb_driver.pool.RoundRobinPicker`.
     """
     def __init__(self,
-                 *nodes,
+                 *node_urls,
                  verifying_key=None,
                  signing_key=None,
                  transport_class=Transport):
@@ -32,9 +32,9 @@ class BigchainDB:
         whenever a verifying and/or signing key are needed.
 
         Args:
-            *nodes (str): BigchainDB nodes to connect to. Currently, the full
-                URL must be given. In the absence of any node, the default of
-                the :attr:`transport_class` will be used, e.g.:
+            *node_urls (str): BigchainDB nodes to connect to. Currently, the
+                full URL must be given. In the absence of any node, the default
+                of the :attr:`transport_class` will be used, e.g.:
                 ``'http://localhost:9984/api/v1'``.
             verifying_key (str, keyword, optional): the base58 encoded public
                 key for the ED25519 curve to bind this driver with.
@@ -46,15 +46,15 @@ class BigchainDB:
         """
         self._verifying_key = verifying_key
         self._signing_key = signing_key
-        self._transport = transport_class(*nodes)
-        self._nodes = self._transport.nodes
+        self._transport = transport_class(*node_urls)
+        self._node_urls = self._transport.node_urls
 
         self._transactions = TransactionsEndpoint(self)
 
     @property
-    def nodes(self):
+    def node_urls(self):
         """(Tuple[str], read-only): URLs of connected nodes."""
-        return self._nodes
+        return self._node_urls
 
     @property
     def verifying_key(self):
@@ -234,7 +234,7 @@ class TransactionsEndpoint(NamespacedDriver):
             method='POST', path=self.path, json=transaction)
 
 
-def temp_driver(node):
+def temp_driver(node_url):
     """Create a new temporary driver.
 
     Returns:
@@ -242,6 +242,6 @@ def temp_driver(node):
 
     """
     signing_key, verifying_key = generate_keypair()
-    return BigchainDB(node,
+    return BigchainDB(node_url,
                       signing_key=signing_key,
                       verifying_key=verifying_key)
