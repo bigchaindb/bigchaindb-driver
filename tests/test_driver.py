@@ -13,7 +13,7 @@ def test_temp_driver_returns_a_temp_driver(bdb_node):
     driver = temp_driver(bdb_node)
     assert driver.verifying_key
     assert driver.signing_key
-    assert driver.nodes[0] == bdb_node
+    assert driver.node_urls[0] == bdb_node
 
 
 def test_driver_init_basic(bdb_node):
@@ -21,15 +21,38 @@ def test_driver_init_basic(bdb_node):
     driver = BigchainDB(bdb_node)
     assert driver.verifying_key is None
     assert driver.signing_key is None
-    assert driver.nodes[0] == bdb_node
+    assert driver.node_urls[0] == bdb_node
     assert driver.transactions
 
 
 def test_driver_init_without_nodes(alice_keypair):
-    from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
+    from bigchaindb_driver.driver import BigchainDB
+    from bigchaindb_driver.transport import DEFAULT_NODE
     driver = BigchainDB(verifying_key=alice_keypair.vk,
                         signing_key=alice_keypair.sk)
-    assert driver.nodes == (DEFAULT_NODE,)
+    assert driver.node_urls == (DEFAULT_NODE,)
+
+
+def test_driver_init_with_custom_transports(mock_transport, mock_pool,
+                                            mock_connection, mock_picker):
+    from bigchaindb_driver.driver import BigchainDB
+    mock_transport.return_value = mock_transport
+    mock_pool.return_value = mock_pool
+    mock_pool.connect.return_value = mock_pool
+    mock_connection.return_value = mock_connection
+    mock_picker.return_value = mock_picker
+
+    driver = BigchainDB(transport_cls=mock_transport)
+    assert driver.transport == mock_transport
+
+    driver = BigchainDB(pool_cls=mock_pool)
+    assert driver.transport.pool == mock_pool
+
+    driver = BigchainDB(connection_cls=mock_connection)
+    assert driver.transport.pool.connections[0] == mock_connection
+
+    driver = BigchainDB(picker_cls=mock_picker)
+    assert driver.transport.pool.picker == mock_picker
 
 
 class TestTransactionsEndpoint:
@@ -109,7 +132,7 @@ class TestTransactionsEndpoint:
         transfer_transaction = Transaction.transfer(inputs, [bob_pubkey])
         signed_transaction = transfer_transaction.sign([driver.signing_key])
         json = signed_transaction.to_dict()
-        url = driver.nodes[0] + '/transactions/'
+        url = driver.node_urls[0] + '/transactions/'
         with RequestsMock() as requests_mock:
             requests_mock.add('POST', url, json=json)
             tx = driver.transactions.transfer(alice_transaction, bob_privkey)

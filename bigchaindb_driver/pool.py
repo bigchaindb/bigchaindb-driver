@@ -1,78 +1,90 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractclassmethod, abstractmethod
+
+from .connection import Connection
+from .picker import RoundRobinPicker
 
 
-class AbstractPicker(metaclass=ABCMeta):
-    """Abstract class for picker classes that pick connections from a pool."""
-
-    @abstractmethod
-    def pick(self, connections):
-        """Picks a :class:`~bigchaindb_driver.connection.Connection`
-        instance from the given list of
-        :class:`~bigchaindb_driver.connection.Connection` instances.
-
-        Args:
-            connections (List): List of
-                :class:`~bigchaindb_driver.connection.Connection` instances.
-
-        """
-        pass    # pragma: no cover
-
-
-class RoundRobinPicker(AbstractPicker):
-    """Object to pick a :class:`~bigchaindb_driver.connection.Connection`
-    instance from a list of connections.
+class AbstractPool(ABC):
+    """Abstract interface for Pool classes
 
     Attributes:
-        picked (str): List index of
-            :class:`~bigchaindb_driver.connection.Connection`
-            instance that has been picked.
-
+        connections (:obj:`list` of Connections): Set of Connections to nodes
+        picker (Picker): Picker instance for selecting Connections
     """
-    def __init__(self):
-        """Initializes a :class:`~bigchaindb_driver.pool.RoundRobinPicker`
-        instance. Sets :attr:`picked` to `-1`.
 
-        """
-        self.picked = -1
-
-    def pick(self, connections):
-        """Picks a :class:`~bigchaindb_driver.connection.Connection`
-        instance from the given list of
-        :class:`~bigchaindb_driver.connection.Connection` instances.
+    @abstractclassmethod
+    def connect(cls, *node_urls, connection_cls, picker_cls, **kwargs):
+        """Factory for creating an instance of a Pool connected to the given
+        nodes
 
         Args:
-            connections (List): List of
-                :class:`~bigchaindb_driver.connection.Connection` instances.
+            *node_urls (str): URLs of the nodes to connect to
+            connection_cls (Connection, keyword): a subclass of
+                :class:`~bigchaindb_driver.connection.AbstractConnection` the
+                pool should use for its connections
+            picker_cls (Picker, keyword): a subclass of
+                :class:`~bigchaindb_driver.picker.AbstractPicker` this
+                Pool should use when selecting a connection
+            **kwargs: Any other keyword arguments passed will be passed to
+                the instantiation of :attr:`connection_cls`
 
+        Returns:
+            Pool: an instance of :class:`~bigchaindb_driver.pool.AbstractPool`
+            subclass connected to the given nodes
         """
-        self.picked += 1
-        self.picked = self.picked % len(connections)
-        return connections[self.picked]
+
+    @abstractmethod
+    def get_connection(self):
+        """Get a connection from the pool
+
+        Returns:
+            Connection: an instance of the subclass of
+            :class:`~bigchaindb_driver.connection.AbstractConnection` used by
+            the Pool.
+        """
 
 
-class Pool:
+class Pool(AbstractPool):
     """Pool of connections."""
 
-    def __init__(self, connections, picker_class=RoundRobinPicker):
+    def __init__(self, connections, picker):
         """Initializes a :class:`~bigchaindb_driver.pool.Pool` instance.
 
         Args:
             connections (list): List of
                 :class:`~bigchaindb_driver.connection.Connection` instances.
-
+            picker_cls (Picker): a subclass of
+                :class:`~bigchaindb_driver.picker.AbstractPicker` this
+                Pool should use when selecting a connection
         """
         self.connections = connections
-        self.picker = picker_class()
+        self.picker = picker
 
     def get_connection(self):
         """Gets a :class:`~bigchaindb_driver.connection.Connection`
         instance from the pool.
 
         Returns:
-            A :class:`~bigchaindb_driver.connection.Connection` instance.
-
+            Connection: an instance of
+            :class:`~bigchaindb_driver.connection.AbstractConnection` used by
+            the Pool that is connected to a node.
         """
-        if len(self.connections) > 1:
-            return self.picker.pick(self.connections)
+        return self.picker.pick()
 
-        return self.connections[0]
+    @classmethod
+    def connect(cls, *node_urls, connection_cls=Connection,
+                picker_cls=RoundRobinPicker, **kwargs):
+        """Factory for creating a Pool connected to the given nodes.
+
+        See :meth:`~bigchaindb_driver.pool.AbstractPool.connect` for the
+        arguments.
+
+        By default sets arguments to be:
+            - :attr:`connection_cls`:
+                :class:`~bigchaindb_driver.connection.Connection`
+            - :attr:`picker_cls`:
+                :class:`~bigchaindb_driver.picker.RoundRobinPicker`
+        """
+        connections = [connection_cls(node, **kwargs) for node in node_urls]
+        picker = picker_cls(*connections)
+        return Pool(connections, picker)

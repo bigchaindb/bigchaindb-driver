@@ -1,3 +1,4 @@
+from abc import ABC, abstractproperty
 from bigchaindb_common.transaction import Transaction
 
 from .crypto import generate_keypair
@@ -5,24 +6,26 @@ from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
 
 
-DEFAULT_NODE = 'http://localhost:9984/api/v1'
-
-
 class BigchainDB:
-    """BigchainDB driver class.
+    """BigchainDB driver class connected to one or more BigchainDB nodes.
 
-    A :class:`~bigchaindb_driver.BigchainDB` driver is initialized with a
-    keypair and is able to create, sign, and submit transactions to a Node in
-    the Federation. At the moment, a BigchainDB driver instance is bounded to
-    a specific ``node`` in the Federation. In the future, a
-    :class:`~bigchaindb_driver.BigchainDB` driver instance might connect to
-    ``>1`` nodes.
+    The BigchainDB API is exposed from :class:`~bigchaindb_driver.BigchainDB`
+    through a number of attribute namespaces:
+        - ``.transactions``: create, sign, and submit transactions
+
+    A custom class subclassing
+    :class:`~bigchaindb_driver.transport.AbstractTransport`'s interface can be
+    given to modify the behaviour of how to send requests (and where to, if
+    multiple nodes are given). By default, requests are sent to the given nodes
+    based on a simple round-robin algorithm (see
+    :class:`~bigchaindb_driver.pool.RoundRobinPicker`.
     """
     def __init__(self,
-                 *nodes,
+                 *node_urls,
                  verifying_key=None,
                  signing_key=None,
-                 transport_class=Transport):
+                 transport_cls=Transport,
+                 **kwargs):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
         If a :attr:`verifying_key` or :attr:`signing_key` are given, this
@@ -30,28 +33,43 @@ class BigchainDB:
         whenever a verifying and/or signing key are needed.
 
         Args:
-            *nodes (str): BigchainDB nodes to connect to. Currently, the full
-                URL must be given. In the absence of any node, the default of
-                the :attr:`transport_class` will be used, e.g.:
+            *node_urls (str): BigchainDB nodes to connect to. Currently, the
+                full URL must be given. In the absence of any node, the default
+                of the :attr:`transport_cls` will be used, e.g.:
                 ``'http://localhost:9984/api/v1'``.
             verifying_key (str, keyword, optional): the base58 encoded public
                 key for the ED25519 curve to bind this driver with.
             signing_key (str, keyword, optional): the base58 encoded private
                 key for the ED25519 curve to bind this driver with.
-            transport_class (Transport, keyword, optional): Transport class to
-                use.
+            transport_cls (Transport, keyword, optional): a subclass of
+                :class:`~bigchaindb_driver.transport.AbstractTransport` to
+                use as the request manager.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
+            **kwargs: Any other keyword arguments passed will be passed to
+                the instantiation of :attr:`transport_cls`. A few useful
+                arguments:
+                    - ``pool_cls`` (Pool): a subclass of
+                        :class:`~bigchaindb_driver.pool.AbstractPool` to use as
+                        the underlying connection manager for
+                        :attr:`transport_cls`
+                    - ``connection_cls`` (Connection): a subclass of
+                        :class:`~bigchaindb_driver.connection.AbstractConnection`
+                        the ``pool_cls`` should use for its connections
+                    - ``picker_cls`` (Picker): a subclass of
+                        :class:`~bigchaindb_driver.picker.AbstractPicker` the
+                        ``pool_cls`` should use when selecting a connection
         """
-        self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._verifying_key = verifying_key
         self._signing_key = signing_key
-        self._transport = transport_class(*nodes)
+        self._transport = transport_cls(*node_urls, **kwargs)
+        self._node_urls = self._transport.node_urls
+
         self._transactions = TransactionsEndpoint(self)
 
     @property
-    def nodes(self):
+    def node_urls(self):
         """(Tuple[str], read-only): URLs of connected nodes."""
-        return self._nodes
+        return self._node_urls
 
     @property
     def verifying_key(self):
@@ -83,7 +101,7 @@ class BigchainDB:
         return self._transactions
 
 
-class NamespacedDriver:
+class NamespacedDriver(ABC):
     """Base class for creating endpoints (namespaced objects) that can be added
     under the :class:`~bigchaindb_driver.driver.BigchainDB` driver.
     """
@@ -97,6 +115,10 @@ class NamespacedDriver:
                 :class:`~bigchaindb_driver.driver.BigchainDB`.
         """
         self.driver = driver
+
+    @abstractproperty
+    def path(self):
+        """Base path of the endpoint"""
 
     @property
     def transport(self):
@@ -227,7 +249,7 @@ class TransactionsEndpoint(NamespacedDriver):
             method='POST', path=self.path, json=transaction)
 
 
-def temp_driver(node):
+def temp_driver(node_url):
     """Create a new temporary driver.
 
     Returns:
@@ -235,6 +257,6 @@ def temp_driver(node):
 
     """
     signing_key, verifying_key = generate_keypair()
-    return BigchainDB(node,
+    return BigchainDB(node_url,
                       signing_key=signing_key,
                       verifying_key=verifying_key)
