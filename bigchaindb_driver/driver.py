@@ -1,3 +1,4 @@
+from abc import ABC, abstractproperty
 from bigchaindb_common.transaction import Transaction
 
 from .crypto import generate_keypair
@@ -83,7 +84,7 @@ class BigchainDB:
         return self._transactions
 
 
-class NamespacedDriver:
+class NamespacedDriver(ABC):
     """Base class for creating endpoints (namespaced objects) that can be added
     under the :class:`~bigchaindb_driver.driver.BigchainDB` driver.
     """
@@ -97,6 +98,10 @@ class NamespacedDriver:
                 :class:`~bigchaindb_driver.driver.BigchainDB`.
         """
         self.driver = driver
+
+    @abstractproperty
+    def path(self):
+        """Base path of the endpoint"""
 
     @property
     def transport(self):
