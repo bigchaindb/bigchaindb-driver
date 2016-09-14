@@ -5,7 +5,6 @@ from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
 
 
-DEFAULT_NODE = 'http://localhost:9984/api/v1'
 
 
 class BigchainDB:
@@ -42,10 +41,11 @@ class BigchainDB:
                 use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
         """
-        self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._verifying_key = verifying_key
         self._signing_key = signing_key
         self._transport = transport_class(*nodes)
+        self._nodes = self._transport.nodes
+
         self._transactions = TransactionsEndpoint(self)
 
     @property

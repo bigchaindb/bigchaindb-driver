@@ -2,6 +2,9 @@ from .connection import Connection
 from .pool import Pool
 
 
+DEFAULT_NODE = 'http://localhost:9984/api/v1'
+
+
 class Transport:
     """Transport class."""
 
@@ -13,7 +16,7 @@ class Transport:
             nodes: nodes
 
         """
-        self.nodes = nodes
+        self.nodes = nodes if nodes else (DEFAULT_NODE,)
         self.init_pool(nodes)
 
     def init_pool(self, nodes):
