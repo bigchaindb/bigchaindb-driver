@@ -58,13 +58,6 @@ class BigchainDB:
                     - ``picker_cls`` (Picker): a subclass of
                         :class:`~bigchaindb_driver.picker.AbstractPicker` the
                         ``pool_cls`` should use when selecting a connection
-
-        Raises:
-            :class:`~bigchaindb_driver.exceptions.InvalidVerifyingKey: if the
-                given :attr:`verifying_key` was not valid, or a
-                :attr:`signing_key` was given without a :attr:`verifying_key`
-            :class:`~bigchaindb_driver.exceptions.InvalidSigningKey: if the
-                given :attr:`signing_key` was not valid
         """
         self._verifying_key = verifying_key
         self._signing_key = signing_key
