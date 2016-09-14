@@ -7,6 +7,7 @@ def test_round_robin_picker_raises_on_no_connections():
     with raises(ConnectionError):
         RoundRobinPicker()
 
+
 def test_round_robin_picker_cycles():
     from bigchaindb_driver.picker import RoundRobinPicker
     url_1 = 'url1'

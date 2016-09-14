@@ -14,7 +14,6 @@ class AbstractTransport(ABC):
         pool (Pool): Pool instance managing the connections
     """
 
-
     @abstractmethod
     def __init__(self, *node_urls, pool_cls, **kwargs):
         """Initialize a Transport class with the nodes it should connect to.

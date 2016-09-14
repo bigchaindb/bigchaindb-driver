@@ -12,7 +12,6 @@ class AbstractPool(ABC):
         picker (Picker): Picker instance for selecting Connections
     """
 
-
     @abstractclassmethod
     def connect(cls, *node_urls, connection_cls, picker_cls, **kwargs):
         """Factory for creating an instance of a Pool connected to the given
