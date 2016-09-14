@@ -114,7 +114,7 @@ Tips
 Dependency on Bigchaindb
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, the `BigchainDB server Dockerfile <https://github.com/bigchaindb/bigchaindb-driver/blob/master/compose/server/Dockerfile>`_
+By default, the development requirements, `BigchainDB server Dockerfile <https://github.com/bigchaindb/bigchaindb-driver/blob/master/compose/server/Dockerfile>`_,
 and `.travis.yml <https://github.com/bigchaindb/bigchaindb-driver/blob/master/.travis.yml>`_
 are set to depend from BigchainDB's master branch to more easily track changes
 against BigchainDB's API.
