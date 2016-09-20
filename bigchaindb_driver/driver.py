@@ -34,13 +34,13 @@ class BigchainDB:
                 URL must be given. In the absence of any node, the default of
                 the :attr:`transport_class` will be used, e.g.:
                 ``'http://localhost:9984/api/v1'``.
-            verifying_key (str, keyword, optional): the base58 encoded public
+            verifying_key (:obj:`str`, optional): The base58 encoded public
                 key for the ED25519 curve to bind this driver with.
-            signing_key (str, keyword, optional): the base58 encoded private
+            signing_key (:obj:`str`, optional): The base58 encoded private
                 key for the ED25519 curve to bind this driver with.
-            transport_class (Transport, keyword, optional): Transport class to
-                use.
+            transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
+
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._verifying_key = verifying_key
