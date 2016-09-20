@@ -34,13 +34,13 @@ class BigchainDB:
                 URL must be given. In the absence of any node, the default of
                 the :attr:`transport_class` will be used, e.g.:
                 ``'http://localhost:9984/api/v1'``.
-            verifying_key (str, keyword, optional): the base58 encoded public
+            verifying_key (:obj:`str`, optional): The base58 encoded public
                 key for the ED25519 curve to bind this driver with.
-            signing_key (str, keyword, optional): the base58 encoded private
+            signing_key (:obj:`str`, optional): The base58 encoded private
                 key for the ED25519 curve to bind this driver with.
-            transport_class (Transport, keyword, optional): Transport class to
-                use.
+            transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
+
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._verifying_key = verifying_key
@@ -50,34 +50,34 @@ class BigchainDB:
 
     @property
     def nodes(self):
-        """(Tuple[str], read-only): URLs of connected nodes."""
+        """:obj:`tuple` of :obj:`str`: URLs of connected nodes."""
         return self._nodes
 
     @property
     def verifying_key(self):
-        """(str|None, read-only): Public key associated with the
+        """:obj:`str`: Public key associated with the
         :attr:`signing_key`, if bounded during initialization.
         """
         return self._verifying_key
 
     @property
     def signing_key(self):
-        """(str|None, read-only): Private key used to sign transactions, if
+        """:obj:`str`: Private key used to sign transactions, if
         bounded during initialization.
         """
         return self._signing_key
 
     @property
     def transport(self):
-        """(:class:`~bigchaindb_driver.transport.Transport`, read-only):
-        Object responsible for forwarding requests to a
-        :class:`~bigchaindb_driver.connection.Connection`) instance (node).
+        """:class:`~bigchaindb_driver.transport.Transport`: Object
+        responsible for forwarding requests to a
+        :class:`~bigchaindb_driver.connection.Connection` instance (node).
         """
         return self._transport
 
     @property
     def transactions(self):
-        """(:class:`~bigchaindb_driver.driver.TransactionsEndpoint`, read-only):
+        """:class:`~bigchaindb_driver.driver.TransactionsEndpoint`:
             Exposes functionalities of the `'/transactions'` endpoint.
         """
         return self._transactions
