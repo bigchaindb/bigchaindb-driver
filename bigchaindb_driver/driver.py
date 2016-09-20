@@ -50,34 +50,34 @@ class BigchainDB:
 
     @property
     def nodes(self):
-        """(Tuple[str], read-only): URLs of connected nodes."""
+        """:obj:`tuple` of :obj:`str`: URLs of connected nodes."""
         return self._nodes
 
     @property
     def verifying_key(self):
-        """(str|None, read-only): Public key associated with the
+        """:obj:`str`: Public key associated with the
         :attr:`signing_key`, if bounded during initialization.
         """
         return self._verifying_key
 
     @property
     def signing_key(self):
-        """(str|None, read-only): Private key used to sign transactions, if
+        """:obj:`str`: Private key used to sign transactions, if
         bounded during initialization.
         """
         return self._signing_key
 
     @property
     def transport(self):
-        """(:class:`~bigchaindb_driver.transport.Transport`, read-only):
-        Object responsible for forwarding requests to a
-        :class:`~bigchaindb_driver.connection.Connection`) instance (node).
+        """:class:`~bigchaindb_driver.transport.Transport`: Object
+        responsible for forwarding requests to a
+        :class:`~bigchaindb_driver.connection.Connection` instance (node).
         """
         return self._transport
 
     @property
     def transactions(self):
-        """(:class:`~bigchaindb_driver.driver.TransactionsEndpoint`, read-only):
+        """:class:`~bigchaindb_driver.driver.TransactionsEndpoint`:
             Exposes functionalities of the `'/transactions'` endpoint.
         """
         return self._transactions
