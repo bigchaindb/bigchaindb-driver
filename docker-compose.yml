@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  driver:
+  bdb-driver:
     build:
       context: .
       dockerfile: ./compose/driver/Dockerfile
@@ -11,18 +11,18 @@ services:
       - ./bigchaindb_driver:/usr/src/app/bigchaindb_driver
       - ./setup.py:/usr/src/app/setup.py
     environment:
-      BDB_HOST: server
+      BDB_HOST: bdb-server
     command: py.test -v
-  rethinkdb:
+  rdb:
     image: rethinkdb
     ports:
       - "58585:8080"
       - "28015"
-  server:
+  bdb-server:
     build: ./compose/server
     environment:
-      BIGCHAINDB_DATABASE_HOST: rethinkdb
-      BIGCHAINDB_API_ENDPOINT: http://server:9984/api/v1
+      BIGCHAINDB_DATABASE_HOST: rdb
+      BIGCHAINDB_API_ENDPOINT: http://bdb-server:9984/api/v1
       BIGCHAINDB_SERVER_BIND: 0.0.0.0:9984
     ports:
         - "32769:9984"
