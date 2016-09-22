@@ -2,6 +2,123 @@
 Usage
 =====
 
-To use bigchaindb-driver in a project::
+As an example, let's consider the creation and transfer of a digital asset that
+represents a bicycle:
 
-    import bigchaindb_driver
+.. code-block:: python
+    
+    bicycle = {
+        'bicycle': {
+            'serial_number': 'abcd1234',
+            'manufacturer': 'bkfab',
+        },
+    }
+
+We'll suppose that the bike belongs to Alice, and that it will be transferred
+to Bob.
+
+Alice, and Bob are represented by signing/verifying key pairs. The signing
+(private) key is used to sign transactions, meanwhile the verifying (public)
+key is used to verify that a signed transaction was indeed signed by the one
+who claims to be the signee. 
+
+.. code-block:: python
+
+    from bigchaindb_driver.crypto import generate_keypair
+
+    alice, bob = generate_keypair(), generate_keypair()
+
+We're now ready to create the digital asset. Let's first connect to a
+BigchainDB node:
+
+.. code-block:: python
+
+    from bigchaindb_driver import BigchainDB
+
+    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+
+    creation_tx = bdb.transactions.create(verifying_key=alice.verifying_key,
+                                          signing_key=alice.signing_key)
+
+    creation_tx   
+    {'id': 'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5',
+     'transaction': {'conditions': [{'cid': 0,
+        'condition': {'details': {'bitmask': 32,
+          'public_key': '6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi',
+          'signature': None,
+          'type': 'fulfillment',
+          'type_id': 4},
+         'uri': 'cc:4:20:VJLFHYncUMIXusBIghrOVLXPAmec9VJWx6NJl0_9MKE:96'},
+        'owners_after': ['6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi']}],
+      'data': None,
+      'fulfillments': [{'fid': 0,
+        'fulfillment': 'cf:4:VJLFHYncUMIXusBIghrOVLXPAmec9VJWx6NJl0_9MKHONkikhxXjNFY03EW4c0MJFvsHYTZh97QxMM2ZBeoiljjge5Tn7wPoILjyLShEALQ9gzf_QK44KboStzpw0nUB',
+        'input': None,
+        'owners_before': ['6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi']}],
+      'operation': 'CREATE',
+      'timestamp': '1474467828'},
+     'version': 1}
+
+
+Notice the transaction ``id``:
+
+.. code-block:: python
+ 
+    creation_tx['id']
+    'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5'
+
+Imagine some time goes by, during which Alice is happy with her bicycle, and
+one day, she meets Bob, who is interested in acquiring her bicycle. The timing
+is good for Alice as she had been wanting to get a new bicycle.
+
+To transfer the bicycle (asset) to Bob, Alice first retrieves the transaction
+in which the bicycle (asset) had been created:
+
+.. code-block:: python
+
+    creation_tx = bdb.transactions.retrieve(
+        'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5')
+
+and then transfers it to Bob:
+
+.. code-block:: python
+    
+    from bigchaindb_common.transaction import Transaction 
+    
+    transaction_model = Transaction.from_dict(creation_tx)
+    transfer_tx = bdb.transactions.transfer(
+        transaction_model, bob.verifying_key, signing_key=alice.signing_key) 
+
+    transfer_tx
+    {'id': 'a28e86a93173350f51e8f5661b07def2e2e3399eaaad179d29ec2155e05e7413',
+     'transaction': {'conditions': [{'cid': 0,
+        'condition': {'details': {'bitmask': 32,
+          'public_key': '3op6F4aU4kQhXVYG9tkEPM7AXJftAFTKjqM9iv11gBhQ',
+          'signature': None,
+          'type': 'fulfillment',
+          'type_id': 4},
+         'uri': 'cc:4:20:KbVWGmfin6ueqTPS62z3IoAEFY-bjYIVJU8oCQtCImc:96'},
+        'owners_after': ['3op6F4aU4kQhXVYG9tkEPM7AXJftAFTKjqM9iv11gBhQ']}],
+      'data': None,
+      'fulfillments': [{'fid': 0,
+        'fulfillment': 'cf:4:VJLFHYncUMIXusBIghrOVLXPAmec9VJWx6NJl0_9MKESz8EdircaOtIsIWhoK8XnddCIzNh__MaDEp026OIkH7SkLeAP5bEIcwjzHWefazle8NsTQmZraR4FEbPhV1cM',
+        'input': {'cid': 0,
+         'txid': 'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5'},
+        'owners_before': ['6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi']}],
+      'operation': 'TRANSFER',
+      'timestamp': '1474468018'},
+     'version': 1}
+ 
+Bob is the new owner: 
+
+.. code-block:: python
+
+    transfer_tx['transaction']['conditions'][0]['owners_after'][0] == bob.verifying_key
+    True
+
+Alice is the former owner:
+
+.. code-block:: python
+
+    transfer_tx['transaction']['fulfillments'][0]['owners_before'][0] == alice.verifying_key
+    True
