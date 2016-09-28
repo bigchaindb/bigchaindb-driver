@@ -25,5 +25,5 @@ services:
       BIGCHAINDB_API_ENDPOINT: http://bdb-server:9984/api/v1
       BIGCHAINDB_SERVER_BIND: 0.0.0.0:9984
     ports:
-        - "32769:9984"
+        - "9984"
     command: bigchaindb start
