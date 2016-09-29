@@ -182,15 +182,11 @@ class TransactionsEndpoint(NamespacedDriver):
         path = self.path + txid + '/status'
         return self.transport.forward_request(method='GET', path=path)
 
-    # TODO: A transfer-tx needs to support adding a payload
-    # TODO: A transfer-tx can require multiple signing_keys
     def transfer(self, transaction, *owners_after, signing_key=None):
         """Issue a transaction to transfer an asset.
 
         Args:
-            transaction (Transaction): An instance of
-                :class:`bigchaindb_common.transaction.Transaction` to
-                transfer.
+            transaction (dict): The transaction to transfer.
             owners_after (str): Zero or more public keys of the new owners.
             signing_key (str): Private key used to sign transactions.
 
@@ -205,13 +201,12 @@ class TransactionsEndpoint(NamespacedDriver):
         signing_key = signing_key if signing_key else self.signing_key
         if not signing_key:
             raise InvalidSigningKey
-        inputs = transaction.to_inputs()
-        transfer_transaction = Transaction.transfer(
-            inputs,
+        transaction_obj = Transaction.from_dict(transaction)
+        signed_transfer_transaction = Transaction.transfer(
+            transaction_obj.to_inputs(),
             list(owners_after)
-        )
-        signed_transaction = transfer_transaction.sign([signing_key])
-        return self._push(signed_transaction.to_dict())
+        ).sign([signing_key]).to_dict()
+        return self._push(signed_transfer_transaction)
 
     def _push(self, transaction):
         """Submit a transaction to the Federation.
