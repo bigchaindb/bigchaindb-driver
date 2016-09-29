@@ -102,17 +102,18 @@ class TestTransactionsEndpoint:
         with raises(InvalidVerifyingKey):
             driver.transactions.create(signing_key=alice_privkey)
 
-    def test_transfer_assets(self, alice_driver, alice_transaction,
+    def test_transfer_assets(self, alice_driver, alice_transaction_obj,
                              bob_pubkey, bob_privkey):
         driver = alice_driver
-        inputs = alice_transaction.to_inputs()
+        inputs = alice_transaction_obj.to_inputs()
         transfer_transaction = Transaction.transfer(inputs, [bob_pubkey])
         signed_transaction = transfer_transaction.sign([driver.signing_key])
         json = signed_transaction.to_dict()
         url = driver.nodes[0] + '/transactions/'
         with RequestsMock() as requests_mock:
             requests_mock.add('POST', url, json=json)
-            tx = driver.transactions.transfer(alice_transaction, bob_privkey)
+            tx = driver.transactions.transfer(
+                alice_transaction_obj.to_dict(), bob_privkey)
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == driver.verifying_key
