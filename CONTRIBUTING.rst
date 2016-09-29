@@ -85,7 +85,7 @@ development.
 
 7 To run the tests::
 
-    $ docker-compose run --rm driver py.test -v
+    $ docker-compose run --rm driver pytest -v
 
 8.. Commit your changes and push your branch to GitHub::
 
@@ -124,7 +124,7 @@ Tests
 
 To run a subset of tests::
 
-    $ docker-compose run --rm driver py.test -v tests/test_driver.py
+    $ docker-compose run --rm driver pytest -v tests/test_driver.py
 
 .. important:: When running tests, unless you are targeting a test that does
     not require a connection with the BigchainDB server, you need to run the
