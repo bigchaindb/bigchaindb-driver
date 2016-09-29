@@ -1,7 +1,6 @@
 pip==8.1.2
 bumpversion==0.5.3
 wheel==0.29.0
-
--r dependency_links.txt
+git+https://github.com/bigchaindb/bigchaindb.git
 
 -e .[dev]

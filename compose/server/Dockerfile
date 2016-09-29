@@ -9,5 +9,5 @@ RUN pip install --upgrade pip
 
 COPY . /usr/src/app/
 
-RUN pip install --process-dependency-links "git+https://github.com/bigchaindb/bigchaindb.git@feat/586/integrate-tx-model"
+RUN pip install git+https://github.com/bigchaindb/bigchaindb.git
 RUN bigchaindb -y configure

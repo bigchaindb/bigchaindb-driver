@@ -1,3 +1,0 @@
---process-dependency-links
-
-git+https://github.com/bigchaindb/bigchaindb#egg=bigchaindb
