@@ -182,8 +182,6 @@ class TransactionsEndpoint(NamespacedDriver):
         path = self.path + txid + '/status'
         return self.transport.forward_request(method='GET', path=path)
 
-    # TODO: A transfer-tx needs to support adding a payload
-    # TODO: A transfer-tx can require multiple signing_keys
     def transfer(self, transaction, *owners_after, signing_key=None):
         """Issue a transaction to transfer an asset.
 
