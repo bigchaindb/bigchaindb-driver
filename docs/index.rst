@@ -9,8 +9,9 @@ BigchainDB Python Driver
 .. important:: **Development Status: Pre-Alpha**
     
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+   ← Back to All BigchainDB Docs <https://bigchaindb.readthedocs.io/en/latest/index.html>
    readme
    installation
    usage
