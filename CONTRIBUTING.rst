@@ -111,15 +111,6 @@ Before you submit a pull request, check that it meets these guidelines:
 Tips
 ----
 
-Dependency on Bigchaindb
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default, the development requirements, `BigchainDB server Dockerfile <https://github.com/bigchaindb/bigchaindb-driver/blob/master/compose/server/Dockerfile>`_,
-and `.travis.yml <https://github.com/bigchaindb/bigchaindb-driver/blob/master/.travis.yml>`_
-are set to depend from BigchainDB's master branch to more easily track changes
-against BigchainDB's API.
-
-
 .. _devenv-docker:
 
 Development Environment with Docker
@@ -151,6 +142,15 @@ To run a subset of tests::
 
     $ docker-compose up -d rethinkdb
     $ docker-compose up -d bdb-server
+
+
+Dependency on Bigchaindb
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, the development requirements, `BigchainDB server Dockerfile <https://github.com/bigchaindb/bigchaindb-driver/blob/master/compose/server/Dockerfile>`_,
+and `.travis.yml <https://github.com/bigchaindb/bigchaindb-driver/blob/master/.travis.yml>`_
+are set to depend from BigchainDB's master branch to more easily track changes
+against BigchainDB's API.
 
 
 .. _docker-compose.yml: https://github.com/bigchaindb/bigchaindb-driver/blob/master/docker-compose.yml
