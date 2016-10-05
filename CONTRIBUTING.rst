@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/bigchaindb/bigchaindb_driver/issues.
+Report bugs at https://github.com/bigchaindb/bigchaindb-driver/issues.
 
 If you are reporting a bug, please include:
 
@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/bigchaindb/bigchaindb_driver/issues.
+The best way to send feedback is to file an issue at https://github.com/bigchaindb/bigchaindb-driver/issues.
 
 If you are proposing a feature:
 
@@ -57,14 +57,14 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `bigchaindb_driver` for local
+Ready to contribute? Here's how to set up `bigchaindb-driver`_ for local
 development.
 
-1. Fork the `bigchaindb_driver` repo on GitHub.
+1. Fork the `bigchaindb-driver`_ repo on GitHub.
 2. Clone your fork locally and enter into the project::
 
-    $ git clone git@github.com:your_name_here/bigchaindb_driver.git
-    $ cd bigchaindb_driver/
+    $ git clone git@github.com:your_name_here/bigchaindb-driver.git
+    $ cd bigchaindb-driver/
 
 3. Create a branch for local development::
 
@@ -105,7 +105,7 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
 3. The pull request should work for Python 3.5, and pass the flake8 check.
-   Check https://travis-ci.org/bigchaindb/bigchaindb_driver/pull_requests
+   Check https://travis-ci.org/bigchaindb/bigchaindb-driver/pull_requests
    and make sure that the tests pass for all supported Python versions.
 
 Tips
@@ -153,4 +153,5 @@ are set to depend from BigchainDB's master branch to more easily track changes
 against BigchainDB's API.
 
 
+.. _bigchaindb-driver: https://github.com/bigchaindb/bigchaindb-driver
 .. _docker-compose.yml: https://github.com/bigchaindb/bigchaindb-driver/blob/master/docker-compose.yml
