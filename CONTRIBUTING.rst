@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/bigchaindb/bigchaindb_driver/issues.
+Report bugs at https://github.com/bigchaindb/bigchaindb-driver/issues.
 
 If you are reporting a bug, please include:
 
@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/bigchaindb/bigchaindb_driver/issues.
+The best way to send feedback is to file an issue at https://github.com/bigchaindb/bigchaindb-driver/issues.
 
 If you are proposing a feature:
 
@@ -57,14 +57,14 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `bigchaindb_driver` for local
+Ready to contribute? Here's how to set up `bigchaindb-driver`_ for local
 development.
 
-1. Fork the `bigchaindb_driver` repo on GitHub.
+1. Fork the `bigchaindb-driver`_ repo on GitHub.
 2. Clone your fork locally and enter into the project::
 
-    $ git clone git@github.com:your_name_here/bigchaindb_driver.git
-    $ cd bigchaindb_driver/
+    $ git clone git@github.com:your_name_here/bigchaindb-driver.git
+    $ cd bigchaindb-driver/
 
 3. Create a branch for local development::
 
@@ -72,28 +72,29 @@ development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8
+4. When you're done making changes, check that your changes pass flake8
    and the tests. For the tests, you'll need to  start the RethinkDB and
    BigchainDB servers::
 
-    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d rdb
     $ docker-compose up -d bdb-server
 
-6.flake8 check::
+5. flake8 check::
 
     $ docker-compose run --rm bdb-driver flake8 bigchaindb_driver tests
 
-7 To run the tests::
+6. To run the tests::
 
     $ docker-compose run --rm bdb-driver pytest -v
 
-8.. Commit your changes and push your branch to GitHub::
+7. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website.
+8. Submit a pull request through the GitHub website.
+
 
 Pull Request Guidelines
 -----------------------
@@ -105,19 +106,29 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
 3. The pull request should work for Python 3.5, and pass the flake8 check.
-   Check https://travis-ci.org/bigchaindb/bigchaindb_driver/pull_requests
+   Check https://travis-ci.org/bigchaindb/bigchaindb-driver/pull_requests
    and make sure that the tests pass for all supported Python versions.
 
 Tips
 ----
 
-Dependency on Bigchaindb
-~~~~~~~~~~~~~~~~~~~~~~~~
+.. _devenv-docker:
 
-By default, the development requirements, `BigchainDB server Dockerfile <https://github.com/bigchaindb/bigchaindb-driver/blob/master/compose/server/Dockerfile>`_,
-and `.travis.yml <https://github.com/bigchaindb/bigchaindb-driver/blob/master/.travis.yml>`_
-are set to depend from BigchainDB's master branch to more easily track changes
-against BigchainDB's API.
+Development Environment with Docker
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Depending on what you are doing, you may need to run at least one BigchainDB
+node. You can use the `docker-compose.yml`_ file to run a node, and perform
+other tasks that depend on the running node. To run a BigchainDB node, (for
+development), you start a RethinkDB node, followed by the linked BigchainDB
+node::
+
+    $ docker-compose up -d rdb
+    $ docker-compose up -d bdb-server
+
+You can monitor the logs::
+
+    $ docker-compose logs -f
+
 
 Tests
 ~~~~~
@@ -130,5 +141,18 @@ To run a subset of tests::
     not require a connection with the BigchainDB server, you need to run the
     BigchainDB and RethinkDB servers::
 
-    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d rdb 
     $ docker-compose up -d bdb-server
+
+
+Dependency on Bigchaindb
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, the development requirements, `BigchainDB server Dockerfile <https://github.com/bigchaindb/bigchaindb-driver/blob/master/compose/server/Dockerfile>`_,
+and `.travis.yml <https://github.com/bigchaindb/bigchaindb-driver/blob/master/.travis.yml>`_
+are set to depend from BigchainDB's master branch to more easily track changes
+against BigchainDB's API.
+
+
+.. _bigchaindb-driver: https://github.com/bigchaindb/bigchaindb-driver
+.. _docker-compose.yml: https://github.com/bigchaindb/bigchaindb-driver/blob/master/docker-compose.yml

@@ -46,7 +46,7 @@ Connecting to a BigchainDB node, is done via the
 .. note:: The URL you pass to :class:`~bigchaindb_driver.BigchainDB` needs to
     be pointing to a running server node. In the current example, it implies
     that you are running the docker-based dev setup that comes along with the
-    `bigchaindb_driver`_ repository. 
+    `bigchaindb_driver`_ repository. See :ref:`devenv-docker` for instructions.
 
 Asset Creation
 --------------
