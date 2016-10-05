@@ -34,15 +34,13 @@ def test_driver_init_without_nodes(alice_keypair):
 
 class TestTransactionsEndpoint:
 
-    @mark.skip(reason='transaction model not ready; see bigchaindb/issues/342')
     def test_driver_can_create_assets(self, alice_driver):
         tx = alice_driver.transactions.create()
-        # XXX: `CREATE` operations require the node that receives the
-        # transaction to modify the data in the transaction itself.
-        # `owners_before` will be overwritten with the public key of the node
-        # in the federation that will create the real transaction. `signature`
-        # will be overwritten with the new signature. Note that this scenario
-        # is ignored by this test.
+        assert tx['id']
+        assert tx['version']
+        assert tx['transaction']['operation'] == 'CREATE'
+        assert tx['transaction']['data'] is None
+        assert tx['transaction']['timestamp']
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == alice_driver.verifying_key
@@ -51,31 +49,22 @@ class TestTransactionsEndpoint:
         tx_obj = Transaction.from_dict(tx)
         assert tx_obj.fulfillments_valid()
 
-    # FIXME The next two tests can be removed once the following are taken
-    # care of
-    #
-    # * server is ready with new transaction model
-    #       see https://github.com/bigchaindb/bigchaindb/issues/342
-    #
-    # * common lib is ready
-    #       see https://github.com/bigchaindb/bigchaindb-common/pull/4
-    #
-    # NOTE: owners_before and payload_hash are ignored
-    def test_create_ignoring_fulfillment_details(self, alice_driver):
-        tx = alice_driver.transactions.create()
-        fulfillment = tx['transaction']['fulfillments'][0]
-        condition = tx['transaction']['conditions'][0]
-        assert condition['owners_after'][0] == alice_driver.verifying_key
-        assert fulfillment['input'] is None
-
     def test_create_with_different_keypair(self, alice_driver,
                                            bob_pubkey, bob_privkey):
         tx = alice_driver.transactions.create(verifying_key=bob_pubkey,
                                               signing_key=bob_privkey)
+        assert tx['id']
+        assert tx['version']
+        assert tx['transaction']['operation'] == 'CREATE'
+        assert tx['transaction']['data'] is None
+        assert tx['transaction']['timestamp']
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
+        assert fulfillment['owners_before'][0] == bob_pubkey
         assert condition['owners_after'][0] == bob_pubkey
         assert fulfillment['input'] is None
+        tx_obj = Transaction.from_dict(tx)
+        assert tx_obj.fulfillments_valid()
 
     @mark.skip(reason='transaction model not ready; see bigchaindb/issues/342')
     def test_create(self, alice_driver):
