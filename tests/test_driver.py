@@ -2,7 +2,7 @@
 
 from time import sleep
 
-from pytest import mark, raises
+from pytest import raises
 from responses import RequestsMock
 
 from bigchaindb_common.transaction import Transaction
@@ -62,17 +62,6 @@ class TestTransactionsEndpoint:
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == bob_pubkey
         assert condition['owners_after'][0] == bob_pubkey
-        assert fulfillment['input'] is None
-        tx_obj = Transaction.from_dict(tx)
-        assert tx_obj.fulfillments_valid()
-
-    @mark.skip(reason='transaction model not ready; see bigchaindb/issues/342')
-    def test_create(self, alice_driver):
-        tx = alice_driver.transactions.create()
-        fulfillment = tx['transaction']['fulfillments'][0]
-        condition = tx['transaction']['conditions'][0]
-        assert fulfillment['owners_before'][0] == alice_driver.verifying_key
-        assert condition['owners_after'][0] == alice_driver.verifying_key
         assert fulfillment['input'] is None
         tx_obj = Transaction.from_dict(tx)
         assert tx_obj.fulfillments_valid()
