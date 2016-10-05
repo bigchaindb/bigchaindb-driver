@@ -1,4 +1,4 @@
-class TestTrasnportError:
+class TestTransportError:
 
     def test_status_code_property(self):
         from bigchaindb_driver.exceptions import TransportError
