@@ -131,7 +131,7 @@ class TestTransactionsEndpoint:
         # FIXME The sleep, or some other approach is required to wait for the
         # transaction to be available as some processing is being done by the
         # server.
-        sleep(1.2)
+        sleep(1.5)
         tx = driver.transactions.retrieve(txid)
         assert tx['id'] == txid
 
@@ -146,7 +146,7 @@ class TestTransactionsEndpoint:
         # FIXME The sleep, or some other approach is required to wait for the
         # transaction to be available as some processing is being done by the
         # server.
-        sleep(1.2)
+        sleep(1.5)
         status = driver.transactions.status(txid)
         assert status['status'] == 'valid'
 
