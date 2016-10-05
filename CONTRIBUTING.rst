@@ -119,6 +119,25 @@ and `.travis.yml <https://github.com/bigchaindb/bigchaindb-driver/blob/master/.t
 are set to depend from BigchainDB's master branch to more easily track changes
 against BigchainDB's API.
 
+
+.. _devenv-docker:
+
+Development Environment with Docker
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Depending on what you are doing, you may need to run at least one BigchainDB
+node. You can use the `docker-compose.yml`_ file to run a node, and perform
+other tasks that depend on the running node. To run a BigchainDB node, (for
+development), you start a RethinkDB node, followed by the linked BigchainDB
+node::
+
+    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d bdb-server
+
+You can monitor the logs::
+
+    $ docker-compose logs -f
+
+
 Tests
 ~~~~~
 
@@ -132,3 +151,6 @@ To run a subset of tests::
 
     $ docker-compose up -d rethinkdb
     $ docker-compose up -d bdb-server
+
+
+.. _docker-compose.yml: https://github.com/bigchaindb/bigchaindb-driver/blob/master/docker-compose.yml
