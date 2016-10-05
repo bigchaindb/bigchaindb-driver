@@ -32,16 +32,29 @@ who claims to be the signee.
     alice, bob = generate_keypair(), generate_keypair()
 
 
-Asset Creation
---------------
-We're now ready to create the digital asset. Let's first connect to a
-BigchainDB node:
+Connecting to a BigchainDB Node
+-------------------------------
+Connecting to a BigchainDB node, is done via the
+:class:`BigchainDB class <bigchaindb_driver.BigchainDB>`:
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984/api/v1')
+
+.. note:: The URL you pass to :class:`~bigchaindb_driver.BigchainDB` needs to
+    be pointing to a running server node. In the current example, it implies
+    that you are running the docker-based dev setup that comes along with the
+    `bigchaindb_driver`_ repository. 
+
+Asset Creation
+--------------
+We're now ready to create the digital asset.
+
+Let's first connect to a BigchainDB node:
+
+.. code-block:: python
 
     creation_tx = bdb.transactions.create(verifying_key=alice.verifying_key,
                                           signing_key=alice.signing_key)
@@ -73,7 +86,8 @@ Notice the transaction ``id``:
 
 .. code-block:: python
  
-    >>> creation_tx['id']
+    >>> txid = creation_tx['id']
+    >>> txid
     'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5'
 
 
@@ -88,8 +102,7 @@ in which the bicycle (asset) had been created:
 
 .. code-block:: python
 
-    creation_tx = bdb.transactions.retrieve(
-        'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5')
+    creation_tx = bdb.transactions.retrieve(txid)
 
 and then transfers it to Bob:
 
@@ -171,3 +184,6 @@ Running the above code should give something similar to:
 .. code-block:: bash
 
     2016-09-29 15:06:30,606 404 Transaction "12345" could was not found.
+
+
+.. _bigchaindb_driver: https://github.com/bigchaindb/bigchaindb-driver
