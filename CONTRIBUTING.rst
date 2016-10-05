@@ -72,28 +72,29 @@ development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8
+4. When you're done making changes, check that your changes pass flake8
    and the tests. For the tests, you'll need to  start the RethinkDB and
    BigchainDB servers::
 
     $ docker-compose up -d rethinkdb
     $ docker-compose up -d bdb-server
 
-6.flake8 check::
+5. flake8 check::
 
     $ docker-compose run --rm bdb-driver flake8 bigchaindb_driver tests
 
-7 To run the tests::
+6. To run the tests::
 
     $ docker-compose run --rm bdb-driver pytest -v
 
-8.. Commit your changes and push your branch to GitHub::
+7. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website.
+8. Submit a pull request through the GitHub website.
+
 
 Pull Request Guidelines
 -----------------------
