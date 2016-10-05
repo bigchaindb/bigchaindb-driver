@@ -17,6 +17,9 @@ represents a bicycle:
 We'll suppose that the bike belongs to Alice, and that it will be transferred
 to Bob.
 
+
+Cryptographic Identities Generation
+-----------------------------------
 Alice, and Bob are represented by signing/verifying key pairs. The signing
 (private) key is used to sign transactions, meanwhile the verifying (public)
 key is used to verify that a signed transaction was indeed signed by the one
@@ -28,8 +31,11 @@ who claims to be the signee.
 
     alice, bob = generate_keypair(), generate_keypair()
 
-We're now ready to create the digital asset. Let's first connect to a
-BigchainDB node:
+
+Connecting to a BigchainDB Node
+-------------------------------
+Connecting to a BigchainDB node, is done via the
+:class:`BigchainDB class <bigchaindb_driver.BigchainDB>`:
 
 .. code-block:: python
 
@@ -37,10 +43,26 @@ BigchainDB node:
 
     bdb = BigchainDB('http://bdb-server:9984/api/v1')
 
+.. note:: The URL you pass to :class:`~bigchaindb_driver.BigchainDB` needs to
+    be pointing to a running server node. In the current example, it implies
+    that you are running the docker-based dev setup that comes along with the
+    `bigchaindb_driver`_ repository. 
+
+Asset Creation
+--------------
+We're now ready to create the digital asset.
+
+Let's first connect to a BigchainDB node:
+
+.. code-block:: python
+
     creation_tx = bdb.transactions.create(verifying_key=alice.verifying_key,
                                           signing_key=alice.signing_key)
 
-    creation_tx   
+The ``creation_tx`` dictionary should be similar to:
+
+.. code-block:: bash
+
     {'id': 'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5',
      'transaction': {'conditions': [{'cid': 0,
         'condition': {'details': {'bitmask': 32,
@@ -64,9 +86,13 @@ Notice the transaction ``id``:
 
 .. code-block:: python
  
-    creation_tx['id']
+    >>> txid = creation_tx['id']
+    >>> txid
     'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5'
 
+
+Asset Transfer
+--------------
 Imagine some time goes by, during which Alice is happy with her bicycle, and
 one day, she meets Bob, who is interested in acquiring her bicycle. The timing
 is good for Alice as she had been wanting to get a new bicycle.
@@ -76,20 +102,19 @@ in which the bicycle (asset) had been created:
 
 .. code-block:: python
 
-    creation_tx = bdb.transactions.retrieve(
-        'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5')
+    creation_tx = bdb.transactions.retrieve(txid)
 
 and then transfers it to Bob:
 
 .. code-block:: python
     
-    from bigchaindb_common.transaction import Transaction 
-    
-    transaction_model = Transaction.from_dict(creation_tx)
     transfer_tx = bdb.transactions.transfer(
-        transaction_model, bob.verifying_key, signing_key=alice.signing_key) 
+        creation_tx, bob.verifying_key, signing_key=alice.signing_key)
 
-    transfer_tx
+The ``transfer_tx`` dictionary should look something like:
+
+.. code-block:: bash
+
     {'id': 'a28e86a93173350f51e8f5661b07def2e2e3399eaaad179d29ec2155e05e7413',
      'transaction': {'conditions': [{'cid': 0,
         'condition': {'details': {'bitmask': 32,
@@ -113,12 +138,52 @@ Bob is the new owner:
 
 .. code-block:: python
 
-    transfer_tx['transaction']['conditions'][0]['owners_after'][0] == bob.verifying_key
+    >>> transfer_tx['transaction']['conditions'][0]['owners_after'][0] == bob.verifying_key
     True
 
 Alice is the former owner:
 
 .. code-block:: python
 
-    transfer_tx['transaction']['fulfillments'][0]['owners_before'][0] == alice.verifying_key
+    >>> transfer_tx['transaction']['fulfillments'][0]['owners_before'][0] == alice.verifying_key
     True
+
+
+Transaction Status
+------------------
+Using the ``id`` of a transaction, its status can be obtained:
+
+.. code-block:: python
+
+    >>> bdb.transactions.status(creation_tx['id'])
+    {'status': 'valid'}
+
+Handling cases for which the transaction ``id`` may not be found:
+
+.. code-block:: python
+
+    import logging
+
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.exceptions import NotFoundError
+
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(format='%(asctime)-15s %(status)-3s %(message)s')
+
+    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    txid = '12345'
+    try:
+        status = bdb.transactions.status(txid)
+    except NotFoundError as e:
+        logger.error('Transaction "%s" could was not found.',
+                     txid,
+                     extra={'status': e.status_code})
+
+Running the above code should give something similar to:
+
+.. code-block:: bash
+
+    2016-09-29 15:06:30,606 404 Transaction "12345" could was not found.
+
+
+.. _bigchaindb_driver: https://github.com/bigchaindb/bigchaindb-driver
