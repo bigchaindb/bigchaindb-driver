@@ -76,7 +76,7 @@ development.
    and the tests. For the tests, you'll need to  start the RethinkDB and
    BigchainDB servers::
 
-    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d rdb
     $ docker-compose up -d bdb-server
 
 5. flake8 check::
@@ -122,7 +122,7 @@ other tasks that depend on the running node. To run a BigchainDB node, (for
 development), you start a RethinkDB node, followed by the linked BigchainDB
 node::
 
-    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d rdb
     $ docker-compose up -d bdb-server
 
 You can monitor the logs::
@@ -141,7 +141,7 @@ To run a subset of tests::
     not require a connection with the BigchainDB server, you need to run the
     BigchainDB and RethinkDB servers::
 
-    $ docker-compose up -d rethinkdb
+    $ docker-compose up -d rdb 
     $ docker-compose up -d bdb-server
 
 
