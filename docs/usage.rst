@@ -57,30 +57,32 @@ Let's first connect to a BigchainDB node:
 .. code-block:: python
 
     creation_tx = bdb.transactions.create(verifying_key=alice.verifying_key,
-                                          signing_key=alice.signing_key)
+                                          signing_key=alice.signing_key,
+                                          payload=bicycle)
 
 The ``creation_tx`` dictionary should be similar to:
 
 .. code-block:: bash
 
-    {'id': 'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5',
+    {'id': '1dee8db53d86bbba7af7da2b2772ce58c699d29701e8e97bbaa3837a67c265d8',
      'transaction': {'conditions': [{'cid': 0,
         'condition': {'details': {'bitmask': 32,
-          'public_key': '6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi',
+          'public_key': '6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL',
           'signature': None,
           'type': 'fulfillment',
           'type_id': 4},
-         'uri': 'cc:4:20:VJLFHYncUMIXusBIghrOVLXPAmec9VJWx6NJl0_9MKE:96'},
-        'owners_after': ['6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi']}],
-      'data': None,
+         'uri': 'cc:4:20:T-H5zquMLzqRX0U59K1eABKViOq5G_aaJmJb4fLU_As:96'},
+        'owners_after': ['6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL']}],
+      'data': {'payload': {'bicycle': {'manufacturer': 'bkfab',
+         'serial_number': 'abcd1234'}},
+       'uuid': '26bf6f2e-70c5-4bad-88f8-ace9b60b78bb'},
       'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:VJLFHYncUMIXusBIghrOVLXPAmec9VJWx6NJl0_9MKHONkikhxXjNFY03EW4c0MJFvsHYTZh97QxMM2ZBeoiljjge5Tn7wPoILjyLShEALQ9gzf_QK44KboStzpw0nUB',
+        'fulfillment': 'cf:4:T-H5zquMLzqRX0U59K1eABKViOq5G_aaJmJb4fLU_Atx3Abk4qmD5PNcI4R48Dxar9rYpbNoyLmD4jvkZK-x6XVQcEaIZKVmuLIxEpwbHuuuEBfPMk32Fl6vMo8zk2AF',
         'input': None,
-        'owners_before': ['6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi']}],
+        'owners_before': ['6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL']}],
       'operation': 'CREATE',
-      'timestamp': '1474467828'},
+      'timestamp': '1475749690'},
      'version': 1}
-
 
 Notice the transaction ``id``:
 
@@ -88,7 +90,7 @@ Notice the transaction ``id``:
  
     >>> txid = creation_tx['id']
     >>> txid
-    'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5'
+    '1dee8db53d86bbba7af7da2b2772ce58c699d29701e8e97bbaa3837a67c265d8'
 
 
 Asset Transfer
@@ -115,25 +117,25 @@ The ``transfer_tx`` dictionary should look something like:
 
 .. code-block:: bash
 
-    {'id': 'a28e86a93173350f51e8f5661b07def2e2e3399eaaad179d29ec2155e05e7413',
+    {'id': '8d89f9c97ddea72feee1286f428e38ab1479e9f2014c817a15eecfd661325312',
      'transaction': {'conditions': [{'cid': 0,
         'condition': {'details': {'bitmask': 32,
-          'public_key': '3op6F4aU4kQhXVYG9tkEPM7AXJftAFTKjqM9iv11gBhQ',
+          'public_key': 'CQztMZFEWJwF3Qf81vnGv6H15m6HUJ6LAcEj8FeUYNn2',
           'signature': None,
           'type': 'fulfillment',
           'type_id': 4},
-         'uri': 'cc:4:20:KbVWGmfin6ueqTPS62z3IoAEFY-bjYIVJU8oCQtCImc:96'},
-        'owners_after': ['3op6F4aU4kQhXVYG9tkEPM7AXJftAFTKjqM9iv11gBhQ']}],
+         'uri': 'cc:4:20:qZZdtaETW9Ax-a-vqLJ4HHFoPe7uHjRncMtlC3Lzqs8:96'},
+        'owners_after': ['CQztMZFEWJwF3Qf81vnGv6H15m6HUJ6LAcEj8FeUYNn2']}],
       'data': None,
       'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:VJLFHYncUMIXusBIghrOVLXPAmec9VJWx6NJl0_9MKESz8EdircaOtIsIWhoK8XnddCIzNh__MaDEp026OIkH7SkLeAP5bEIcwjzHWefazle8NsTQmZraR4FEbPhV1cM',
+        'fulfillment': 'cf:4:T-H5zquMLzqRX0U59K1eABKViOq5G_aaJmJb4fLU_AsuvYww_nA3GtZvLmXeEvOIiAC0UyyyyihNcmm4WGKK7ot-i-ychkR5NpfIzxVOOXzrM14chmMJoi9W-QGW5woG',
         'input': {'cid': 0,
-         'txid': 'b795cc579436d743b0e63ac00fecce8d79dd9ed5c450be9aaf7d916e53c118f5'},
-        'owners_before': ['6h93weebF6Zn8RwV9Kejcwmzbfcb3Rv8srPQeuuzRjZi']}],
+         'txid': '1dee8db53d86bbba7af7da2b2772ce58c699d29701e8e97bbaa3837a67c265d8'},
+        'owners_before': ['6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL']}],
       'operation': 'TRANSFER',
-      'timestamp': '1474468018'},
+      'timestamp': '1475749812'},
      'version': 1}
- 
+
 Bob is the new owner: 
 
 .. code-block:: python
