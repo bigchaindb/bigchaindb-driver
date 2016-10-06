@@ -11,8 +11,8 @@ BigchainDB Python Driver
 .. image:: https://img.shields.io/codecov/c/github/bigchaindb/bigchaindb-driver/master.svg
     :target: https://codecov.io/github/bigchaindb/bigchaindb-driver?branch=master
 
-.. image:: https://readthedocs.org/projects/bigchaindb-driver/badge/?version=latest
-        :target: https://bigchaindb-driver.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/bigchaindb-python-driver/badge/?version=latest
+        :target: http://bigchaindb.readthedocs.io/projects/py-driver/en/latest/?badge=latest
         :alt: Documentation Status
 
 .. image:: https://pyup.io/repos/github/bigchaindb/bigchaindb-driver/shield.svg
@@ -24,7 +24,7 @@ Python driver for BigchainDB
 
 * Development Status: Pre-Alpha
 * Free software: Apache Software License 2.0
-* Documentation: https://bigchaindb-driver.readthedocs.io.
+* Documentation: https://bigchaindb.readthedocs.io/projects/py-driver/en/latest/index.html
 
 
 Features
