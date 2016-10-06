@@ -59,7 +59,7 @@ texinfo_documents = [
      'BigchainDB Python Driver Documentation',
      'BigchainDB',
      'bigchaindb_python_driver',
-     'A Python SDK for writing apps that communicate with BigchainDB',
+     '',
      'Miscellaneous'),
 ]
 
