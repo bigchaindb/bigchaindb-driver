@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import sys
 import os
 
@@ -30,8 +27,8 @@ extensions = [
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
-project = u'bigchaindb-driver'
-copyright = u"2016, BigchainDB"
+project = 'BigchainDB Python Driver'
+copyright = '2016, BigchainDB Contributors'
 version = bigchaindb_driver.__version__
 release = bigchaindb_driver.__version__
 exclude_patterns = ['_build']
@@ -42,28 +39,28 @@ suppress_warnings = ['image.nonlocal_uri']
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_static_path = ['_static']
-htmlhelp_basename = 'bigchaindb_driverdoc'
+htmlhelp_basename = 'bigchaindb_python_driverdoc'
 
 latex_elements = {}
 
 latex_documents = [
-    ('index', 'bigchaindb_driver.tex',
-     u'bigchaindb-driver Documentation',
-     u'BigchainDB', 'manual'),
+    ('index', 'bigchaindb_python_driver.tex',
+     'BigchainDB Python Driver Documentation',
+     'BigchainDB', 'manual'),
 ]
 
 man_pages = [
-    ('index', 'bigchaindb_driver',
-     u'bigchaindb-driver Documentation',
-     [u'BigchainDB'], 1)
+    ('index', 'bigchaindb_python_driver',
+     'BigchainDB Python Driver Documentation',
+     ['BigchainDB'], 1)
 ]
 
 texinfo_documents = [
-    ('index', 'bigchaindb_driver',
-     u'bigchaindb-driver Documentation',
-     u'BigchainDB',
-     'bigchaindb_driver',
-     'One line description of project.',
+    ('index', 'bigchaindb_python_driver',
+     'BigchainDB Python Driver Documentation',
+     'BigchainDB',
+     'bigchaindb_python_driver',
+     '',
      'Miscellaneous'),
 ]
 
