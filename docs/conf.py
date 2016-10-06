@@ -1,9 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import sys
 import os
-
 import sphinx_rtd_theme
 
 # Get the project root dir, which is the parent dir of this
