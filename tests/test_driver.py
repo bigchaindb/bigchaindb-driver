@@ -3,7 +3,6 @@
 from time import sleep
 
 from pytest import raises
-from responses import RequestsMock
 
 from bigchaindb_common.transaction import Transaction
 
@@ -80,22 +79,25 @@ class TestTransactionsEndpoint:
         with raises(InvalidVerifyingKey):
             driver.transactions.create(signing_key=alice_privkey)
 
-    def test_transfer_assets(self, alice_driver, alice_transaction_obj,
+    def test_transfer_assets(self, alice_driver, persisted_alice_transaction,
                              bob_pubkey, bob_privkey):
-        driver = alice_driver
-        inputs = alice_transaction_obj.to_inputs()
-        transfer_transaction = Transaction.transfer(inputs, [bob_pubkey])
-        signed_transaction = transfer_transaction.sign([driver.signing_key])
-        json = signed_transaction.to_dict()
-        url = driver.nodes[0] + '/transactions/'
-        with RequestsMock() as requests_mock:
-            requests_mock.add('POST', url, json=json)
-            tx = driver.transactions.transfer(
-                alice_transaction_obj.to_dict(), bob_privkey)
+        tx = alice_driver.transactions.transfer(
+            persisted_alice_transaction, bob_pubkey)
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
-        assert fulfillment['owners_before'][0] == driver.verifying_key
+        assert fulfillment['owners_before'][0] == alice_driver.verifying_key
         assert condition['owners_after'][0] == bob_pubkey
+
+    def test_transfer_assets_with_payload(self, alice_driver,
+                                          persisted_alice_transaction,
+                                          bob_pubkey, bob_privkey):
+        tx = alice_driver.transactions.transfer(
+            persisted_alice_transaction, bob_pubkey, payload={'a': 'b'})
+        fulfillment = tx['transaction']['fulfillments'][0]
+        condition = tx['transaction']['conditions'][0]
+        assert fulfillment['owners_before'][0] == alice_driver.verifying_key
+        assert condition['owners_after'][0] == bob_pubkey
+        assert tx['transaction']['data']['payload'] == {'a': 'b'}
 
     def test_transfer_without_signing_key(self, bdb_node):
         from bigchaindb_driver import BigchainDB

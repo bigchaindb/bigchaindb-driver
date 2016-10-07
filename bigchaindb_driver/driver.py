@@ -182,13 +182,15 @@ class TransactionsEndpoint(NamespacedDriver):
         path = self.path + txid + '/status'
         return self.transport.forward_request(method='GET', path=path)
 
-    def transfer(self, transaction, *owners_after, signing_key=None):
+    def transfer(self, transaction,
+                 *owners_after, signing_key=None, payload=None):
         """Issue a transaction to transfer an asset.
 
         Args:
             transaction (dict): The transaction to transfer.
             owners_after (str): Zero or more public keys of the new owners.
             signing_key (str): Private key used to sign transactions.
+            payload (dict): Transfer payload.
 
         Returns:
             dict: The transaction pushed to the Federation.
@@ -204,7 +206,8 @@ class TransactionsEndpoint(NamespacedDriver):
         transaction_obj = Transaction.from_dict(transaction)
         signed_transfer_transaction = Transaction.transfer(
             transaction_obj.to_inputs(),
-            list(owners_after)
+            list(owners_after),
+            payload=payload,
         ).sign([signing_key]).to_dict()
         return self._push(signed_transfer_transaction)
 

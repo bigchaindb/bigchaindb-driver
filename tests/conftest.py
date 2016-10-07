@@ -1,5 +1,6 @@
+from base64 import b64encode
 from collections import namedtuple
-from os import environ
+from os import environ, urandom
 
 import requests
 from pytest import fixture
@@ -86,8 +87,12 @@ def mock_requests_post(monkeypatch):
 
 @fixture
 def alice_transaction_obj(alice_pubkey):
-    return Transaction.create(owners_before=[alice_pubkey],
-                              owners_after=[alice_pubkey])
+    serial_number = b64encode(urandom(10), altchars=b'-_').decode()
+    return Transaction.create(
+        owners_before=[alice_pubkey],
+        owners_after=[alice_pubkey],
+        payload={'serial_number': serial_number},
+    )
 
 
 @fixture
