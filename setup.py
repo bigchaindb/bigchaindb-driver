@@ -36,6 +36,7 @@ docs_require = [
     'sphinx-autobuild',
     'sphinxcontrib-napoleon>=0.4.4',
     'sphinx_rtd_theme',
+    'sphinxcontrib-httpdomain',
 ]
 
 setup(

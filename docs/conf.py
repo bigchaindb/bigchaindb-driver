@@ -22,6 +22,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinxcontrib.httpdomain',
 ]
 
 templates_path = ['_templates']
@@ -64,4 +65,8 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-intersphinx_mapping = {'https://docs.python.org/3': None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'bigchaindb-server': (
+        'https://docs.bigchaindb.com/projects/server/en/latest/', None),
+}

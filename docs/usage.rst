@@ -1,7 +1,73 @@
 =====
 Usage
 =====
+The BigchainDB driver's main purpose is to connect to one or more BigchainDB
+server nodes, in order to perform supported API calls (such as
+:http:post:`creating a transaction </transactions/>`, or
+:http:get:`retrieving a transaction </transactions/{tx_id}>`). 
 
+Connecting to a BigchainDB node, is done via the
+:class:`BigchainDB class <bigchaindb_driver.BigchainDB>`:
+
+.. code-block:: python
+
+    from bigchaindb_driver import BigchainDB
+
+    bdb = BigchainDB('<api_endpoint>')
+
+where ``<api_endpoint>`` is the root URL of the BigchainDB server API you wish
+to connect to. 
+
+If you do not know the URL, and have access to the server, you
+can use the BigchainDB server command line. For instance, for the simplest case
+in which a BigchainDB node would be running locally:
+
+.. code-block:: bash
+
+    $ bigchaindb show-config | grep api_endpoint
+        "api_endpoint": "http://localhost:9984/api/v1",
+
+You would then connect to the local BigchainDB server this way:
+
+.. code-block:: python
+
+    bdb = BigchainDB('http://localhost:9984/api/v1')
+
+If you are running the docker-based dev setup that comes along with the
+`bigchaindb_driver`_ repository (see :ref:`devenv-docker` for more
+information), and wish to connect to it from the ``bdb-driver`` linked
+(container) service:
+
+.. code-block:: bash
+
+    $ docker-compose run --rm bdb-server bigchaindb show-config | grep api_endpoint
+        "api_endpoint": "http://bdb-server:9984/api/v1",
+
+.. code-block:: bash
+    
+    $ docker-compose run --rm bdb-driver python
+
+.. code-block:: python
+
+    >>> from bigchaindb_driver import BigchainDB
+    >>> bdb = BigchainDB('http://bdb-server:9984/api/v1')
+
+Alternatively, you may connect to the containerized BigchainDB node from
+"outside", in which case you need to know the port binding:
+
+.. code-block:: bash
+    
+    $ docker-compose port bdb-server 9984
+    0.0.0.0:32780
+
+.. code-block:: python
+
+    >>> from bigchaindb_driver import BigchainDB
+    >>> bdb = BigchainDB('http://0.0.0.0:32780/api/v1')
+
+
+Digital Asset Definition
+------------------------
 As an example, let's consider the creation and transfer of a digital asset that
 represents a bicycle:
 
@@ -31,22 +97,6 @@ who claims to be the signee.
 
     alice, bob = generate_keypair(), generate_keypair()
 
-
-Connecting to a BigchainDB Node
--------------------------------
-Connecting to a BigchainDB node, is done via the
-:class:`BigchainDB class <bigchaindb_driver.BigchainDB>`:
-
-.. code-block:: python
-
-    from bigchaindb_driver import BigchainDB
-
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
-
-.. note:: The URL you pass to :class:`~bigchaindb_driver.BigchainDB` needs to
-    be pointing to a running server node. In the current example, it implies
-    that you are running the docker-based dev setup that comes along with the
-    `bigchaindb_driver`_ repository. See :ref:`devenv-docker` for instructions.
 
 Asset Creation
 --------------
