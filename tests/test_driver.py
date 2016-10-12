@@ -81,6 +81,10 @@ class TestTransactionsEndpoint:
 
     def test_transfer_assets(self, alice_driver, persisted_alice_transaction,
                              bob_pubkey, bob_privkey):
+        # FIXME The sleep, or some other approach is required to wait for the
+        # transaction to be available as some processing is being done by the
+        # server.
+        sleep(1.5)
         tx = alice_driver.transactions.transfer(
             persisted_alice_transaction, bob_pubkey)
         fulfillment = tx['transaction']['fulfillments'][0]
@@ -91,6 +95,10 @@ class TestTransactionsEndpoint:
     def test_transfer_assets_with_payload(self, alice_driver,
                                           persisted_alice_transaction,
                                           bob_pubkey, bob_privkey):
+        # FIXME The sleep, or some other approach is required to wait for the
+        # transaction to be available as some processing is being done by the
+        # server.
+        sleep(1.5)
         tx = alice_driver.transactions.transfer(
             persisted_alice_transaction, bob_pubkey, payload={'a': 'b'})
         fulfillment = tx['transaction']['fulfillments'][0]
