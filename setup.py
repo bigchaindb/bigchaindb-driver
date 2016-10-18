@@ -10,7 +10,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'bigchaindb_common>=0.0.2',
+    'bigchaindb_common>=0.0.6',
     'requests>=2.11.0',
 ]
 

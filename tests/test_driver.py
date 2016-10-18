@@ -38,7 +38,17 @@ class TestTransactionsEndpoint:
         assert tx['id']
         assert tx['version']
         assert tx['transaction']['operation'] == 'CREATE'
-        assert tx['transaction']['data'] is None
+        assert 'asset' in tx['transaction']
+        assert 'data' in tx['transaction']['asset']
+        assert 'divisible' in tx['transaction']['asset']
+        assert 'id' in tx['transaction']['asset']
+        assert 'refillable' in tx['transaction']['asset']
+        assert 'updatable' in tx['transaction']['asset']
+        assert tx['transaction']['asset']['data'] is None
+        assert tx['transaction']['asset']['divisible'] is False
+        assert tx['transaction']['asset']['id']
+        assert tx['transaction']['asset']['refillable'] is False
+        assert tx['transaction']['asset']['updatable'] is False
         assert tx['transaction']['timestamp']
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
@@ -55,7 +65,7 @@ class TestTransactionsEndpoint:
         assert tx['id']
         assert tx['version']
         assert tx['transaction']['operation'] == 'CREATE'
-        assert tx['transaction']['data'] is None
+        assert tx['transaction']['asset']['data'] is None
         assert tx['transaction']['timestamp']
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
@@ -86,33 +96,21 @@ class TestTransactionsEndpoint:
         # server.
         sleep(1.5)
         tx = alice_driver.transactions.transfer(
-            persisted_alice_transaction, bob_pubkey)
+            persisted_alice_transaction,
+            bob_pubkey,
+            asset=persisted_alice_transaction['transaction']['asset'],
+        )
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == alice_driver.verifying_key
         assert condition['owners_after'][0] == bob_pubkey
-
-    def test_transfer_assets_with_payload(self, alice_driver,
-                                          persisted_alice_transaction,
-                                          bob_pubkey, bob_privkey):
-        # FIXME The sleep, or some other approach is required to wait for the
-        # transaction to be available as some processing is being done by the
-        # server.
-        sleep(1.5)
-        tx = alice_driver.transactions.transfer(
-            persisted_alice_transaction, bob_pubkey, payload={'a': 'b'})
-        fulfillment = tx['transaction']['fulfillments'][0]
-        condition = tx['transaction']['conditions'][0]
-        assert fulfillment['owners_before'][0] == alice_driver.verifying_key
-        assert condition['owners_after'][0] == bob_pubkey
-        assert tx['transaction']['data']['payload'] == {'a': 'b'}
 
     def test_transfer_without_signing_key(self, bdb_node):
         from bigchaindb_driver import BigchainDB
         from bigchaindb_driver.exceptions import InvalidSigningKey
         driver = BigchainDB(bdb_node)
         with raises(InvalidSigningKey):
-            driver.transactions.transfer(None)
+            driver.transactions.transfer(None, asset=None)
 
     def test_retrieve(self, driver, persisted_alice_transaction):
         txid = persisted_alice_transaction['id']
