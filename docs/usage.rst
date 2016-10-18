@@ -74,9 +74,11 @@ represents a bicycle:
 .. code-block:: python
     
     bicycle = {
-        'bicycle': {
-            'serial_number': 'abcd1234',
-            'manufacturer': 'bkfab',
+        'data': {
+            'bicycle': {
+                'serial_number': 'abcd1234',
+                'manufacturer': 'bkfab',
+            },
         },
     }
 
@@ -108,31 +110,37 @@ Let's first connect to a BigchainDB node:
 
     creation_tx = bdb.transactions.create(verifying_key=alice.verifying_key,
                                           signing_key=alice.signing_key,
-                                          payload=bicycle)
+                                          asset=bicycle)
 
 The ``creation_tx`` dictionary should be similar to:
 
 .. code-block:: bash
 
-    {'id': '1dee8db53d86bbba7af7da2b2772ce58c699d29701e8e97bbaa3837a67c265d8',
-     'transaction': {'conditions': [{'cid': 0,
+    {'id': '9da5e3bfd34725b9c0a40c491bd27c23f4b225e027ce2f51a8c99e9fbd02d97a',
+     'transaction': {'asset': {'data': {'bicycle': {'manufacturer': 'bkfab',
+         'serial_number': 'abcd1234'}},
+       'divisible': False,
+       'id': 'd6a3b850-e960-4391-98c3-f16f1cd26a40',
+       'refillable': False,
+       'updatable': False},
+      'conditions': [{'amount': 1,
+        'cid': 0,
         'condition': {'details': {'bitmask': 32,
-          'public_key': '6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL',
+          'public_key': '3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj',
           'signature': None,
           'type': 'fulfillment',
           'type_id': 4},
-         'uri': 'cc:4:20:T-H5zquMLzqRX0U59K1eABKViOq5G_aaJmJb4fLU_As:96'},
-        'owners_after': ['6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL']}],
-      'data': {'payload': {'bicycle': {'manufacturer': 'bkfab',
-         'serial_number': 'abcd1234'}},
-       'uuid': '26bf6f2e-70c5-4bad-88f8-ace9b60b78bb'},
+         'uri': 'cc:4:20:IT8NBLRPBWXt8qNmYlYaqVxux_KWfKiiymxeuqkIVmY:96'},
+        'owners_after': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
       'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:T-H5zquMLzqRX0U59K1eABKViOq5G_aaJmJb4fLU_Atx3Abk4qmD5PNcI4R48Dxar9rYpbNoyLmD4jvkZK-x6XVQcEaIZKVmuLIxEpwbHuuuEBfPMk32Fl6vMo8zk2AF',
+        'fulfillment': 'cf:4:IT8NBLRPBWXt8qNmYlYaqVxux_KWfKiiymxeuqkIVmYx2pP5XyS2KZJ3jN90hJausCTqaycqQZh4g8MczME8kSM4ApfrQs_3w6Uz4ZkcjhzxcUz2FXsysljqGIaLVaoL',
         'input': None,
-        'owners_before': ['6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL']}],
+        'owners_before': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
+      'metadata': None,
       'operation': 'CREATE',
-      'timestamp': '1475749690'},
+      'timestamp': '1476809307'},
      'version': 1}
+
 
 Notice the transaction ``id``:
 
@@ -161,30 +169,37 @@ and then transfers it to Bob:
 .. code-block:: python
     
     transfer_tx = bdb.transactions.transfer(
-        creation_tx, bob.verifying_key, signing_key=alice.signing_key)
+        creation_tx,
+        bob.verifying_key,
+        asset=creation_tx['transaction']['asset'],
+        signing_key=alice.signing_key,
+    )
 
 The ``transfer_tx`` dictionary should look something like:
 
 .. code-block:: bash
 
-    {'id': '8d89f9c97ddea72feee1286f428e38ab1479e9f2014c817a15eecfd661325312',
-     'transaction': {'conditions': [{'cid': 0,
+    {'id': 'ad1b4294bd6e255a579f51ae020be60da32256b0da979fd3df4ac6130e8eeed1',
+     'transaction': {'asset': {'id': 'd6a3b850-e960-4391-98c3-f16f1cd26a40'},
+      'conditions': [{'amount': 1,
+        'cid': 0,
         'condition': {'details': {'bitmask': 32,
-          'public_key': 'CQztMZFEWJwF3Qf81vnGv6H15m6HUJ6LAcEj8FeUYNn2',
+          'public_key': '35WbK4tqJWy4z98TzBr83iekhyY4xUmNWabiC9FQoEwp',
           'signature': None,
           'type': 'fulfillment',
           'type_id': 4},
-         'uri': 'cc:4:20:qZZdtaETW9Ax-a-vqLJ4HHFoPe7uHjRncMtlC3Lzqs8:96'},
-        'owners_after': ['CQztMZFEWJwF3Qf81vnGv6H15m6HUJ6LAcEj8FeUYNn2']}],
-      'data': None,
+         'uri': 'cc:4:20:Ht8oCVawCLOMNS758n5Q-5eFhxYr_xXbQ6X7AYsJZB8:96'},
+        'owners_after': ['35WbK4tqJWy4z98TzBr83iekhyY4xUmNWabiC9FQoEwp']}],
       'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:T-H5zquMLzqRX0U59K1eABKViOq5G_aaJmJb4fLU_AsuvYww_nA3GtZvLmXeEvOIiAC0UyyyyihNcmm4WGKK7ot-i-ychkR5NpfIzxVOOXzrM14chmMJoi9W-QGW5woG',
+        'fulfillment': 'cf:4:IT8NBLRPBWXt8qNmYlYaqVxux_KWfKiiymxeuqkIVmac1bLg24vkQ_rW7BMnJFsvUjn1J8gwFbcr5q8WqUCCnRe_uBrEvxwiAG9aPlldkh8YjHibHdkLzTKEJJE41BAK',
         'input': {'cid': 0,
-         'txid': '1dee8db53d86bbba7af7da2b2772ce58c699d29701e8e97bbaa3837a67c265d8'},
-        'owners_before': ['6Nq4cVaKXsdpVLoaqJ8oYto7dSvp3BgzMgj7v8ZMNBuL']}],
+         'txid': '9da5e3bfd34725b9c0a40c491bd27c23f4b225e027ce2f51a8c99e9fbd02d97a'},
+        'owners_before': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
+      'metadata': None,
       'operation': 'TRANSFER',
-      'timestamp': '1475749812'},
+      'timestamp': '1476809389'},
      'version': 1}
+
 
 Bob is the new owner: 
 
