@@ -5,7 +5,7 @@ from os import environ, urandom
 import requests
 from pytest import fixture
 
-from bigchaindb_common.transaction import Transaction
+from bigchaindb_common.transaction import Asset, Transaction
 
 
 @fixture
@@ -91,7 +91,7 @@ def alice_transaction_obj(alice_pubkey):
     return Transaction.create(
         owners_before=[alice_pubkey],
         owners_after=[alice_pubkey],
-        payload={'serial_number': serial_number},
+        asset=Asset(data={'data': {'serial_number': serial_number}}),
     )
 
 
