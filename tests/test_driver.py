@@ -4,7 +4,7 @@ from time import sleep
 
 from pytest import raises
 
-from bigchaindb_common.transaction import Transaction
+from bigchaindb.common.transaction import Transaction
 
 
 def test_temp_driver_returns_a_temp_driver(bdb_node):

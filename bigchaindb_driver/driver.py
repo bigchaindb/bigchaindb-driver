@@ -1,4 +1,4 @@
-from bigchaindb_common.transaction import Asset, Transaction
+from bigchaindb.common.transaction import Asset, Transaction
 
 from .crypto import generate_keypair
 from .exceptions import InvalidVerifyingKey, InvalidSigningKey

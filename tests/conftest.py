@@ -5,7 +5,7 @@ from os import environ, urandom
 import requests
 from pytest import fixture
 
-from bigchaindb_common.transaction import Asset, Transaction
+from bigchaindb.common.transaction import Asset, Transaction
 
 
 @fixture
