@@ -30,13 +30,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/bigchaindb/bigchaindb_driver
+    $ git clone git://github.com/bigchaindb/bigchaindb-driver
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/bigchaindb/bigchaindb_driver/tarball/master
+    $ curl  -OL https://github.com/bigchaindb/bigchaindb-driver/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -45,5 +45,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/bigchaindb/bigchaindb_driver
-.. _tarball: https://github.com/bigchaindb/bigchaindb_driver/tarball/master
+.. _Github repo: https://github.com/bigchaindb/bigchaindb-driver
+.. _tarball: https://github.com/bigchaindb/bigchaindb-driver/tarball/master
