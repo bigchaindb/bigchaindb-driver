@@ -24,22 +24,16 @@ Python driver for BigchainDB
 
 * Development Status: Pre-Alpha
 * Free software: Apache Software License 2.0
-* Documentation: https://bigchaindb.readthedocs.io/projects/py-driver/en/latest/index.html
+* Documentation: https://docs.bigchaindb.com/projects/py-driver/
 
 Important
 ---------
-Please upgrade to the latest version of the driver, using:
+Since the BigchainDB driver is under development, and may rapidly change, we  
+recommend installing the latest version:
 
 .. code-block:: bash
 
     pip install --upgrade bigchaindb_driver
-
-Also, please note that the latest ``master`` version of the BigchainDB server
-is required:
-
-.. code-block:: bash
-
-    pip install git+https://github.com/bigchaindb/bigchaindb.git
 
 Lastly, BigchainDB (server and driver) depend on `cryptoconditions`_, which now
 uses `PyNaCl`_ (`Networking and Cryptography library`_) which depends on
