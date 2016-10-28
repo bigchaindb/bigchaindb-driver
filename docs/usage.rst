@@ -242,7 +242,7 @@ Handling cases for which the transaction ``id`` may not be found:
     try:
         status = bdb.transactions.status(txid)
     except NotFoundError as e:
-        logger.error('Transaction "%s" could was not found.',
+        logger.error('Transaction "%s" was not found.',
                      txid,
                      extra={'status': e.status_code})
 
@@ -250,7 +250,7 @@ Running the above code should give something similar to:
 
 .. code-block:: bash
 
-    2016-09-29 15:06:30,606 404 Transaction "12345" could was not found.
+    2016-09-29 15:06:30,606 404 Transaction "12345" was not found.
 
 
 .. _bigchaindb_driver: https://github.com/bigchaindb/bigchaindb-driver
