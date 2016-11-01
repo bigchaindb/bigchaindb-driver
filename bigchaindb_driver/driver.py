@@ -1,6 +1,5 @@
 from bigchaindb.common.transaction import Asset, Transaction
 
-from .crypto import generate_keypair
 from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
 
@@ -224,16 +223,3 @@ class TransactionsEndpoint(NamespacedDriver):
         """
         return self.transport.forward_request(
             method='POST', path=self.path, json=transaction)
-
-
-def temp_driver(node):
-    """Create a new temporary driver.
-
-    Returns:
-        BigchainDB: A driver initialized with a keypair generated on the fly.
-
-    """
-    signing_key, verifying_key = generate_keypair()
-    return BigchainDB(node,
-                      signing_key=signing_key,
-                      verifying_key=verifying_key)

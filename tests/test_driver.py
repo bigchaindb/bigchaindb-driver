@@ -7,14 +7,6 @@ from pytest import raises
 from bigchaindb.common.transaction import Transaction
 
 
-def test_temp_driver_returns_a_temp_driver(bdb_node):
-    from bigchaindb_driver.driver import temp_driver
-    driver = temp_driver(bdb_node)
-    assert driver.verifying_key
-    assert driver.signing_key
-    assert driver.nodes[0] == bdb_node
-
-
 def test_driver_init_basic(bdb_node):
     from bigchaindb_driver.driver import BigchainDB
     driver = BigchainDB(bdb_node)
