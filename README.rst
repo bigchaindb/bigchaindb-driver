@@ -20,26 +20,8 @@ BigchainDB Python Driver
      :alt: Updates
 
 
-Python driver for BigchainDB
-
-* Development Status: Pre-Alpha
 * Free software: Apache Software License 2.0
 * Documentation: https://docs.bigchaindb.com/projects/py-driver/
-
-Important
----------
-Since the BigchainDB driver is under development, and may rapidly change, we  
-recommend installing the latest version:
-
-.. code-block:: bash
-
-    pip install --upgrade bigchaindb_driver
-
-Lastly, BigchainDB (server and driver) depend on `cryptoconditions`_, which now
-uses `PyNaCl`_ (`Networking and Cryptography library`_) which depends on
-``ffi.h``. Hence, depending on your setup you may need to install the
-development files for ``libffi``. Please see
-`How to Install OS-Level Dependencies <https://docs.bigchaindb.com/projects/server/en/latest/appendices/install-os-level-deps.html#how-to-install-os-level-dependencies>`_.
 
 
 Features
@@ -48,10 +30,11 @@ Features
 * Minimal support for `CREATE`, `TRANSFER`, and `GET` operations on the
   `/transactions` endpoint.
 
+
 Credits
 -------
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+This package was initially created using Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template. Many BigchainDB developers have contributed since then.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
