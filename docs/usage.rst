@@ -1,6 +1,14 @@
-=====
-Usage
-=====
+====================
+Basic Usage Examples
+====================
+
+.. note::
+
+   You must :doc:`install the bigchaindb_driver Python package <quickstart-installation>` first.
+
+   You should use Python 3 for these examples.
+
+
 The BigchainDB driver's main purpose is to connect to one or more BigchainDB
 server nodes, in order to perform supported API calls (such as
 :http:post:`creating a transaction </transactions/>`, or
