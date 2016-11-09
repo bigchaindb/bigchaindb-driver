@@ -23,6 +23,16 @@ Library Reference
 
     .. automethod:: __init__
 
+
+``offchain``
+------------
+.. automodule:: bigchaindb_driver.offchain
+.. autofunction::  prepare_transaction
+.. autofunction::  prepare_create_transaction
+.. autofunction::  prepare_transfer_transaction
+.. autofunction::  fulfill_transaction
+
+
 ``transport``
 -------------
 .. automodule:: bigchaindb_driver.transport
@@ -84,3 +94,11 @@ Library Reference
 .. autoclass:: InvalidSigningKey
 
 .. autoclass:: InvalidVerifyingKey
+
+
+``utils``
+---------
+
+.. automodule:: bigchaindb_driver.utils
+    :members:
+    :private-members:
