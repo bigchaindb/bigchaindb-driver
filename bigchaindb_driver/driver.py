@@ -2,6 +2,7 @@ from bigchaindb.common.transaction import Asset, Transaction
 
 from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
+from .offchain import prepare_transaction, fulfill_transaction
 
 
 DEFAULT_NODE = 'http://localhost:9984/api/v1'
@@ -119,6 +120,131 @@ class TransactionsEndpoint(NamespacedDriver):
     """
     path = '/transactions/'
 
+    @staticmethod
+    def prepare(*, operation='CREATE', owners_before=None,
+                owners_after=None, asset=None, metadata=None, inputs=None):
+        """
+        Prepares a transaction payload, ready to be fulfilled.
+
+        Args:
+            operation (str): The operation to perform. Must be ``'CREATE'``
+                or ``'TRANSFER'``. Case insensitive. Defaults to ``'CREATE'``.
+            owners_before (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+                One or more public keys representing the issuer(s) of
+                the asset being created. Only applies for ``'CREATE'``
+                operations. Defaults to ``None``.
+            owners_after (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+                One or more public keys representing the new owner(s) of the
+                asset being created or transferred. Defaults to ``None``.
+            asset (:obj:`dict`, optional): The asset being created or
+                transferred. MUST be supplied for ``'TRANSFER'`` operations.
+                Defaults to ``None``.
+            metadata (:obj:`dict`, optional): Metadata associated with the
+                transaction. Defaults to ``None``.
+            inputs (:obj:`dict` | :obj:`list` | :obj:`tuple`, optional):
+                One or more inputs holding the condition(s) that this
+                transaction intends to fulfill. Each input is expected to
+                be a :obj:`dict`. Only applies to, and MUST be supplied for,
+                ``'TRANSFER'`` operations.
+
+        Returns:
+            dict: The prepared transaction.
+
+        Raises:
+            :class:`~.exceptions.BigchaindbException`: If ``operation`` is
+                not ``'CREATE'`` or ``'TRANSFER'``.
+
+        .. important::
+
+            **CREATE operations**
+
+            * ``owners_before`` MUST be set.
+            * ``owners_after``, ``asset``, and ``metadata`` MAY be set.
+            * The argument ``inputs`` is ignored.
+            * If ``owners_after`` is not given, or evaluates to
+              ``False``, it will be set equal to ``owners_before``::
+
+                if not owners_after:
+                    owners_after = owners_before
+
+            **TRANSFER operations**
+
+            * ``owners_after``, ``asset``, and ``inputs`` MUST be set.
+            * ``metadata`` MAY be set.
+            * The argument ``owners_before`` is ignored.
+
+        """
+        return prepare_transaction(
+            operation=operation,
+            owners_before=owners_before,
+            owners_after=owners_after,
+            asset=asset,
+            metadata=metadata,
+            inputs=inputs,
+        )
+
+    @staticmethod
+    def fulfill(transaction, private_keys):
+        """
+        Fulfills the given transaction.
+
+        Args:
+            transaction (dict): The transaction to be fulfilled.
+            private_keys (:obj:`str` | :obj:`list` | :obj:`tuple`): One or
+                more private keys to be used for fulfilling the
+                transaction.
+
+        Returns:
+            dict: The fulfilled transaction payload, ready to be sent to a
+            BigchainDB federation.
+
+        Raises:
+            :exception:`~.exceptions.MissingSigningKeyError`: If a private
+                key, (aka signing key), is missing.
+
+        """
+        return fulfill_transaction(transaction, private_keys=private_keys)
+
+    def send(self, transaction):
+        """Submit a transaction to the Federation.
+
+        Args:
+            transaction (dict): the transaction to be sent
+                to the Federation node(s).
+
+        Returns:
+            dict: The transaction sent to the Federation node(s).
+
+        """
+        return self.transport.forward_request(
+            method='POST', path=self.path, json=transaction)
+
+    def retrieve(self, txid):
+        """Retrieves the transaction with the given id.
+
+        Args:
+            txid (str): Id of the transaction to retrieve.
+
+        Returns:
+            dict: The transaction with the given id.
+
+        """
+        path = self.path + txid
+        return self.transport.forward_request(method='GET', path=path)
+
+    def status(self, txid):
+        """Retrieves the status of the transaction with the given id.
+
+        Args:
+            txid (str): Id of the transaction to retrieve the status for.
+
+        Returns:
+            dict: A dict containing a 'status' item for the transaction.
+
+        """
+        path = self.path + txid + '/status'
+        return self.transport.forward_request(method='GET', path=path)
+
     def create(self, asset=None, verifying_key=None, signing_key=None):
         """Issue a transaction to create an asset.
 
@@ -155,33 +281,7 @@ class TransactionsEndpoint(NamespacedDriver):
             asset=asset,
         )
         signed_transaction = transaction.sign([signing_key])
-        return self._push(signed_transaction.to_dict())
-
-    def retrieve(self, txid):
-        """Retrieves the transaction with the given id.
-
-        Args:
-            txid (str): Id of the transaction to retrieve.
-
-        Returns:
-            dict: The transaction with the given id.
-
-        """
-        path = self.path + txid
-        return self.transport.forward_request(method='GET', path=path)
-
-    def status(self, txid):
-        """Retrieves the status of the transaction with the given id.
-
-        Args:
-            txid (str): Id of the transaction to retrieve the status for.
-
-        Returns:
-            dict: A dict containing a 'status' item for the transaction.
-
-        """
-        path = self.path + txid + '/status'
-        return self.transport.forward_request(method='GET', path=path)
+        return self.send(signed_transaction.to_dict())
 
     def transfer(self, transaction, *owners_after, asset, signing_key=None):
         """Issue a transaction to transfer an asset.
@@ -209,17 +309,4 @@ class TransactionsEndpoint(NamespacedDriver):
             list(owners_after),
             asset=Asset.from_dict(asset),
         ).sign([signing_key]).to_dict()
-        return self._push(signed_transfer_transaction)
-
-    def _push(self, transaction):
-        """Submit a transaction to the Federation.
-
-        Args:
-            transaction (dict): the transaction to be pushed to the Federation.
-
-        Returns:
-            dict: The transaction pushed to the Federation.
-
-        """
-        return self.transport.forward_request(
-            method='POST', path=self.path, json=transaction)
+        return self.send(signed_transfer_transaction)
