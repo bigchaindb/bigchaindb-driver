@@ -6,9 +6,6 @@ from setuptools import setup
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 install_requires = [
     'requests>=2.11.0',
     'bigchaindb>=0.7.0',
@@ -43,7 +40,7 @@ setup(
     name='bigchaindb_driver',
     version='0.0.2',
     description="Python driver for BigchainDB",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author="BigchainDB",
     author_email='dev@bigchaindb.com',
     url='https://github.com/bigchaindb/bigchaindb_driver',
@@ -58,7 +55,7 @@ setup(
     zip_safe=False,
     keywords='bigchaindb_driver',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
