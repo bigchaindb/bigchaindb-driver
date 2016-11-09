@@ -66,7 +66,7 @@ You can check your version of ``pip`` using:
 
 (You might also try the same command with ``pip3`` in place of ``pip``.)
 
-``pip`` was at version 9.0.0 as of November 2016. If you need to upgrade your version of pip, see the page about that in the `BigchainDB Server docs <https://docs.bigchaindb.com/projects/server/en/latest/appendices/install-latest-pip.html>`_.
+``pip`` was at version 9.0.0 as of November 2016. If you need to upgrade your version of ``pip``, see the page about that in the `BigchainDB Server docs <https://docs.bigchaindb.com/projects/server/en/latest/appendices/install-latest-pip.html>`_.
 
 
 Installing the BigchainDB Python Driver
