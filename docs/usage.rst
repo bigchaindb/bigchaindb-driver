@@ -4,7 +4,7 @@ Basic Usage Examples
 
 .. note::
 
-   You must :doc:`install the bigchaindb_driver Python package <quickstart-installation>` first.
+   You must :doc:`install the bigchaindb_driver Python package <quickstart>` first.
 
    You should use Python 3 for these examples.
 

@@ -9,14 +9,14 @@ BigchainDB Python Driver
 .. important:: **Development Status: Alpha**
     
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    ← Back to All BigchainDB Docs <https://bigchaindb.readthedocs.io/en/latest/index.html>
    readme
-   quickstart-installation
+   quickstart
    usage
-   advanced-installation
    advanced-usage
+   upgrading
    libref
    aboutthedocs
    contributing
