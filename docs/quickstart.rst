@@ -74,7 +74,10 @@ You can check your version of ``pip`` using:
 
     pip --version
 
-``pip`` was at version 9.0.0 as of November 2016. If you need to upgrade your version of ``pip``, see the page about that in the `BigchainDB Server docs <https://docs.bigchaindb.com/projects/server/en/latest/appendices/install-latest-pip.html>`_.
+``pip`` was at version 9.0.0 as of November 2016.
+If you need to upgrade your version of ``pip``,
+then see `the pip documentation <https://pip.pypa.io/en/stable/installing/>`_
+or our page about that in the `BigchainDB Server docs <https://docs.bigchaindb.com/projects/server/en/latest/appendices/install-latest-pip.html>`_.
 
 
 Dependency 4: setuptools
