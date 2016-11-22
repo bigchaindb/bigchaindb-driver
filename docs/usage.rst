@@ -198,7 +198,6 @@ The transaction needs to be fulfilled:
       'metadata': {'data': {'planet': 'earth'},
        'id': '4d406690-d6e3-48b2-ac64-9fff714f0ff3'},
       'operation': 'CREATE',
-      'timestamp': '1479921799'},
      'version': 1}
 
 And sent over to a BigchainDB node:
