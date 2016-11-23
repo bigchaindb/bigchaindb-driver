@@ -158,6 +158,12 @@ def prepare_create_transaction(*,
 
     if not owners_after:
         owners_after = owners_before
+    elif not isinstance(owners_after, (list, tuple)):
+        owners_after = [owners_after]
+    # NOTE: Needed for the time being. See
+    # https://github.com/bigchaindb/bigchaindb/issues/797
+    elif isinstance(owners_after, tuple):
+        owners_after = list(owners_after)
 
     asset = _normalize_asset(asset)
 
