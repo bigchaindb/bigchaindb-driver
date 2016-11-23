@@ -146,7 +146,6 @@ The ``creation_tx`` dictionary should be similar to:
         'owners_before': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
       'metadata': None,
       'operation': 'CREATE',
-      'timestamp': '1476809307'},
      'version': 1}
 
 
@@ -205,7 +204,6 @@ The ``transfer_tx`` dictionary should look something like:
         'owners_before': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
       'metadata': None,
       'operation': 'TRANSFER',
-      'timestamp': '1476809389'},
      'version': 1}
 
 

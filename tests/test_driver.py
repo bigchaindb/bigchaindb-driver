@@ -44,7 +44,6 @@ class TestTransactionsEndpoint:
         assert tx['transaction']['asset']['id']
         assert tx['transaction']['asset']['refillable'] is False
         assert tx['transaction']['asset']['updatable'] is False
-        assert tx['transaction']['timestamp']
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == alice_driver.verifying_key
@@ -61,7 +60,6 @@ class TestTransactionsEndpoint:
         assert tx['version']
         assert tx['transaction']['operation'] == 'CREATE'
         assert tx['transaction']['asset']['data'] is None
-        assert tx['transaction']['timestamp']
         fulfillment = tx['transaction']['fulfillments'][0]
         condition = tx['transaction']['conditions'][0]
         assert fulfillment['owners_before'][0] == bob_pubkey
