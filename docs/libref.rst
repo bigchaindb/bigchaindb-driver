@@ -95,6 +95,8 @@ Library Reference
 
 .. autoexception:: InvalidVerifyingKey
 
+.. autoexception:: MissingSigningKeyError
+
 
 ``utils``
 ---------
