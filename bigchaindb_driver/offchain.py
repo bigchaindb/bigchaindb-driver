@@ -307,7 +307,7 @@ def fulfill_transaction(transaction, *, private_keys):
         BigchainDB federation.
 
     Raises:
-        :exception:`~.exceptions.MissingSigningKeyError`: If a private
+        :exc:`~.exceptions.MissingSigningKeyError`: If a private
             key, (aka signing key), is missing.
 
     """
