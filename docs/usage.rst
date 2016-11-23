@@ -94,6 +94,17 @@ We'll suppose that the bike belongs to Alice, and that it will be transferred
 to Bob.
 
 
+Metadata Definition (*optional*)
+--------------------------------
+You can `optionally` add metadata to a transaction. Any dictionary is accepted.
+
+For example:
+
+.. code-block:: python
+
+    metadata = {'planet': 'earth'}
+
+
 Cryptographic Identities Generation
 -----------------------------------
 Alice, and Bob are represented by signing/verifying key pairs. The signing
@@ -110,53 +121,112 @@ who claims to be the signee.
 
 Asset Creation
 --------------
-We're now ready to create the digital asset.
-
-Let's first connect to a BigchainDB node:
+We're now ready to create the digital asset. First we prepare the transaction:
 
 .. code-block:: python
 
-    creation_tx = bdb.transactions.create(verifying_key=alice.verifying_key,
-                                          signing_key=alice.signing_key,
-                                          asset=bicycle)
+   prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        owners_before=alice.verifying_key,
+        asset=bicycle,
+        metadata=metadata,
+   )
 
-The ``creation_tx`` dictionary should be similar to:
+The ``prepared_creation_tx`` dictionary should be similar to:
 
 .. code-block:: bash
 
-    {'id': '9da5e3bfd34725b9c0a40c491bd27c23f4b225e027ce2f51a8c99e9fbd02d97a',
+    {'id': 'f713f1c662bcf7e72805c51222b82d0408df5a0cadddfb040d9a2e7171204471',
      'transaction': {'asset': {'data': {'bicycle': {'manufacturer': 'bkfab',
          'serial_number': 'abcd1234'}},
        'divisible': False,
-       'id': 'd6a3b850-e960-4391-98c3-f16f1cd26a40',
+       'id': 'd591879f-aa02-417a-825a-f55154676f00',
        'refillable': False,
        'updatable': False},
       'conditions': [{'amount': 1,
         'cid': 0,
         'condition': {'details': {'bitmask': 32,
-          'public_key': '3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj',
+          'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
           'signature': None,
           'type': 'fulfillment',
           'type_id': 4},
-         'uri': 'cc:4:20:IT8NBLRPBWXt8qNmYlYaqVxux_KWfKiiymxeuqkIVmY:96'},
-        'owners_after': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
+         'uri': 'cc:4:20:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg:96'},
+        'owners_after': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
       'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:IT8NBLRPBWXt8qNmYlYaqVxux_KWfKiiymxeuqkIVmYx2pP5XyS2KZJ3jN90hJausCTqaycqQZh4g8MczME8kSM4ApfrQs_3w6Uz4ZkcjhzxcUz2FXsysljqGIaLVaoL',
+        'fulfillment': {'bitmask': 32,
+         'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
+         'signature': None,
+         'type': 'fulfillment',
+         'type_id': 4},
         'input': None,
-        'owners_before': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
-      'metadata': None,
+        'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
+      'metadata': {'data': {'planet': 'earth'},
+       'id': '4d406690-d6e3-48b2-ac64-9fff714f0ff3'},
       'operation': 'CREATE',
-      'timestamp': '1476809307'},
+      'timestamp': '1479921799'},
      'version': 1}
 
+The transaction needs to be fulfilled:
+
+.. code-block:: python
+
+    fulfilled_creation_tx = bdb.transactions.fulfill(
+        prepared_creation_tx, private_keys=alice.signing_key)
+
+.. code-block:: python
+
+    >>> fulfilled_creation_tx
+    {'id': 'f713f1c662bcf7e72805c51222b82d0408df5a0cadddfb040d9a2e7171204471',
+     'transaction': {'asset': {'data': {'bicycle': {'manufacturer': 'bkfab',
+         'serial_number': 'abcd1234'}},
+       'divisible': False,
+       'id': 'd591879f-aa02-417a-825a-f55154676f00',
+       'refillable': False,
+       'updatable': False},
+      'conditions': [{'amount': 1,
+        'cid': 0,
+        'condition': {'details': {'bitmask': 32,
+          'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
+          'signature': None,
+          'type': 'fulfillment',
+          'type_id': 4},
+         'uri': 'cc:4:20:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg:96'},
+        'owners_after': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
+      'fulfillments': [{'fid': 0,
+        'fulfillment': 'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugjCpOCtzI1L59uV2Mw7wg2bHAnzj5AyA0dXkquAeENBAsSR0DVhKFUf3JH7Ii2gPqhln7rlOYpk8EsQKLD6K2YJ',
+        'input': None,
+        'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
+      'metadata': {'data': {'planet': 'earth'},
+       'id': '4d406690-d6e3-48b2-ac64-9fff714f0ff3'},
+      'operation': 'CREATE',
+      'timestamp': '1479921799'},
+     'version': 1}
+
+And sent over to a BigchainDB node:
+
+.. code-block:: python
+
+    sent_creation_tx = bdb.transactions.send(fulfilled_creation_tx)
+
+.. code-block:: python
+ 
+    >>> sent_creation_tx == fulfilled_creation_tx
+    True
 
 Notice the transaction ``id``:
 
 .. code-block:: python
- 
-    >>> txid = creation_tx['id']
+
+    >>> txid = sent_creation_tx['id']
     >>> txid
-    '1dee8db53d86bbba7af7da2b2772ce58c699d29701e8e97bbaa3837a67c265d8'
+    'f713f1c662bcf7e72805c51222b82d0408df5a0cadddfb040d9a2e7171204471'
+
+To check the status of the transaction:
+
+.. code-block:: python
+
+    >>> bdb.transactions.status(txid)
+    {'status': 'valid'}
 
 
 Asset Transfer
@@ -172,55 +242,85 @@ in which the bicycle (asset) had been created:
 
     creation_tx = bdb.transactions.retrieve(txid)
 
-and then transfers it to Bob:
+and then prepares a transfer transaction:
 
 .. code-block:: python
     
-    transfer_tx = bdb.transactions.transfer(
-        creation_tx,
-        bob.verifying_key,
+    cid = 0
+    condition = creation_tx['transaction']['conditions'][cid]
+    transfer_input = {
+        'fulfillment': condition['condition']['details'],
+        'input': {
+            'cid': cid,
+            'txid': creation_tx['id'],
+        },
+        'owners_before': condition['owners_after'],
+    }
+
+    prepared_transfer_tx = bdb.transactions.prepare(
+        operation='TRANSFER',
         asset=creation_tx['transaction']['asset'],
-        signing_key=alice.signing_key,
+        inputs=transfer_input,
+        owners_after=bob.verifying_key,
     )
 
-The ``transfer_tx`` dictionary should look something like:
+and then fulfills the prepared transfer:
+
+.. code-block:: python
+
+    fulfilled_transfer_tx = bdb.transactions.fulfill(
+        prepared_transfer_tx,
+        private_keys=alice.signing_key,
+    )
+
+and finally sends the fulfilled transaction to the connected BigchainDB node:
+
+.. code-block:: python
+
+    >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+
+.. code-block:: python
+
+    >>> sent_transfer_tx == fulfilled_transfer_tx
+    True
+
+The ``sent_transfer_tx`` dictionary should look something like:
 
 .. code-block:: bash
 
-    {'id': 'ad1b4294bd6e255a579f51ae020be60da32256b0da979fd3df4ac6130e8eeed1',
-     'transaction': {'asset': {'id': 'd6a3b850-e960-4391-98c3-f16f1cd26a40'},
+    {'id': '554dc17744baa9c2d954022f4ed49a9672c8a497ac0ae37a30cf3be20c9f8000',
+     'transaction': {'asset': {'id': 'd591879f-aa02-417a-825a-f55154676f00'},
       'conditions': [{'amount': 1,
         'cid': 0,
         'condition': {'details': {'bitmask': 32,
-          'public_key': '35WbK4tqJWy4z98TzBr83iekhyY4xUmNWabiC9FQoEwp',
+          'public_key': 'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA',
           'signature': None,
           'type': 'fulfillment',
           'type_id': 4},
-         'uri': 'cc:4:20:Ht8oCVawCLOMNS758n5Q-5eFhxYr_xXbQ6X7AYsJZB8:96'},
-        'owners_after': ['35WbK4tqJWy4z98TzBr83iekhyY4xUmNWabiC9FQoEwp']}],
+         'uri': 'cc:4:20:yjsOmwsugrgj_QAcdaLZdZWKHWTB2T5yVmBf8IfdV_s:96'},
+        'owners_after': ['EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA']}],
       'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:IT8NBLRPBWXt8qNmYlYaqVxux_KWfKiiymxeuqkIVmac1bLg24vkQ_rW7BMnJFsvUjn1J8gwFbcr5q8WqUCCnRe_uBrEvxwiAG9aPlldkh8YjHibHdkLzTKEJJE41BAK',
+        'fulfillment': 'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugjQ2I3H7d2hUHgJhY-8CipIxnCrmF554ZKsZTGxjA86Y68MJR9kRC_270x9DejFGSg7DKJ1kRjen8DevtYWCg0B',
         'input': {'cid': 0,
-         'txid': '9da5e3bfd34725b9c0a40c491bd27c23f4b225e027ce2f51a8c99e9fbd02d97a'},
-        'owners_before': ['3EnDZNgf9Ss7cEdiPaSJ8NZDbVjRE5aXG1UT9aoE7kRj']}],
+         'txid': 'f713f1c662bcf7e72805c51222b82d0408df5a0cadddfb040d9a2e7171204471'},
+        'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
       'metadata': None,
       'operation': 'TRANSFER',
-      'timestamp': '1476809389'},
+      'timestamp': '1479940709'},
      'version': 1}
-
 
 Bob is the new owner: 
 
 .. code-block:: python
 
-    >>> transfer_tx['transaction']['conditions'][0]['owners_after'][0] == bob.verifying_key
+    >>> sent_transfer_tx['transaction']['conditions'][0]['owners_after'][0] == bob.verifying_key
     True
 
 Alice is the former owner:
 
 .. code-block:: python
 
-    >>> transfer_tx['transaction']['fulfillments'][0]['owners_before'][0] == alice.verifying_key
+    >>> sent_transfer_tx['transaction']['fulfillments'][0]['owners_before'][0] == alice.verifying_key
     True
 
 
