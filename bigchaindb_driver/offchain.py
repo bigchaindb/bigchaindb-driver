@@ -150,10 +150,9 @@ def prepare_create_transaction(*,
     """
     if not isinstance(owners_before, (list, tuple)):
         owners_before = [owners_before]
-
     # NOTE: Needed for the time being. See
     # https://github.com/bigchaindb/bigchaindb/issues/797
-    if isinstance(owners_before, tuple):
+    elif isinstance(owners_before, tuple):
         owners_before = list(owners_before)
 
     if not owners_after:
