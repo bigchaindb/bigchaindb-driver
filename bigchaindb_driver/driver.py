@@ -1,6 +1,3 @@
-from bigchaindb.common.transaction import Asset, Transaction
-
-from .exceptions import InvalidVerifyingKey, InvalidSigningKey
 from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
 
@@ -244,69 +241,3 @@ class TransactionsEndpoint(NamespacedDriver):
         """
         path = self.path + txid + '/status'
         return self.transport.forward_request(method='GET', path=path)
-
-    def create(self, asset=None, verifying_key=None, signing_key=None):
-        """Issue a transaction to create an asset.
-
-        Args:
-            asset (dict): Fungible unit to spend and lock with the
-                transaction being created.
-            signing_key (str): Private key used to sign transactions.
-            verifying_key (str): Public key associated with the
-                :attr:`signing_key`.
-
-        Returns:
-            dict: The transaction pushed to the Federation.
-
-        Raises:
-            :class:`~bigchaindb_driver.exceptions.InvalidSigningKey`: If
-                neither ``signing_key`` nor ``self.signing_key`` have been set.
-            :class:`~bigchaindb_driver.exceptions.InvalidVerifyingKey`: If
-                neither ``verifying_key`` nor ``self.verifying_key`` have
-                been set.
-
-        """
-        signing_key = signing_key if signing_key else self.signing_key
-        if not signing_key:
-            raise InvalidSigningKey
-        verifying_key = verifying_key if verifying_key else self.verifying_key
-        if not verifying_key:
-            raise InvalidVerifyingKey
-        asset = Asset(**asset) if asset else Asset()
-        # TODO: In the future, we should adjust this to let the user of the
-        #       driver define both `owners_before` and `owners_after`.
-        transaction = Transaction.create(
-            owners_before=[verifying_key],
-            owners_after=[verifying_key],
-            asset=asset,
-        )
-        signed_transaction = transaction.sign([signing_key])
-        return self.send(signed_transaction.to_dict())
-
-    def transfer(self, transaction, *owners_after, asset, signing_key=None):
-        """Issue a transaction to transfer an asset.
-
-        Args:
-            transaction (dict): The transaction to transfer.
-            owners_after (str): Zero or more public keys of the new owners.
-            asset (dict): Asset to transfer.
-            signing_key (str): Private key used to sign transactions.
-
-        Returns:
-            dict: The transaction pushed to the Federation.
-
-        Raises:
-            :class:`~bigchaindb_driver.exceptions.InvalidSigningKey`: If
-                neither ``signing_key`` nor ``self.signing_key`` have been set.
-
-        """
-        signing_key = signing_key if signing_key else self.signing_key
-        if not signing_key:
-            raise InvalidSigningKey
-        transaction_obj = Transaction.from_dict(transaction)
-        signed_transfer_transaction = Transaction.transfer(
-            transaction_obj.to_inputs(),
-            list(owners_after),
-            asset=Asset.from_dict(asset),
-        ).sign([signing_key]).to_dict()
-        return self.send(signed_transfer_transaction)
