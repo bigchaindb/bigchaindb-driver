@@ -12,16 +12,13 @@ from cryptoconditions.crypto import Ed25519SigningKey
 def test_driver_init_basic(bdb_node):
     from bigchaindb_driver.driver import BigchainDB
     driver = BigchainDB(bdb_node)
-    assert driver.verifying_key is None
-    assert driver.signing_key is None
     assert driver.nodes[0] == bdb_node
     assert driver.transactions
 
 
 def test_driver_init_without_nodes(alice_keypair):
     from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
-    driver = BigchainDB(verifying_key=alice_keypair.vk,
-                        signing_key=alice_keypair.sk)
+    driver = BigchainDB()
     assert driver.nodes == (DEFAULT_NODE,)
 
 

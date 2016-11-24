@@ -17,8 +17,6 @@ class BigchainDB:
     """
     def __init__(self,
                  *nodes,
-                 verifying_key=None,
-                 signing_key=None,
                  transport_class=Transport):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
@@ -31,17 +29,11 @@ class BigchainDB:
                 URL must be given. In the absence of any node, the default of
                 the :attr:`transport_class` will be used, e.g.:
                 ``'http://localhost:9984/api/v1'``.
-            verifying_key (:obj:`str`, optional): The base58 encoded public
-                key for the ED25519 curve to bind this driver with.
-            signing_key (:obj:`str`, optional): The base58 encoded private
-                key for the ED25519 curve to bind this driver with.
             transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
 
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
-        self._verifying_key = verifying_key
-        self._signing_key = signing_key
         self._transport = transport_class(*nodes)
         self._transactions = TransactionsEndpoint(self)
 
@@ -49,20 +41,6 @@ class BigchainDB:
     def nodes(self):
         """:obj:`tuple` of :obj:`str`: URLs of connected nodes."""
         return self._nodes
-
-    @property
-    def verifying_key(self):
-        """:obj:`str`: Public key associated with the
-        :attr:`signing_key`, if bounded during initialization.
-        """
-        return self._verifying_key
-
-    @property
-    def signing_key(self):
-        """:obj:`str`: Private key used to sign transactions, if
-        bounded during initialization.
-        """
-        return self._signing_key
 
     @property
     def transport(self):
@@ -98,14 +76,6 @@ class NamespacedDriver:
     @property
     def transport(self):
         return self.driver.transport
-
-    @property
-    def verifying_key(self):
-        return self.driver.verifying_key
-
-    @property
-    def signing_key(self):
-        return self.driver.signing_key
 
 
 class TransactionsEndpoint(NamespacedDriver):
