@@ -16,6 +16,7 @@ def test_driver_init_basic(bdb_node):
     assert driver.verifying_key is None
     assert driver.signing_key is None
     assert driver.nodes[0] == bdb_node
+    assert driver.transport.nodes == driver.nodes
     assert driver.transactions
 
 
@@ -24,6 +25,7 @@ def test_driver_init_without_nodes(alice_keypair):
     driver = BigchainDB(verifying_key=alice_keypair.vk,
                         signing_key=alice_keypair.sk)
     assert driver.nodes == (DEFAULT_NODE,)
+    assert driver.transport.nodes == (DEFAULT_NODE,)
 
 
 class TestTransactionsEndpoint:
