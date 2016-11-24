@@ -45,7 +45,7 @@ class BigchainDB:
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._verifying_key = verifying_key
         self._signing_key = signing_key
-        self._transport = transport_class(*self.nodes)
+        self._transport = transport_class(*self._nodes)
         self._transactions = TransactionsEndpoint(self)
 
     @property
