@@ -93,7 +93,7 @@ def alice_transaction_obj(alice_pubkey):
     serial_number = b64encode(urandom(10), altchars=b'-_').decode()
     return Transaction.create(
         owners_before=[alice_pubkey],
-        owners_after=[alice_pubkey],
+        owners_after=[([alice_pubkey], 1)],
         asset=Asset(data={'data': {'serial_number': serial_number}}),
     )
 
@@ -116,44 +116,43 @@ def persisted_alice_transaction(alice_privkey, alice_driver,
 @fixture
 def unsigned_transaction():
     return {
-        'id': '4b92d248aa0d35448b09e1156060e70911a9e391f8290a58433b2f103aabb811',   # noqa
+        'id': 'fb9089e9f16a4632edb951489a78ced1e7bc5681e6406ccc42c5a46e979ee54e',  # noqa
         'transaction': {
             'asset': {
                 'data': None,
                 'divisible': False,
-                'id': '8d1085f3-bc9c-4e4e-96af-fe8eed3f8a9a',
+                'id': '923adcf2-93df-4f82-9b44-032e2188b882',
                 'refillable': False,
                 'updatable': False},
-            'conditions': [{
-                'amount': 1,
-                'cid': 0,
-                'condition': {
-                    'details': {
-                        'bitmask': 32,
-                        'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa
-                        'signature': None,
-                        'type': 'fulfillment',
-                        'type_id': 4,
-                    },
-                    'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96',    # noqa
-                },
-                'owners_after': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],   # noqa
-            }],
-            'fulfillments': [{
-                'fid': 0,
-                'fulfillment': {
+        'conditions': [{
+            'amount': 1,
+            'cid': 0,
+            'condition': {
+                'details': {
                     'bitmask': 32,
-                    'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa
+                    'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',  # noqa
                     'signature': None,
                     'type': 'fulfillment',
-                    'type_id': 4,
+                    'type_id': 4
                 },
-                'input': None,
-                'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],  # noqa
-            }],
-            'metadata': None,
-            'operation': 'CREATE',
-            'timestamp': '1478709889',
+                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96'
+            },
+            'owners_after': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3']
+        }],
+        'fulfillments': [{
+            'fid': 0,
+            'fulfillment': {
+                'bitmask': 32,
+                'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
+                'signature': None,
+                'type': 'fulfillment',
+                'type_id': 4
+            },
+            'input': None,
+            'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3']
+        }],
+        'metadata': None,
+        'operation': 'CREATE'
         },
-        'version': 1,
+        'version': 1
     }

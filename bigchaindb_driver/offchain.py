@@ -156,8 +156,11 @@ def prepare_create_transaction(*,
     if isinstance(owners_before, tuple):
         owners_before = list(owners_before)
 
+    # TODO: This will only work for non-divisible. If its a divisible asset
+    # Transaction.create will raise an exception saying that divisible assets
+    # need to have amount > 1.
     if not owners_after:
-        owners_after = owners_before
+        owners_after = [(owners_before, 1)]
 
     asset = _normalize_asset(asset)
 

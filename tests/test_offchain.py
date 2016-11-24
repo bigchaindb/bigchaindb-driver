@@ -45,16 +45,10 @@ def test_prepare_create_transaction(asset, alice_vk):
     assert 'fulfillments' in create_transaction['transaction']
     assert 'metadata' in create_transaction['transaction']
     assert 'operation' in create_transaction['transaction']
-    assert 'timestamp' in create_transaction['transaction']
     assert create_transaction['transaction']['operation'] == 'CREATE'
 
 
-@mark.parametrize('bob_vk', (
-    '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
-    ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
-    ['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'],
-))
-def test_prepare_transfer_transaction(alice_transaction, bob_vk):
+def test_prepare_transfer_transaction(alice_transaction, bob_pubkey):
     from bigchaindb_driver.offchain import prepare_transfer_transaction
     condition_index = 0
     condition = alice_transaction['transaction']['conditions'][condition_index]
@@ -68,7 +62,7 @@ def test_prepare_transfer_transaction(alice_transaction, bob_vk):
     }
     asset = alice_transaction['transaction']['asset']
     transfer_transaction = prepare_transfer_transaction(
-        inputs=input_, owners_after=bob_vk, asset=asset)
+        inputs=input_, owners_after=[([bob_pubkey], 1)], asset=asset)
     assert 'id' in transfer_transaction
     assert 'transaction' in transfer_transaction
     assert 'version' in transfer_transaction
@@ -77,7 +71,6 @@ def test_prepare_transfer_transaction(alice_transaction, bob_vk):
     assert 'fulfillments' in transfer_transaction['transaction']
     assert 'metadata' in transfer_transaction['transaction']
     assert 'operation' in transfer_transaction['transaction']
-    assert 'timestamp' in transfer_transaction['transaction']
     assert transfer_transaction['transaction']['operation'] == 'TRANSFER'
 
 

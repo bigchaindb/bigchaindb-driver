@@ -3,7 +3,7 @@
 from time import sleep
 
 import rapidjson
-from pytest import raises
+from pytest import raises, mark
 
 from bigchaindb.common.transaction import Transaction
 from cryptoconditions import Ed25519Fulfillment
@@ -28,6 +28,7 @@ def test_driver_init_without_nodes(alice_keypair):
 
 class TestTransactionsEndpoint:
 
+    @mark.skip(reason='Deprecated')
     def test_driver_can_create_assets(self, alice_driver):
         tx = alice_driver.transactions.create()
         assert tx['id']
@@ -53,6 +54,7 @@ class TestTransactionsEndpoint:
         tx_obj = Transaction.from_dict(tx)
         assert tx_obj.fulfillments_valid()
 
+    @mark.skip(reason='Deprecated')
     def test_create_with_different_keypair(self, alice_driver,
                                            bob_pubkey, bob_privkey):
         tx = alice_driver.transactions.create(verifying_key=bob_pubkey,
@@ -70,6 +72,7 @@ class TestTransactionsEndpoint:
         tx_obj = Transaction.from_dict(tx)
         assert tx_obj.fulfillments_valid()
 
+    @mark.skip(reason='Deprecated')
     def test_create_without_signing_key(self, bdb_node, alice_pubkey):
         from bigchaindb_driver import BigchainDB
         from bigchaindb_driver.exceptions import InvalidSigningKey
@@ -77,6 +80,7 @@ class TestTransactionsEndpoint:
         with raises(InvalidSigningKey):
             driver.transactions.create(verifying_key=alice_pubkey)
 
+    @mark.skip(reason='Deprecated')
     def test_create_without_verifying_key(self, bdb_node, alice_privkey):
         from bigchaindb_driver import BigchainDB
         from bigchaindb_driver.exceptions import InvalidVerifyingKey
@@ -84,6 +88,7 @@ class TestTransactionsEndpoint:
         with raises(InvalidVerifyingKey):
             driver.transactions.create(signing_key=alice_privkey)
 
+    @mark.skip(reason='Deprecated')
     def test_transfer_assets(self, alice_driver, persisted_alice_transaction,
                              bob_pubkey, bob_privkey):
         # FIXME The sleep, or some other approach is required to wait for the
@@ -100,6 +105,7 @@ class TestTransactionsEndpoint:
         assert fulfillment['owners_before'][0] == alice_driver.verifying_key
         assert condition['owners_after'][0] == bob_pubkey
 
+    @mark.skip(reason='Deprecated')
     def test_transfer_without_signing_key(self, bdb_node):
         from bigchaindb_driver import BigchainDB
         from bigchaindb_driver.exceptions import InvalidSigningKey
@@ -147,7 +153,6 @@ class TestTransactionsEndpoint:
         assert 'fulfillments' in transaction['transaction']
         assert 'metadata' in transaction['transaction']
         assert 'operation' in transaction['transaction']
-        assert 'timestamp' in transaction['transaction']
         assert transaction['transaction']['operation'] == 'CREATE'
         conditions = transaction['transaction']['conditions']
         assert len(conditions) == 1
