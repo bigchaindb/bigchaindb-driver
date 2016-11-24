@@ -25,18 +25,38 @@ def test_prepare_transaction_raises():
     with raises(BigchaindbException):
         prepare_transaction(operation=None)
 
+
+def test_prepare_create_transaction_default(alice_pubkey):
+    from bigchaindb_driver.offchain import prepare_create_transaction
+    create_transaction = prepare_create_transaction(owners_before=alice_pubkey)
+    assert 'id' in create_transaction
+    assert 'transaction' in create_transaction
+    assert 'version' in create_transaction
+    assert 'asset' in create_transaction['transaction']
+    assert 'conditions' in create_transaction['transaction']
+    assert 'fulfillments' in create_transaction['transaction']
+    assert 'metadata' in create_transaction['transaction']
+    assert 'operation' in create_transaction['transaction']
+    assert create_transaction['transaction']['operation'] == 'CREATE'
+
+
 @mark.parametrize('asset', (
     None, {}, '', {'data': {'msg': 'Hello BigchainDB!'}},
 ))
-@mark.parametrize('alice_vk', (
+@mark.parametrize('owners_before', (
     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
     ('G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',),
     ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
 ))
-def test_prepare_create_transaction(asset, alice_vk):
+@mark.parametrize('owners_after', (
+    '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
+    ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
+    ['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'],
+))
+def test_prepare_create_transaction(asset, owners_before, owners_after):
     from bigchaindb_driver.offchain import prepare_create_transaction
     create_transaction = prepare_create_transaction(
-        owners_before=alice_vk, asset=asset)
+        owners_before=owners_before, owners_after=owners_after, asset=asset)
     assert 'id' in create_transaction
     assert 'transaction' in create_transaction
     assert 'version' in create_transaction

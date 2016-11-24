@@ -150,10 +150,9 @@ def prepare_create_transaction(*,
     """
     if not isinstance(owners_before, (list, tuple)):
         owners_before = [owners_before]
-
     # NOTE: Needed for the time being. See
     # https://github.com/bigchaindb/bigchaindb/issues/797
-    if isinstance(owners_before, tuple):
+    elif isinstance(owners_before, tuple):
         owners_before = list(owners_before)
 
     # TODO: This will only work for non-divisible. If its a divisible asset
@@ -161,6 +160,14 @@ def prepare_create_transaction(*,
     # need to have amount > 1.
     if not owners_after:
         owners_after = [(owners_before, 1)]
+    else:
+        if not isinstance(owners_after, (list, tuple)):
+            owners_after = [owners_after]
+        # NOTE: Needed for the time being. See
+        # https://github.com/bigchaindb/bigchaindb/issues/797
+        elif isinstance(owners_after, tuple):
+            owners_after = list(owners_after)
+        owners_after = [(owners_after, 1)]
 
     asset = _normalize_asset(asset)
 
