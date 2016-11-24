@@ -1,3 +1,5 @@
+from warnings import warn
+
 from bigchaindb.common.transaction import Asset, Transaction
 
 from .exceptions import InvalidVerifyingKey, InvalidSigningKey
@@ -266,6 +268,11 @@ class TransactionsEndpoint(NamespacedDriver):
                 been set.
 
         """
+        warn(
+            'The create() method is deprecated. Use prepare(), fulfill(), '
+            'and send() instead. Yes, it is now a three-step process!',
+            DeprecationWarning,
+        )
         signing_key = signing_key if signing_key else self.signing_key
         if not signing_key:
             raise InvalidSigningKey
@@ -300,6 +307,11 @@ class TransactionsEndpoint(NamespacedDriver):
                 neither ``signing_key`` nor ``self.signing_key`` have been set.
 
         """
+        warn(
+            'The transfer() method is deprecated. Use prepare(), fulfill(), '
+            'and send() instead. Yes, it is now a three-step process!',
+            DeprecationWarning,
+        )
         signing_key = signing_key if signing_key else self.signing_key
         if not signing_key:
             raise InvalidSigningKey

@@ -3,7 +3,7 @@
 from time import sleep
 
 import rapidjson
-from pytest import raises
+from pytest import raises, warns
 
 from bigchaindb.common.transaction import Transaction
 from cryptoconditions import Ed25519Fulfillment
@@ -27,6 +27,37 @@ def test_driver_init_without_nodes(alice_keypair):
 
 
 class TestTransactionsEndpoint:
+
+    def test_deprecation_warning_create(self, alice_driver):
+        with warns(DeprecationWarning):
+            alice_driver.transactions.create()
+
+    def test_deprecation_warning_transfer(self, alice_driver, monkeypatch):
+        from bigchaindb_driver.driver import TransactionsEndpoint
+
+        class TransactionMock:
+            def to_inputs(self):
+                pass
+
+            def sign(self, x):
+                return self
+
+            def to_dict(self):
+                pass
+
+        monkeypatch.setattr(
+            'bigchaindb.common.transaction.Transaction.from_dict',
+            lambda x: TransactionMock(),
+        )
+        monkeypatch.setattr(
+            'bigchaindb.common.transaction.Asset.from_dict', lambda x: None)
+        monkeypatch.setattr(
+            'bigchaindb.common.transaction.Transaction.transfer',
+            lambda x, y, asset: TransactionMock(),
+        )
+        monkeypatch.setattr(TransactionsEndpoint, 'send', lambda x, y: None)
+        with warns(DeprecationWarning):
+            alice_driver.transactions.transfer(None, asset=None)
 
     def test_driver_can_create_assets(self, alice_driver):
         tx = alice_driver.transactions.create()
