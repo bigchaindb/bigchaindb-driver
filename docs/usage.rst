@@ -361,3 +361,183 @@ Running the above code should give something similar to:
 
 
 .. _bigchaindb_driver: https://github.com/bigchaindb/bigchaindb-driver
+
+
+Divisible Assets
+----------------
+
+In BigchainDB all assets are non-divisible by default so if we want to make a
+divisible asset we need to explicitly mark it as divisible.
+
+Lets continue with the bicycle example. Bob is now the proud owner of the
+bicycle and he decides he wants to rent the bicycle. Bob starts by creating a
+time sharing token in which 1 token corresponds to 1 hour of riding time:
+
+.. code-block:: python
+
+    bicycle_token = {
+        'divisible': True,
+        'data': {
+            'token_for': {
+                'bicycle': {
+                    'serial_number': 'abcd1234',
+                    'manufacturer': 'bkfab'
+                }
+            },
+            'description': 'Time share token. Each token equals 1 hour of riding.'
+        }
+    }
+
+Bob has now decided to issue 10 tokens and assign them to Carly.
+
+.. code-block:: python
+
+    bob, carly = generate_keypair(), generate_keypair()
+
+    prepared_token_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        owners_before=bob.verifying_key,
+        owners_after=[([carly.verifying_key], 10)]
+        asset=bicycle_token
+    )
+
+    fulfilled_token_tx = bdb.transactions.fulfill(
+        prepared_token_tx, private_keys=bob.signing_key)
+
+    sent_token_tx = bdb.transactions.send(fulfilled_token_tx)
+
+.. note:: Defining ``owners_after``.
+
+    For divisible assets we need to specify the amounts togheter with the
+    public keys. The way we do this is by passing a ``list`` of ``tuples`` in
+    ``owners_after`` in which each ``tuple`` corresponds to a condition.
+
+    For instance instead of creating a transaction with 1 condition with
+    ``amount=10`` we could have created a transaction with 2 conditions with
+    ``amount=5`` with:
+
+    .. code-block:: python
+
+        owners_after=[([carly.verifying_key], 5), ([carly.verifying_key], 5)]
+
+    The reason why the addresses are contained in ``lists`` its because each
+    condition can have multiple ownership. For instance we can create a
+    condition with ``amount=10`` in which both Carly and Alice are owners
+    with:
+
+    .. code-block:: python
+
+        owners_after=[([carly.verifying_key, alice.verifying_key], 10)]
+
+The ``sent_token_tx`` dictionary should look something like:
+
+.. code-block:: bash
+
+   {'id': 'd97f44d490fc6865d30d1192394cac40a3651872a463f5b8e60c153ef2ae495f',
+ 'transaction': {'asset': {'data': {'description': 'Time share token. Each token equals 1 hour of riding.',
+    'token_for': {'bicycle': {'manufacturer': 'bkfab',
+      'serial_number': 'abcd1234'}}},
+   'divisible': True,
+   'id': 'fb5769e3-e9f3-4b8c-98a2-4604d93a7aeb',
+   'refillable': False,
+   'updatable': False},
+  'conditions': [{'amount': 10,
+    'cid': 0,
+    'condition': {'details': {'bitmask': 32,
+      'public_key': 'GTqE9XHunryuBrS9pkyzLUMTTDKaa1vqqirF4fHFTf7f',
+      'signature': None,
+      'type': 'fulfillment',
+      'type_id': 4},
+     'uri': 'cc:4:20:5b7vXE_5Ht2_vfc1D8P7Pak5PRMSePAFhtH79e71Zso:96'},
+    'owners_after': ['GTqE9XHunryuBrS9pkyzLUMTTDKaa1vqqirF4fHFTf7f']}],
+  'fulfillments': [{'fid': 0,
+    'fulfillment': 'cf:4:d5mfbc9zapn7oAoYgX_tX9fzLiLCfDdLOC94tVswcYyJ-NW5L959kw0TLw3SpsJdDKcw1KQKWRZ2xzS4xAnMNbjgK9WRYvXGHYV7SOhrOWJoRAyNqjlMmdTRdGzHUNwC',
+    'input': None,
+    'owners_before': ['93sP5ycRLRRxsec15HDpaa1u1bBSeo17XEVJSHSArbZm']}],
+  'metadata': None,
+  'operation': 'CREATE'},
+ 'version': 1} 
+
+Bob is the issuer: 
+
+.. code-block:: python
+
+    >>> sent_token_tx['transaction']['fulfillments'][0]['owners_before'][0] == bob.verifying_key
+    True
+
+Carly is the owner of 10 tokens:
+
+.. code-block:: python
+
+    >>> sent_token_tx['transaction']['conditions'][0]['owners_after'][0] == carly.verifying_key
+    True
+    >>> sent_token_tx['transaction']['conditions'][0]['amount'] == 10
+    True
+
+
+Now Carly wants to ride the bicycle for 2 hours so she needs to send 2 tokens
+to Bob:
+
+.. code:: python
+
+    cid = 0
+    condition = prepared_token_tx['transaction']['conditions'][cid]
+    transfer_input = {
+        'fulfillment': condition['condition']['details'],
+        'input': {
+            'cid': cid,
+            'txid': prepared_token_tx['id'],
+        },
+        'owners_before': condition['owners_after'],
+    }
+
+    prepared_transfer_tx = bdb.transactions.prepare(
+        operation='TRANSFER',
+        asset=prepared_token_tx['transaction']['asset'],
+        inputs=transfer_input,
+        owners_after=[([bob.verifying_key], 2), ([carly.verifying_key], 8)]
+    )
+
+    fulfilled_transfer_tx = bdb.transactions.fulfill(
+        prepared_transfer_tx, private_keys=carly.signing_key)
+
+    sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+
+When transferring divisible assets BigchainDB makes sure that the amount being
+used is the same as the amount being spent. This ensures that no amounts are
+lost. For this reason, if Carly wants to transfer 2 tokens of her 10 tokens she
+needs to reassign the remaining 8 tokens to herself.
+
+The ``sent_transfer_tx`` with 2 conditions, one with ``amount=2`` and the other
+with ``amount=8`` dictionary should look something like:
+
+.. code-block:: bash
+
+	{'id': '773ad928417859350bdc999899b7e5815bce58527ea49b852c11076ab79751a3',
+	 'transaction': {'asset': {'id': 'fb5769e3-e9f3-4b8c-98a2-4604d93a7aeb'},
+	  'conditions': [{'amount': 2,
+		'cid': 0,
+		'condition': {'details': {'bitmask': 32,
+		  'public_key': '93sP5ycRLRRxsec15HDpaa1u1bBSeo17XEVJSHSArbZm',
+		  'signature': None,
+		  'type': 'fulfillment',
+		  'type_id': 4},
+		 'uri': 'cc:4:20:d5mfbc9zapn7oAoYgX_tX9fzLiLCfDdLOC94tVswcYw:96'},
+		'owners_after': ['93sP5ycRLRRxsec15HDpaa1u1bBSeo17XEVJSHSArbZm']},
+	   {'amount': 8,
+		'cid': 1,
+		'condition': {'details': {'bitmask': 32,
+		  'public_key': 'GTqE9XHunryuBrS9pkyzLUMTTDKaa1vqqirF4fHFTf7f',
+		  'signature': None,
+		  'type': 'fulfillment',
+		  'type_id': 4},
+		 'uri': 'cc:4:20:5b7vXE_5Ht2_vfc1D8P7Pak5PRMSePAFhtH79e71Zso:96'},
+		'owners_after': ['GTqE9XHunryuBrS9pkyzLUMTTDKaa1vqqirF4fHFTf7f']}],
+	  'fulfillments': [{'fid': 0,
+		'fulfillment': 'cf:4:5b7vXE_5Ht2_vfc1D8P7Pak5PRMSePAFhtH79e71ZsqNmkEEwI1gt-2Xk9T-3-gxOo8vOS8itIPMM7SrARJWVruH4ORFH7kVqis1gsBM54pP39FBD3T_jjCuWu75HTcO',
+		'input': {'cid': 0,
+		 'txid': 'd97f44d490fc6865d30d1192394cac40a3651872a463f5b8e60c153ef2ae495f'},
+		'owners_before': ['GTqE9XHunryuBrS9pkyzLUMTTDKaa1vqqirF4fHFTf7f']}],
+	  'metadata': None,
+	  'operation': 'TRANSFER'},
+	 'version': 1}
