@@ -277,12 +277,12 @@ def prepare_transfer_transaction(*,
     if not isinstance(inputs, (list, tuple)):
         inputs = (inputs, )
     if not isinstance(owners_after, (list, tuple)):
-        owners_after = [owners_after]
+        owners_after = [([owners_after], 1)]
 
     # NOTE: Needed for the time being. See
     # https://github.com/bigchaindb/bigchaindb/issues/797
     if isinstance(owners_after, tuple):
-        owners_after = list(owners_after)
+        owners_after = [(list(owners_after), 1)]
 
     fulfillments = [
         BdbFulfillment(Fulfillment.from_dict(input_['fulfillment']),
