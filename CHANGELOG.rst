@@ -17,8 +17,9 @@ Added
 
 Added
 ^^^^^
-* Minimal support for ``POST`` (via ``.create`` and ``.transfer``), and ``GET``
-  operations on the ``/transactions`` endpoint.
+* Minimal support for ``POST`` (via ``create()`` and ``transfer()``), and
+  ``GET`` operations on the ``/transactions`` endpoint.
+
 
 0.0.1a1 (2016-08-12)
 --------------------
