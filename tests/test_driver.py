@@ -3,7 +3,7 @@
 from time import sleep
 
 import rapidjson
-from pytest import raises
+from pytest import raises, warns
 
 from cryptoconditions import Ed25519Fulfillment
 from cryptoconditions.crypto import Ed25519SigningKey
@@ -13,6 +13,7 @@ def test_driver_init_basic(bdb_node):
     from bigchaindb_driver.driver import BigchainDB
     driver = BigchainDB(bdb_node)
     assert driver.nodes[0] == bdb_node
+    assert driver.transport.nodes == driver.nodes
     assert driver.transactions
 
 
@@ -20,6 +21,7 @@ def test_driver_init_without_nodes(alice_keypair):
     from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
     driver = BigchainDB()
     assert driver.nodes == (DEFAULT_NODE,)
+    assert driver.transport.nodes == (DEFAULT_NODE,)
 
 
 class TestTransactionsEndpoint:

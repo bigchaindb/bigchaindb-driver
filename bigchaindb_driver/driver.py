@@ -1,3 +1,5 @@
+from warnings import warn
+
 from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
 
@@ -34,7 +36,7 @@ class BigchainDB:
 
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
-        self._transport = transport_class(*nodes)
+        self._transport = transport_class(*self._nodes)
         self._transactions = TransactionsEndpoint(self)
 
     @property
