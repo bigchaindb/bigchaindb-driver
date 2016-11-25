@@ -51,7 +51,7 @@ def test_prepare_create_transaction_default(alice_pubkey):
 @mark.parametrize('owners_after', (
     '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
-    ['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'],
+    [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
 def test_prepare_create_transaction(asset, owners_before, owners_after):
     from bigchaindb_driver.offchain import prepare_create_transaction
