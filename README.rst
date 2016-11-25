@@ -27,8 +27,8 @@ BigchainDB Python Driver
 Features
 --------
 
-* Minimal support for `CREATE`, `TRANSFER`, and `GET` operations on the
-  `/transactions` endpoint.
+* Minimal support for ``CREATE``, ``TRANSFER``, and ``GET`` operations on the
+  ``/transactions`` endpoint.
 
 
 Credits
