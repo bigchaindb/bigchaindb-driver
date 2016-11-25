@@ -11,7 +11,7 @@ with open('CHANGELOG.rst') as changelog_file:
 
 install_requires = [
     'requests>=2.11.0',
-    'bigchaindb>=0.7.0',
+    'bigchaindb>=0.8.0.dev',
 ]
 
 tests_require = [
@@ -37,6 +37,10 @@ docs_require = [
     'sphinx_rtd_theme',
     'sphinxcontrib-httpdomain',
     'sphinxcontrib-autorun',
+]
+
+dependency_links = [
+    'git+https://github.com/bigchaindb/bigchaindb.git#egg=bigchaindb-0.8.0.dev',    # noqa E501
 ]
 
 setup(
@@ -71,4 +75,5 @@ setup(
         'dev': dev_require + tests_require + docs_require,
         'docs': docs_require,
     },
+    dependency_links=dependency_links,
 )
