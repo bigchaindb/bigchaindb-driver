@@ -17,7 +17,7 @@ def test_driver_init_basic(bdb_node):
     assert driver.transactions
 
 
-def test_driver_init_without_nodes(alice_keypair):
+def test_driver_init_without_nodes():
     from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
     driver = BigchainDB()
     assert driver.nodes == (DEFAULT_NODE,)
