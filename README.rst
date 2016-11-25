@@ -27,8 +27,10 @@ BigchainDB Python Driver
 Features
 --------
 
-* Minimal support for ``CREATE``, ``TRANSFER``, and ``GET`` operations on the
-  ``/transactions`` endpoint.
+* Support for preparing, fulfilling, and sending transactions to a BigchainDB
+  node.
+* Retrieval of transactions by id.
+* Getting status of a transaction by id.
 
 
 Credits
