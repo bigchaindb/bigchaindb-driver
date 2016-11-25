@@ -1,5 +1,3 @@
-from warnings import warn
-
 from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
 
