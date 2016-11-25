@@ -147,7 +147,6 @@ bigchain:
         'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
       'metadata': None,
       'operation': 'CREATE',
-      'timestamp': '1479393278'},
      'version': 1}
 
 
@@ -255,7 +254,6 @@ The ``transfer_tx`` dictionary should look something like:
         'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
       'metadata': None,
       'operation': 'TRANSFER',
-      'timestamp': '1479401063'},
      'version': 1}
 
 Notice, ``bob``'s verifying key (public key), appearing in the above ``dict``.

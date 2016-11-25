@@ -37,7 +37,6 @@ def test_prepare_create_transaction_default(alice_pubkey):
     assert 'fulfillments' in create_transaction['transaction']
     assert 'metadata' in create_transaction['transaction']
     assert 'operation' in create_transaction['transaction']
-    assert 'timestamp' in create_transaction['transaction']
     assert create_transaction['transaction']['operation'] == 'CREATE'
 
 
@@ -52,7 +51,7 @@ def test_prepare_create_transaction_default(alice_pubkey):
 @mark.parametrize('owners_after', (
     '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
-    ['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'],
+    [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
 def test_prepare_create_transaction(asset, owners_before, owners_after):
     from bigchaindb_driver.offchain import prepare_create_transaction
@@ -66,16 +65,15 @@ def test_prepare_create_transaction(asset, owners_before, owners_after):
     assert 'fulfillments' in create_transaction['transaction']
     assert 'metadata' in create_transaction['transaction']
     assert 'operation' in create_transaction['transaction']
-    assert 'timestamp' in create_transaction['transaction']
     assert create_transaction['transaction']['operation'] == 'CREATE'
 
 
-@mark.parametrize('bob_vk', (
+@mark.parametrize('owners_after', (
     '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
-    ['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'],
+    [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
-def test_prepare_transfer_transaction(alice_transaction, bob_vk):
+def test_prepare_transfer_transaction(alice_transaction, owners_after):
     from bigchaindb_driver.offchain import prepare_transfer_transaction
     condition_index = 0
     condition = alice_transaction['transaction']['conditions'][condition_index]
@@ -89,7 +87,7 @@ def test_prepare_transfer_transaction(alice_transaction, bob_vk):
     }
     asset = alice_transaction['transaction']['asset']
     transfer_transaction = prepare_transfer_transaction(
-        inputs=input_, owners_after=bob_vk, asset=asset)
+        inputs=input_, owners_after=owners_after, asset=asset)
     assert 'id' in transfer_transaction
     assert 'transaction' in transfer_transaction
     assert 'version' in transfer_transaction
@@ -98,7 +96,6 @@ def test_prepare_transfer_transaction(alice_transaction, bob_vk):
     assert 'fulfillments' in transfer_transaction['transaction']
     assert 'metadata' in transfer_transaction['transaction']
     assert 'operation' in transfer_transaction['transaction']
-    assert 'timestamp' in transfer_transaction['transaction']
     assert transfer_transaction['transaction']['operation'] == 'TRANSFER'
 
 

@@ -163,7 +163,6 @@ The ``prepared_creation_tx`` dictionary should be similar to:
       'metadata': {'data': {'planet': 'earth'},
        'id': '4d406690-d6e3-48b2-ac64-9fff714f0ff3'},
       'operation': 'CREATE',
-      'timestamp': '1479921799'},
      'version': 1}
 
 The transaction needs to be fulfilled:
@@ -209,7 +208,7 @@ And sent over to a BigchainDB node:
     sent_creation_tx = bdb.transactions.send(fulfilled_creation_tx)
 
 .. code-block:: python
- 
+
     >>> sent_creation_tx == fulfilled_creation_tx
     True
 
@@ -306,7 +305,6 @@ The ``sent_transfer_tx`` dictionary should look something like:
         'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
       'metadata': None,
       'operation': 'TRANSFER',
-      'timestamp': '1479940709'},
      'version': 1}
 
 Bob is the new owner: 
