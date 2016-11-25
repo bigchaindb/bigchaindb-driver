@@ -95,6 +95,6 @@ class TestTransactionsEndpoint:
 
     def test_send(self, driver, alice_privkey, unsigned_transaction):
         fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
-                                                    private_keys=alice_privkey)
+                                                   private_keys=alice_privkey)
         sent_tx = driver.transactions.send(fulfilled_tx)
         assert sent_tx == fulfilled_tx
