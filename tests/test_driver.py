@@ -3,7 +3,7 @@
 from time import sleep
 
 import rapidjson
-from pytest import raises, warns
+from pytest import raises
 
 from cryptoconditions import Ed25519Fulfillment
 from cryptoconditions.crypto import Ed25519SigningKey
