@@ -20,6 +20,7 @@ from .utils import (
     TransferOperation,
     _normalize_asset,
     _normalize_operation,
+    _normalize_owners_after,
 )
 
 logger = logging.getLogger(__name__)
@@ -65,9 +66,13 @@ def prepare_transaction(*, operation='CREATE', owners_before=None,
             One or more public keys representing the issuer(s) of the
             asset being created. Only applies for ``'CREATE'``
             operations. Defaults to ``None``.
-        owners_after (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+        owners_after (:obj:`str` | :obj:`tuple` | :obj:`dict`, optional):
             One or more public keys representing the new owner(s) of the
             asset being created or transferred. Defaults to ``None``.
+            For divisible assets one may pass a dictionary of public
+            keys mapping to the amount. A dictionary key is expected
+            to be a string (one public key) or a tuple of public
+            keys. The amount is expected to be an integer.
         asset (:obj:`dict`, optional): The asset being created or
             transferred. MUST be supplied for ``'TRANSFER'`` operations.
             Defaults to ``None``.
@@ -130,9 +135,13 @@ def prepare_create_transaction(*,
         owners_before (:obj:`list` | :obj:`tuple` | :obj:`str`): One
             or more public keys representing the issuer(s) of the asset
             being created.
-        owners_after (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+        owners_after (:obj:`str` | :obj:`tuple` | :obj:`dict`, optional):
             One or more public keys representing the new owner(s) of the
-            asset being created. Defaults to ``None``.
+            asset being created. Defaults to ``None``. For divisible
+            assets one may pass a dictionary of public keys mapping to
+            the amount. A dictionary key is expected to be a string (one
+            public key) or a tuple of public keys. The amount is
+            expected to be an integer.
         asset (:obj:`dict`, optional): The asset being created. Defaults
             to ``None``.
         metadata (:obj:`dict`, optional): Metadata associated with the
@@ -159,14 +168,9 @@ def prepare_create_transaction(*,
     # Transaction.create will raise an exception saying that divisible assets
     # need to have amount > 1.
     if not owners_after:
-        owners_after = [(owners_before, 1)]
-    elif not isinstance(owners_after, (list, tuple)):
-            owners_after = [([owners_after], 1)]
-    # NOTE: Needed for the time being. See
-    # https://github.com/bigchaindb/bigchaindb/issues/797
-    elif isinstance(owners_after, tuple):
-        owners_after = [(list(owners_after), 1)]
+        owners_after = owners_before
 
+    owners_after = _normalize_owners_after(owners_after)
     asset = _normalize_asset(asset)
 
     transaction = Transaction.create(
@@ -192,9 +196,13 @@ def prepare_transfer_transaction(*,
             inputs holding the condition(s) that this transaction
             intends to fulfill. Each input is expected to be a
             :obj:`dict`.
-        owners_after (:obj:`str` | :obj:`list` | :obj:`tuple`): One or
+        owners_after (:obj:`str` | :obj:`tuple` | :obj:`dict`): One or
             more public keys representing the new owner(s) of the asset
-            being transferred.
+            being transferred. For divisible assets one may pass a
+            dictionary of public keys mapping to the amount. A
+            dictionary key is expected to be a string (one public key)
+            or a tuple of public keys. The amount is expected to be an
+            integer.
         asset (:obj:`dict`): The asset being transferred.
         metadata (:obj:`dict`): Metadata associated with the
             transaction. Defaults to ``None``.
@@ -274,13 +282,8 @@ def prepare_transfer_transaction(*,
     """
     if not isinstance(inputs, (list, tuple)):
         inputs = (inputs, )
-    if not isinstance(owners_after, (list, tuple)):
-        owners_after = [([owners_after], 1)]
 
-    # NOTE: Needed for the time being. See
-    # https://github.com/bigchaindb/bigchaindb/issues/797
-    if isinstance(owners_after, tuple):
-        owners_after = [(list(owners_after), 1)]
+    owners_after = _normalize_owners_after(owners_after)
 
     fulfillments = [
         BdbFulfillment(Fulfillment.from_dict(input_['fulfillment']),

@@ -6,7 +6,12 @@ Attributes:
         :class:`~.CreateOperation`.
 
 """
+import collections
+from functools import singledispatch
+
 from bigchaindb.common.transaction import Asset
+
+from .exceptions import BigchaindbException
 
 
 class CreateOperation:
@@ -91,3 +96,31 @@ def _normalize_asset(asset, is_transfer=False):
             if not asset:
                 asset = None
     return asset
+
+
+@singledispatch
+def _normalize_owners_after(owners_after):
+    raise BigchaindbException(
+        'Unsupported type for owners_after: {}.'
+        'owners_after must be a string, a dict, or an iterable such as'
+        'a list, tuple or a set.'.format(owners_after)
+    )
+
+
+@_normalize_owners_after.register(str)
+def _normalize_owners_after_str(owners_after):
+    return [([owners_after], 1)]
+
+
+@_normalize_owners_after.register(dict)
+def _normalize_owners_after_dict(owners_after):
+    owners_amounts = []
+    for owner, amount in owners_after.items():
+        owner = list(owner) if isinstance(owner, tuple) else [owner]
+        owners_amounts.append((owner, amount))
+    return owners_amounts
+
+
+@_normalize_owners_after.register(collections.abc.Iterable)
+def _normalize_owners_after_iterable(owners_after):
+    return [([owner for owner in owners_after], 1)]
