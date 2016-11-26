@@ -369,7 +369,7 @@ Divisible Assets
 In BigchainDB all assets are non-divisible by default so if we want to make a
 divisible asset we need to explicitly mark it as divisible.
 
-Lets continue with the bicycle example. Bob is now the proud owner of the
+Let's continue with the bicycle example. Bob is now the proud owner of the
 bicycle and he decides he wants to rent the bicycle. Bob starts by creating a
 time sharing token in which 1 token corresponds to 1 hour of riding time:
 
@@ -397,7 +397,7 @@ Bob has now decided to issue 10 tokens and assign them to Carly.
     prepared_token_tx = bdb.transactions.prepare(
         operation='CREATE',
         owners_before=bob.verifying_key,
-        owners_after=[([carly.verifying_key], 10)]
+        owners_after=[([carly.verifying_key], 10)],
         asset=bicycle_token
     )
 
@@ -420,7 +420,7 @@ Bob has now decided to issue 10 tokens and assign them to Carly.
 
         owners_after=[([carly.verifying_key], 5), ([carly.verifying_key], 5)]
 
-    The reason why the addresses are contained in ``lists`` its because each
+    The reason why the addresses are contained in ``lists`` is because each
     condition can have multiple ownership. For instance we can create a
     condition with ``amount=10`` in which both Carly and Alice are owners
     with:
