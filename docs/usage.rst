@@ -26,16 +26,9 @@ Connecting to a BigchainDB node, is done via the
 where ``<api_endpoint>`` is the root URL of the BigchainDB server API you wish
 to connect to. 
 
-If you do not know the URL, and have access to the server, you
-can use the BigchainDB server command line. For instance, for the simplest case
-in which a BigchainDB node would be running locally:
-
-.. code-block:: bash
-
-    $ bigchaindb show-config | grep api_endpoint
-        "api_endpoint": "http://localhost:9984/api/v1",
-
-You would then connect to the local BigchainDB server this way:
+For the simplest case in which a BigchainDB node would be running locally, (and
+the ``BIGCHAINDB_SERVER_BIND`` setting wouldn't have been changed), you would
+connect to the local BigchainDB server this way:
 
 .. code-block:: python
 
@@ -46,18 +39,8 @@ If you are running the docker-based dev setup that comes along with the
 information), and wish to connect to it from the ``bdb-driver`` linked
 (container) service:
 
-.. code-block:: bash
-
-    $ docker-compose run --rm bdb-server bigchaindb show-config | grep api_endpoint
-        "api_endpoint": "http://bdb-server:9984/api/v1",
-
-.. code-block:: bash
-    
-    $ docker-compose run --rm bdb-driver python
-
 .. code-block:: python
 
-    >>> from bigchaindb_driver import BigchainDB
     >>> bdb = BigchainDB('http://bdb-server:9984/api/v1')
 
 Alternatively, you may connect to the containerized BigchainDB node from
@@ -70,7 +53,6 @@ Alternatively, you may connect to the containerized BigchainDB node from
 
 .. code-block:: python
 
-    >>> from bigchaindb_driver import BigchainDB
     >>> bdb = BigchainDB('http://0.0.0.0:32780/api/v1')
 
 For the sake of this example:
