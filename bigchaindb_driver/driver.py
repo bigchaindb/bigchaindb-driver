@@ -100,13 +100,9 @@ class TransactionsEndpoint(NamespacedDriver):
                 One or more public keys representing the issuer(s) of
                 the asset being created. Only applies for ``'CREATE'``
                 operations. Defaults to ``None``.
-            owners_after (:obj:`str` | :obj:`tuple` | :obj:`dict`, optional):
+            owners_after (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
                 One or more public keys representing the new owner(s) of the
                 asset being created or transferred. Defaults to ``None``.
-                For divisible assets one may pass a dictionary of public
-                keys mapping to the amount. A dictionary key is expected
-                to be a string (one public key) or a tuple of public
-                keys. The amount is expected to be an integer.
             asset (:obj:`dict`, optional): The asset being created or
                 transferred. MUST be supplied for ``'TRANSFER'`` operations.
                 Defaults to ``None``.

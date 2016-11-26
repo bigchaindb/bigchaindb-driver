@@ -51,7 +51,7 @@ def test_prepare_create_transaction_default(alice_pubkey):
 @mark.parametrize('owners_after', (
     '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
-    {'2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS': 1},
+    [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
 def test_prepare_create_transaction(asset, owners_before, owners_after):
     from bigchaindb_driver.offchain import prepare_create_transaction
@@ -69,38 +69,9 @@ def test_prepare_create_transaction(asset, owners_before, owners_after):
 
 
 @mark.parametrize('owners_after', (
-    None,
     '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
-    ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
-     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'),
-    {'2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS': 1},
-    {('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
-     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'): 1},
-))
-def test_owners_after_prepare_create_transaction(alice_pubkey, owners_after):
-    from bigchaindb_driver.offchain import prepare_create_transaction
-    create_transaction = prepare_create_transaction(
-        owners_before=alice_pubkey, owners_after=owners_after)
-    assert 'id' in create_transaction
-    assert 'transaction' in create_transaction
-    assert 'version' in create_transaction
-    assert 'asset' in create_transaction['transaction']
-    assert 'conditions' in create_transaction['transaction']
-    assert 'fulfillments' in create_transaction['transaction']
-    assert 'metadata' in create_transaction['transaction']
-    assert 'operation' in create_transaction['transaction']
-    assert create_transaction['transaction']['operation'] == 'CREATE'
-
-
-@mark.parametrize('owners_after', (
-    '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
-    ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
-    ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
-     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'),
-    {'2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS': 1},
-    {('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
-     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'): 1},
+    [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
 def test_prepare_transfer_transaction(alice_transaction, owners_after):
     from bigchaindb_driver.offchain import prepare_transfer_transaction
@@ -126,14 +97,6 @@ def test_prepare_transfer_transaction(alice_transaction, owners_after):
     assert 'metadata' in transfer_transaction['transaction']
     assert 'operation' in transfer_transaction['transaction']
     assert transfer_transaction['transaction']['operation'] == 'TRANSFER'
-
-
-def test_prepare_transfer_transaction_raises(alice_transaction):
-    from bigchaindb_driver.offchain import prepare_transfer_transaction
-    from bigchaindb_driver.exceptions import BigchaindbException
-    with raises(BigchaindbException):
-        prepare_transfer_transaction(
-            inputs={}, owners_after=None, asset=None)
 
 
 @mark.parametrize('alice_sk', (
