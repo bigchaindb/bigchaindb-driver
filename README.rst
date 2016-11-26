@@ -44,6 +44,9 @@ Compatibility Matrix
 | ``master``            | ``master``            |
 +-----------------------+-----------------------+
 
+`Although we do our best to keep the master branches in sync, there may be
+occasional delays.`
+
 
 Credits
 -------
