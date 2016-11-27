@@ -1,3 +1,5 @@
+.. _basic-usage:
+
 ====================
 Basic Usage Examples
 ====================
@@ -176,6 +178,7 @@ To check the status of the transaction:
 .. note:: It may take a small amount of time before a BigchainDB cluster
     confirms a transaction as being valid.
 
+.. _bicycle-transfer:
 
 Asset Transfer
 --------------

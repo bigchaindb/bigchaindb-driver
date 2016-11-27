@@ -16,6 +16,7 @@ BigchainDB Python Driver
    quickstart
    usage
    advanced-usage
+   handcraft
    upgrading
    libref
    aboutthedocs
