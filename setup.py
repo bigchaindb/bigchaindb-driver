@@ -45,7 +45,7 @@ dependency_links = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.0.3',
+    version='0.0.4',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
