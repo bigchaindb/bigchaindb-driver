@@ -114,6 +114,9 @@ Once you have a copy of the source code, you can install it by going to the dire
     python setup.py install
 
 
+.. include:: ../HACKING.rst
+
+
 .. _Github repo: https://github.com/bigchaindb/bigchaindb-driver
 .. _tarball: https://github.com/bigchaindb/bigchaindb-driver/tarball/master
 .. _pynacl: https://github.com/pyca/pynacl/

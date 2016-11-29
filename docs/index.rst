@@ -21,7 +21,7 @@ BigchainDB Python Driver
    aboutthedocs
    contributing
    authors
-   changelog 
+   changelog
 
 Indices and tables
 ==================
