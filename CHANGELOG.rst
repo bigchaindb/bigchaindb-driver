@@ -2,6 +2,21 @@
 Changelog
 =========
 
+0.1.0 (2016-11-29)
+------------------
+Added
+^^^^^
+* Support for BigchainDB server 0.8.0.
+* Support for divisible assets.
+
+Removed
+^^^^^^^
+* ``create()`` and ``transfer()`` under ``TransactionEndpoint``, and available
+  via ``BigchainDB.transactions``. Replaced by the three "canonical"
+  transaction operations: ``prepare()``, ``fulfill()``, and ``send()``.
+* Support for client side timestamps.
+
+
 0.0.3 (2016-11-25)
 ------------------
 Added
