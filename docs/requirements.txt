@@ -6,3 +6,4 @@ sphinxcontrib-autorun
 sphinxcontrib-httpdomain
 sphinxcontrib-napoleon
 sphinx_rtd_theme
+matplotlib
