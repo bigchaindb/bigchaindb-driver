@@ -183,8 +183,16 @@ To check the status of the transaction:
 
 .. code-block:: python
 
+    >>> trials = 0
+
+    >>> while bdb.transactions.status(txid).get('status') != 'valid' and trials < 100:
+    ...     trials += 1
+
     >>> bdb.transactions.status(txid)
     {'status': 'valid'}
+
+.. note:: It may take a small amount of time before a BigchainDB cluster
+    confirms a transaction as being valid.
 
 
 Asset Transfer
