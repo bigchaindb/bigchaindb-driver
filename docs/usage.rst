@@ -160,8 +160,7 @@ The ``prepared_creation_tx`` dictionary should be similar to:
          'type_id': 4},
         'input': None,
         'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'metadata': {'data': {'planet': 'earth'},
-       'id': '4d406690-d6e3-48b2-ac64-9fff714f0ff3'},
+      'metadata': {'planet': 'earth'},
       'operation': 'CREATE',
      'version': 1}
 
@@ -195,8 +194,7 @@ The transaction needs to be fulfilled:
         'fulfillment': 'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugjCpOCtzI1L59uV2Mw7wg2bHAnzj5AyA0dXkquAeENBAsSR0DVhKFUf3JH7Ii2gPqhln7rlOYpk8EsQKLD6K2YJ',
         'input': None,
         'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'metadata': {'data': {'planet': 'earth'},
-       'id': '4d406690-d6e3-48b2-ac64-9fff714f0ff3'},
+      'metadata': {'planet': 'earth'},
       'operation': 'CREATE',
      'version': 1}
 
