@@ -35,10 +35,11 @@ Don't shut them down! In a new terminal, open a Python shell:
 Now we can import the :class:`~bigchaindb_driver.BigchainDB` class and create
 an instance:
 
-.. code-block:: python
+.. ipython::
 
-    from bigchaindb_driver import BigchainDB
-    bdb = BigchainDB()
+    In [0]: from bigchaindb_driver import BigchainDB
+
+    In [0]: bdb = BigchainDB()
 
 This instantiates an object ``bdb`` of class
 :class:`~bigchaindb_driver.BigchainDB`. When instantiating a
@@ -56,27 +57,39 @@ a generic `Python dict <https://docs.python.org/3.4/tutorial/datastructures.html
 In BigchainDB, digital assets can be created by doing a special kind of
 transaction: a ``CREATE`` transaction.
 
+.. ipython::
+
+    In [0]: from bigchaindb_driver.crypto import generate_keypair
+
+Create a test user: alice
+
+.. ipython::
+
+    In [0]: alice = generate_keypair()
+
+Define a digital asset data payload
+
+.. ipython::
+
+    In [0]: digital_asset_payload = {'data': {'msg': 'Hello BigchainDB!'}}
+
+    In [0]: tx = bdb.transactions.prepare(operation='CREATE',
+       ...:                               owners_before=alice.verifying_key,
+       ...:                               asset=digital_asset_payload)
+
+All transactions need to be signed by the user creating the transaction.
+
+.. ipython::
+
+    In [0]: signed_tx = bdb.transactions.fulfill(tx, private_keys=alice.signing_key)
+
+Write the transaction to the bigchain. The transaction will be stored in a
+backlog where it will be validated, included in a block, and written to the
+bigchain.
+
 .. code-block:: python
 
-    from bigchaindb_driver.crypto import generate_keypair
-
-    # Create a test user: alice
-    alice = generate_keypair()
-
-    # Define a digital asset data payload
-    digital_asset_payload = {'data': {'msg': 'Hello BigchainDB!'}}
-
-    tx = bdb.transactions.prepare(operation='CREATE',
-                                  owners_before=alice.verifying_key,
-                                  asset=digital_asset_payload)
-
-    # All transactions need to be signed by the user creating the transaction.
-    signed_tx = bdb.transactions.fulfill(tx, private_keys=alice.signing_key)
-
-    # Write the transaction to the bigchain.
-    # The transaction will be stored in a backlog where it will be validated,
-    # included in a block, and written to the bigchain.
-    sent_tx = bdb.transactions.send(signed_tx)
+    >>> sent_tx = bdb.transactions.send(signed_tx)
 
 Note that the transaction payload returned by the BigchainDB node is equivalent
 to the signed transaction payload.
@@ -86,31 +99,9 @@ to the signed transaction payload.
     >>> sent_tx == signed_tx
     True
 
-    >>> sent_tx
-    {'id': '57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39',
-     'transaction': {'asset': {'data': {'msg': 'Hello BigchainDB!'},
-       'divisible': False,
-       'id': 'd04b05de-774c-4f81-9e54-6c19ed3cd18d',
-       'refillable': False,
-       'updatable': False},
-      'conditions': [{'amount': 1,
-        'cid': 0,
-        'condition': {'details': {'bitmask': 32,
-          'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-          'signature': None,
-          'type': 'fulfillment',
-          'type_id': 4},
-         'uri': 'cc:4:20:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg:96'},
-        'owners_after': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ughA8-9lUJYc_LGAB_NtyTPCCV58LfMcNZ9-0PUB6m1y_6pgTbCOQFBEeDtm_nC293CbpZjziwq7j3skrzS-OiAI',
-        'input': None,
-        'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'metadata': None,
-      'operation': 'CREATE',
-      'timestamp': '1479393278'},
-     'version': 1}
+.. ipython::
 
+    In [0]: signed_tx
 
 
 Read the Creation Transaction from the DB
@@ -121,44 +112,16 @@ bigchain:
 .. code-block:: python
 
     # Retrieve a transaction from the bigchain
-    tx_retrieved = bdb.transactions.retrieve(tx['id'])
-    tx_retrieved
-
-.. code-block:: python
-
-    {'id': '57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39',
-     'transaction': {'asset': {'data': {'msg': 'Hello BigchainDB!'},
-       'divisible': False,
-       'id': 'd04b05de-774c-4f81-9e54-6c19ed3cd18d',
-       'refillable': False,
-       'updatable': False},
-      'conditions': [{'amount': 1,
-        'cid': 0,
-        'condition': {'details': {'bitmask': 32,
-          'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-          'signature': None,
-          'type': 'fulfillment',
-          'type_id': 4},
-         'uri': 'cc:4:20:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg:96'},
-        'owners_after': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ughA8-9lUJYc_LGAB_NtyTPCCV58LfMcNZ9-0PUB6m1y_6pgTbCOQFBEeDtm_nC293CbpZjziwq7j3skrzS-OiAI',
-        'input': None,
-        'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'metadata': None,
-      'operation': 'CREATE',
-     'version': 1}
+    >>> tx_retrieved = bdb.transactions.retrieve(tx['id'])
 
 
 
-The new owner of the digital asset is now
-``3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf``, which is the public key, aka
+The new owner of the digital asset is now alice which is the public key, aka
 verifying key of ``alice``.
 
-.. code-block:: python
+.. ipython::
 
-    >>> alice.verifying_key
-    '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf'
+    In [0]: alice.verifying_key
 
 
 Transfer the Digital Asset
@@ -166,7 +129,11 @@ Transfer the Digital Asset
 Now that ``alice`` has a digital asset assigned to her, she can transfer it to
 another person. Transfer transactions require an input. The input will be the
 transaction id of a digital asset that was assigned to ``alice``, which in our
-case is ``57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39``.
+case is
+
+.. ipython::
+
+    In [0]: signed_tx['id']
 
 BigchainDB makes use of the crypto-conditions library to both cryptographically
 lock and unlock transactions. The locking script is referred to as a
@@ -190,119 +157,79 @@ three things:
 
 To construct the input:
 
-.. code-block:: python
+.. ipython::
 
-    cid = 0
-    condition = tx['transaction']['conditions'][cid]
-    input_ = {
-        'fulfillment': condition['condition']['details'],
-        'input': {
-            'cid': cid,
-            'txid': tx['id'],
-        },
-        'owners_before': condition['owners_after'],
-    }
+    In [0]: cid = 0
+
+    In [0]: condition = tx['transaction']['conditions'][cid]
+
+    In [0]: input_ = {
+       ...:     'fulfillment': condition['condition']['details'],
+       ...:     'input': {
+       ...:         'cid': cid,
+       ...:         'txid': tx['id'],
+       ...:     },
+       ...:     'owners_before': condition['owners_after'],
+       ...: }
 
 The asset, can be directly retrieved from the input ``tx``:
 
-.. code-block:: python
+.. ipython::
 
-    asset = tx['transaction']['asset']
+    In [0]: asset = tx['transaction']['asset']
 
 Create a second test user, ``bob``:
 
-.. code-block:: python
+.. ipython::
 
-    >>> bob = generate_keypair()
-    >>> bob.verifying_key
-    'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA'
+    In [0]: bob = generate_keypair()
+
+    In [0]: bob.verifying_key
 
 And prepare the transfer transaction:
 
-.. code-block:: python
+.. ipython::
 
-    tx_transfer = bdb.transactions.prepare(
-        operation='TRANSFER',
-        inputs=input_,
-        asset=asset,
-        owners_after=bob.verifying_key,
-    )
+    In [0]: tx_transfer = bdb.transactions.prepare(
+       ...:     operation='TRANSFER',
+       ...:     inputs=input_,
+       ...:     asset=asset,
+       ...:     owners_after=bob.verifying_key,
+       ...: )
 
-The ``transfer_tx`` dictionary should look something like:
+The ``tx_transfer`` dictionary should look something like:
 
-.. code-block:: python
+.. ipython::
 
-    {'id': '7fde91ebdb05bb49af4e7613647c27cf4e30809efcbae28e6b34e138e0360c76',
-     'transaction': {'asset': {'id': 'd04b05de-774c-4f81-9e54-6c19ed3cd18d'},
-      'conditions': [{'amount': 1,
-        'cid': 0,
-        'condition': {'details': {'bitmask': 32,
-          'public_key': 'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA',
-          'signature': None,
-          'type': 'fulfillment',
-          'type_id': 4},
-         'uri': 'cc:4:20:yjsOmwsugrgj_QAcdaLZdZWKHWTB2T5yVmBf8IfdV_s:96'},
-        'owners_after': ['EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA']}],
-      'fulfillments': [{'fid': 0,
-        'fulfillment': {'bitmask': 32,
-         'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-         'signature': None,
-         'type': 'fulfillment',
-         'type_id': 4},
-        'input': {'cid': 0,
-         'txid': '57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39'},
-        'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'metadata': None,
-      'operation': 'TRANSFER',
-     'version': 1}
+    In [0]: tx_transfer
 
 Notice, ``bob``'s verifying key (public key), appearing in the above ``dict``.
 
-.. code-block:: python
+.. ipython::
 
-    >>> bob.verifying_key
-    'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA'
+    In [0]: bob.verifying_key
 
 The transaction now needs to be fulfilled by ``alice``:
 
-.. code-block:: python
+.. ipython::
 
-    signed_tx_transfer = bdb.transactions.fulfill(
-        tx_transfer,
-        private_keys=alice.signing_key,
-    )
+    In [0]: signed_tx_transfer = bdb.transactions.fulfill(
+       ...:     tx_transfer,
+       ...:     private_keys=alice.signing_key,
+       ...: )
 
 If you look at the content of ``signed_tx_transfer`` you should see the added
 fulfilment uri, holding the signature:
 
-.. code-block:: python
+.. ipython::
 
-    {'id': '7fde91ebdb05bb49af4e7613647c27cf4e30809efcbae28e6b34e138e0360c76',
-     'transaction': {'asset': {'id': 'd04b05de-774c-4f81-9e54-6c19ed3cd18d'},
-      'conditions': [{'amount': 1,
-        'cid': 0,
-        'condition': {'details': {'bitmask': 32,
-          'public_key': 'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA',
-          'signature': None,
-          'type': 'fulfillment',
-          'type_id': 4},
-         'uri': 'cc:4:20:yjsOmwsugrgj_QAcdaLZdZWKHWTB2T5yVmBf8IfdV_s:96'},
-        'owners_after': ['EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA']}],
-      'fulfillments': [{'fid': 0,
-        'fulfillment': 'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg4S_S7Obu7E-HtL2ZjM3tcKKfoaspMhyx17Eg2KBijylZMxv1NvAD0j8uJP1WOb2AP6ezJorcw6TA5n-cmuwkE',
-        'input': {'cid': 0,
-         'txid': '57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39'},
-        'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-      'metadata': None,
-      'operation': 'TRANSFER',
-      'timestamp': '1479401063'},
-     'version': 1}
+    In [0]: signed_tx_transfer
 
 More precisely:
 
-.. code-block:: python
+.. ipython::
 
-    >>> signed_tx_transfer['transaction']['fulfillments'][0]['fulfillment']
+    In [0]: signed_tx_transfer['transaction']['fulfillments'][0]['fulfillment']
     'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg4S_S7Obu7E-HtL2ZjM3tcKKfoaspMhyx17Eg2KBijylZMxv1NvAD0j8uJP1WOb2AP6ezJorcw6TA5n-cmuwkE'
 
 We have yet to send the transaction over to a BigchainDB node, as both
@@ -330,36 +257,44 @@ more times (i.e. it prevents double spends).
 
 If we try to create another transaction with the same input as before, the
 transaction will be marked invalid and the validation will throw a double spend
-exception:
+exception.
+
+Let's suppose that Alice tries to re-send the asset back to her "secret"
+account.
+
+.. ipython::
+
+    In [0]: alice_secret_stash = generate_keypair()
 
 Create another transfer transaction with the same input
 
-.. code-block:: python
+.. ipython::
 
-    tx_transfer_2 = bdb.transactions.prepare(
-        operation='TRANSFER',
-        inputs=input_,
-        asset=asset,
-        owners_after=bob.verifying_key,
-    )
+    In [0]: tx_transfer_2 = bdb.transactions.prepare(
+       ...:     operation='TRANSFER',
+       ...:     inputs=input_,
+       ...:     asset=asset,
+       ...:     owners_after=alice_secret_stash.verifying_key,
+       ...: )
 
 Fulfill the transaction
 
-.. code-block:: python
+.. ipython::
 
-    fulfilled_tx_transfer_2 = bdb.transactions.fulfill(
-        tx_transfer_2,
-        private_keys=alice.signing_key,
-    )
+    In [0]: fulfilled_tx_transfer_2 = bdb.transactions.fulfill(
+       ...:     tx_transfer_2,
+       ...:     private_keys=alice.signing_key,
+       ...: )
 
 Send the transaction over to the node
 
 .. code-block:: python
 
-    try:
-        bdb.transactions.send(fulfilled_tx_transfer_2)
-    except BigchaindbException as e:
-        print(e.info)
+    >>> from bigchaindb_driver.exceptions import BigchaindbException
+    >>> try:
+    ...     bdb.transactions.send(fulfilled_tx_transfer_2)
+    ... except BigchaindbException as e:
+    ...     print(e.info)
 
     {'message': 'Invalid transaction', 'status': 400}
 
@@ -372,27 +307,29 @@ Multiple Owners
 
 Say ``alice`` and ``bob`` own a car together:
 
-.. code-block:: python
+.. ipython::
 
-    car_asset = {'data': {'car': {'vin': '5YJRE11B781000196'}}}
+    In [0]: car_asset = {'data': {'car': {'vin': '5YJRE11B781000196'}}}
 
 and they agree that ``alice`` will be the one issuing the asset. To create a
 new digital asset with `multiple` owners, one can simply provide a
 list of ``owners_after``:
 
+.. ipython::
+
+    In [0]: car_creation_tx = bdb.transactions.prepare(
+       ...:     operation='CREATE',
+       ...:     owners_before=alice.verifying_key,
+       ...:     owners_after=(alice.verifying_key, bob.verifying_key),
+       ...:     asset=car_asset,
+       ...: )
+
+    In [0]: signed_car_creation_tx = bdb.transactions.fulfill(
+       ...:     car_creation_tx,
+       ...:     private_keys=alice.signing_key,
+       ...: )
+
 .. code-block:: python
-
-    car_creation_tx = bdb.transactions.prepare(
-        operation='CREATE',
-        owners_before=alice.verifying_key,
-        owners_after=[alice.verifying_key, bob.verifying_key],
-        asset=car_asset,
-    )
-
-    signed_car_creation_tx = bdb.transactions.fulfill(
-        car_creation_tx,
-        private_keys=alice.signing_key,
-    )
 
     sent_car_tx = bdb.transactions.send(signed_car_creation_tx
 
@@ -400,68 +337,50 @@ One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
 and realizing they no longer need their car, wish to transfer the ownership of
 their car over to ``carol``:
 
-.. code-block:: python
+.. ipython::
 
-    carol = generate_keypair()
+    In [0]: carol = generate_keypair()
 
 In order to prepare the transfer transaction, ``alice`` and ``bob`` need the
 input:
 
-.. code-block:: python
+.. ipython::
 
-    cid = 0
-    condition = signed_car_creation_tx['transaction']['conditions'][cid]
-    input_ = {
-        'fulfillment': condition['condition']['details'],
-        'input': {
-            'cid': cid,
-            'txid': signed_car_creation_tx['id'],
-        },
-        'owners_before': condition['owners_after'],
-    }
+    In [0]: cid = 0
+
+    In [0]: condition = signed_car_creation_tx['transaction']['conditions'][cid]
+
+    In [0]: input_ = {
+       ...:     'fulfillment': condition['condition']['details'],
+       ...:     'input': {
+       ...:         'cid': cid,
+       ...:         'txid': signed_car_creation_tx['id'],
+       ...:     },
+       ...:     'owners_before': condition['owners_after'],
+       ...: }
 
 Let's take a moment to contemplate what this ``input_`` is:
 
-.. code-block:: python
+.. ipython::
 
-    >>> input_
-    {'fulfillment': {'bitmask': 41,
-      'subfulfillments': [{'bitmask': 32,
-        'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-        'signature': None,
-        'type': 'fulfillment',
-        'type_id': 4,
-        'weight': 1},
-       {'bitmask': 32,
-        'public_key': 'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA',
-        'signature': None,
-        'type': 'fulfillment',
-        'type_id': 4,
-        'weight': 1}],
-      'threshold': 2,
-      'type': 'fulfillment',
-      'type_id': 2},
-     'input': {'cid': 0,
-      'txid': '3128572d430f9ae23010f11e444d1d12e35f90095cf5f0da98acfcada5eed0fe'},
-     'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-      'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA']}
+    In [0]: input_
 
 and the asset:
 
-.. code-block:: python
+.. ipython::
 
-    asset = signed_car_creation_tx['transaction']['asset']
+    In [0]: asset = signed_car_creation_tx['transaction']['asset']
 
 then ``alice`` can prepare the transfer:
 
-.. code-block:: python
+.. ipython::
 
-    car_transfer_tx = bdb.transactions.prepare(
-        operation='TRANSFER',
-        owners_after=carol.verifying_key,
-        asset=asset,
-        inputs=input_,
-    )
+    In [0]: car_transfer_tx = bdb.transactions.prepare(
+       ...:     operation='TRANSFER',
+       ...:     owners_after=carol.verifying_key,
+       ...:     asset=asset,
+       ...:     inputs=input_,
+       ...: )
 
 The asset can be transfered as soon as each of the ``owners_after`` fulfills
 the transaction, that is ``alice`` and ``bob``.
@@ -473,38 +392,32 @@ To do so, simply provide a list of all private keys to the fulfill method.
     `bigchaindb/bigchaindb/issues/729 <https://github.com/bigchaindb/bigchaindb/issues/729>`_
     addresses the current limitation. Your feedback is welcome!
 
-.. code-block:: python
+.. ipython::
 
-    signed_car_transfer_tx = bdb.transactions.fulfill(
-        car_transfer_tx, private_keys=[alice.signing_key, bob.signing_key]
-    )
+    In [0]: signed_car_transfer_tx = bdb.transactions.fulfill(
+       ...:     car_transfer_tx, private_keys=[alice.signing_key, bob.signing_key]
+       ...: )
 
 Note, that if one the signing keys is missing, the fulfillment will fail. If we
 omit ``bob``:
 
-.. code-block:: python
+.. ipython::
 
-    try:
-        signed_car_transfer_tx = bdb.transactions.fulfill(
-            car_transfer_tx,
-            private_keys=alice.signing_key,
-        )
-    except MissingSigningKeyError as e:
-        print(e, e.__cause__, sep='\n')
+    In [0]: from bigchaindb_driver.exceptions import MissingSigningKeyError
 
-You should see a message similar to:
-
-.. code-block:: text
-
-    A signing key is missing!
-    Public key EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA is not a pair to any of the private keys
+    In [0]: try:
+       ...:     signed_car_transfer_tx = bdb.transactions.fulfill(
+       ...:         car_transfer_tx,
+       ...:         private_keys=alice.signing_key,
+       ...:     )
+       ...: except MissingSigningKeyError as e:
+       ...:     print(e, e.__cause__, sep='\n')
 
 Notice ``bob``'s public key in the above message:
 
-.. code-block:: python
+.. ipython::
 
-    >>> bob.verifying_key
-    'EcRawy3Y22eAUSS94vLF8BVJi62wbqbD9iSUSUNU9wAA'
+    In [0]:  bob.verifying_key
 
 And the same goes for ``alice``. Try it!
 
