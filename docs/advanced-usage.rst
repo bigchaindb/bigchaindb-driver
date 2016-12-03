@@ -374,7 +374,7 @@ Say ``alice`` and ``bob`` own a car together:
 
 .. code-block:: python
 
-    car_asset = {'data': {'car': {'vim': '5YJRE11B781000196'}}}
+    car_asset = {'data': {'car': {'vin': '5YJRE11B781000196'}}}
 
 and they agree that ``alice`` will be the one issuing the asset. To create a
 new digital asset with `multiple` owners, one can simply provide a
