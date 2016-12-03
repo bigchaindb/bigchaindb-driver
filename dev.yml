@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  client-dev:
+    build:
+      context: .
+      dockerfile: ./compose/driver/Dockerfile
+    volumes:
+      - ./docs:/usr/src/app/docs
+      - ./tests:/usr/src/app/tests
+      - ./bigchaindb_driver:/usr/src/app/bigchaindb_driver
+      - ./setup.py:/usr/src/app/setup.py
+    environment:
+      BDB_HOST: node-dev
+    command: pytest -v
+  rdb-dev:
+    image: rethinkdb
+    ports:
+      - "8080"
+      - "28015"
+  node-dev:
+    build:
+      context: ../bigchaindb/
+      dockerfile: Dockerfile-dev
+    volumes:
+      - ../bigchaindb/bigchaindb:/usr/src/app/bigchaindb/
+    environment:
+      BIGCHAINDB_DATABASE_HOST: rdb-dev
+      BIGCHAINDB_SERVER_BIND: 0.0.0.0:9984
+    ports:
+      - "9984"
+    command: bigchaindb start
