@@ -59,29 +59,28 @@ class TestTransactionsEndpoint:
     def test_prepare(self, driver, alice_pubkey):
         transaction = driver.transactions.prepare(owners_before=[alice_pubkey])
         assert 'id' in transaction
-        assert 'transaction' in transaction
         assert 'version' in transaction
-        assert 'asset' in transaction['transaction']
-        assert 'conditions' in transaction['transaction']
-        assert 'fulfillments' in transaction['transaction']
-        assert 'metadata' in transaction['transaction']
-        assert 'operation' in transaction['transaction']
-        assert transaction['transaction']['operation'] == 'CREATE'
-        conditions = transaction['transaction']['conditions']
+        assert 'asset' in transaction
+        assert 'conditions' in transaction
+        assert 'fulfillments' in transaction
+        assert 'metadata' in transaction
+        assert 'operation' in transaction
+        assert transaction['operation'] == 'CREATE'
+        conditions = transaction['conditions']
         assert len(conditions) == 1
         assert len(conditions[0]['owners_after']) == 1
         assert conditions[0]['owners_after'][0] == alice_pubkey
-        fulfillments = transaction['transaction']['fulfillments']
+        fulfillments = transaction['fulfillments']
         assert fulfillments[0]['owners_before'][0] == alice_pubkey
         assert len(fulfillments) == 1
         assert len(fulfillments[0]['owners_before']) == 1
         assert fulfillments[0]['owners_before'][0] == alice_pubkey
-        assert not transaction['transaction']['metadata']
+        assert not transaction['metadata']
 
     def test_fulfill(self, driver, alice_keypair, unsigned_transaction):
         signed_transaction = driver.transactions.fulfill(
             unsigned_transaction, private_keys=alice_keypair.sk)
-        unsigned_transaction['transaction']['fulfillments'][0]['fulfillment'] = None    # noqa
+        unsigned_transaction['fulfillments'][0]['fulfillment'] = None    # noqa
         message = rapidjson.dumps(
             unsigned_transaction,
             skipkeys=False,
@@ -91,7 +90,7 @@ class TestTransactionsEndpoint:
         ed25519 = Ed25519Fulfillment(public_key=alice_keypair.vk)
         ed25519.sign(message, Ed25519SigningKey(alice_keypair.sk))
         fulfillment_uri = ed25519.serialize_uri()
-        assert signed_transaction['transaction']['fulfillments'][0]['fulfillment'] == fulfillment_uri   # noqa
+        assert signed_transaction['fulfillments'][0]['fulfillment'] == fulfillment_uri   # noqa
 
     def test_send(self, driver, alice_privkey, unsigned_transaction):
         fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,

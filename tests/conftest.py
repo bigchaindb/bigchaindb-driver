@@ -105,29 +105,29 @@ def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
 
 @fixture
 def unsigned_transaction():
+
     return {
-        'id': 'fb9089e9f16a4632edb951489a78ced1e7bc5681e6406ccc42c5a46e979ee54e',  # noqa
-        'transaction': {
-            'asset': {
-                'data': None,
-                'divisible': False,
-                'id': '923adcf2-93df-4f82-9b44-032e2188b882',
-                'refillable': False,
-                'updatable': False},
+        'asset': {
+            'data': {'serial_number': '0pG9pH37e9SrWg=='},
+            'divisible': False,
+            'id': '9fada0cc-424e-45c3-b85d-3c50ef189738',
+            'refillable': False,
+            'updatable': False,
+        },
         'conditions': [{
             'amount': 1,
             'cid': 0,
             'condition': {
                 'details': {
                     'bitmask': 32,
-                    'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',  # noqa
+                    'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa E501
                     'signature': None,
                     'type': 'fulfillment',
-                    'type_id': 4
+                    'type_id': 4,
                 },
-                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96'
+                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96',    # noqa E501
             },
-            'owners_after': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3']
+            'owners_after': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
         }],
         'fulfillments': [{
             'fid': 0,
@@ -136,13 +136,13 @@ def unsigned_transaction():
                 'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
                 'signature': None,
                 'type': 'fulfillment',
-                'type_id': 4
+                'type_id': 4,
             },
             'input': None,
-            'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3']
+            'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
         }],
+        'id': '25cf61930abe77c78c9a95bf45e8689ee10f0bb5f9292b90859861cdde321749',   # noqa E501
         'metadata': None,
-        'operation': 'CREATE'
-        },
-        'version': 1
+        'operation': 'CREATE',
+        'version': 1,
     }
