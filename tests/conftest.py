@@ -70,6 +70,7 @@ def alice_driver(bdb_node, alice_privkey, alice_pubkey):
     from bigchaindb_driver import BigchainDB
     return BigchainDB(bdb_node)
 
+
 @fixture
 def mock_requests_post(monkeypatch):
     class MockResponse:
