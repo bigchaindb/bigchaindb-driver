@@ -12,9 +12,8 @@ Basic Usage Examples
 
 
 The BigchainDB driver's main purpose is to connect to one or more BigchainDB
-server nodes, in order to perform supported API calls (such as
-:http:post:`creating a transaction </transactions/>`, or
-:http:get:`retrieving a transaction </transactions/{tx_id}>`). 
+server nodes, in order to perform supported API calls documented under
+:doc:`drivers-clients/http-client-server-api`.
 
 Connecting to a BigchainDB node, is done via the
 :class:`BigchainDB class <bigchaindb_driver.BigchainDB>`:
