@@ -7,22 +7,15 @@ env:
   - TOXENV=docs
 
 before_install:
-  - source /etc/lsb-release
-  - echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | sudo tee -a /etc/apt/sources.list.d/rethinkdb.list
-  - wget -qO- https://download.rethinkdb.com/apt/pubkey.gpg | sudo apt-key add -
-  - sudo apt-get update -qq
+  - sudo .ci/travis-before-install.sh
 
 install:
-  - sudo apt-get install rethinkdb
-  - pip install bigchaindb~=0.8
-  - pip install -U codecov tox
+  - .ci/travis-install.sh
 
 before_script:
-  - rethinkdb --daemon
-  - bigchaindb -y configure
-  # Start BigchainDB in the background and ignore any output
-  - bigchaindb start >/dev/null 2>&1 &
+  - .ci/travis-before-script.sh
 
 script: tox -e ${TOXENV}
 
-after_success: codecov
+after_success:
+  - .ci/travis-after-success.sh
