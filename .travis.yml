@@ -4,6 +4,7 @@ python: 3.5
 env:
   - TOXENV=py35
   - TOXENV=flake8
+  - TOXENV=docs
 
 before_install:
   - source /etc/lsb-release
