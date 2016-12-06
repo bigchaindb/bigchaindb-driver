@@ -472,7 +472,7 @@ The ``fulfillments`` value is simply a list or a tuple of all fulfillments:
         
         In [0]: prepared_creation_tx['transaction']['fulfillments'][0]
 
-    More precisely, the value of ``'fulfillment'`:
+    More precisely, the value of ``'fulfillment'``:
 
     .. ipython::
        
