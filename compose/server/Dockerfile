@@ -5,9 +5,9 @@ RUN apt-get update && apt-get install -y vim
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip ipdb ipython
 
 COPY . /usr/src/app/
 
-RUN pip install git+https://github.com/bigchaindb/bigchaindb.git
+RUN pip install bigchaindb
 RUN bigchaindb -y configure
