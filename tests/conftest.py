@@ -92,7 +92,7 @@ def alice_transaction_obj(alice_pubkey):
     return Transaction.create(
         owners_before=[alice_pubkey],
         owners_after=[([alice_pubkey], 1)],
-        asset=Asset(data={'data': {'serial_number': serial_number}}),
+        asset=Asset(data={'serial_number': serial_number}),
     )
 
 
