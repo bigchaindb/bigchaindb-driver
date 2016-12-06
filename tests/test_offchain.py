@@ -30,14 +30,13 @@ def test_prepare_create_transaction_default(alice_pubkey):
     from bigchaindb_driver.offchain import prepare_create_transaction
     create_transaction = prepare_create_transaction(owners_before=alice_pubkey)
     assert 'id' in create_transaction
-    assert 'transaction' in create_transaction
     assert 'version' in create_transaction
-    assert 'asset' in create_transaction['transaction']
-    assert 'conditions' in create_transaction['transaction']
-    assert 'fulfillments' in create_transaction['transaction']
-    assert 'metadata' in create_transaction['transaction']
-    assert 'operation' in create_transaction['transaction']
-    assert create_transaction['transaction']['operation'] == 'CREATE'
+    assert 'asset' in create_transaction
+    assert 'conditions' in create_transaction
+    assert 'fulfillments' in create_transaction
+    assert 'metadata' in create_transaction
+    assert 'operation' in create_transaction
+    assert create_transaction['operation'] == 'CREATE'
 
 
 @mark.parametrize('asset', (
@@ -58,14 +57,13 @@ def test_prepare_create_transaction(asset, owners_before, owners_after):
     create_transaction = prepare_create_transaction(
         owners_before=owners_before, owners_after=owners_after, asset=asset)
     assert 'id' in create_transaction
-    assert 'transaction' in create_transaction
     assert 'version' in create_transaction
-    assert 'asset' in create_transaction['transaction']
-    assert 'conditions' in create_transaction['transaction']
-    assert 'fulfillments' in create_transaction['transaction']
-    assert 'metadata' in create_transaction['transaction']
-    assert 'operation' in create_transaction['transaction']
-    assert create_transaction['transaction']['operation'] == 'CREATE'
+    assert 'asset' in create_transaction
+    assert 'conditions' in create_transaction
+    assert 'fulfillments' in create_transaction
+    assert 'metadata' in create_transaction
+    assert 'operation' in create_transaction
+    assert create_transaction['operation'] == 'CREATE'
 
 
 @mark.parametrize('owners_after', (
@@ -76,7 +74,7 @@ def test_prepare_create_transaction(asset, owners_before, owners_after):
 def test_prepare_transfer_transaction(alice_transaction, owners_after):
     from bigchaindb_driver.offchain import prepare_transfer_transaction
     condition_index = 0
-    condition = alice_transaction['transaction']['conditions'][condition_index]
+    condition = alice_transaction['conditions'][condition_index]
     input_ = {
         'fulfillment': condition['condition']['details'],
         'input': {
@@ -85,18 +83,17 @@ def test_prepare_transfer_transaction(alice_transaction, owners_after):
         },
         'owners_before': condition['owners_after']
     }
-    asset = alice_transaction['transaction']['asset']
+    asset = alice_transaction['asset']
     transfer_transaction = prepare_transfer_transaction(
         inputs=input_, owners_after=owners_after, asset=asset)
     assert 'id' in transfer_transaction
-    assert 'transaction' in transfer_transaction
     assert 'version' in transfer_transaction
-    assert 'asset' in transfer_transaction['transaction']
-    assert 'conditions' in transfer_transaction['transaction']
-    assert 'fulfillments' in transfer_transaction['transaction']
-    assert 'metadata' in transfer_transaction['transaction']
-    assert 'operation' in transfer_transaction['transaction']
-    assert transfer_transaction['transaction']['operation'] == 'TRANSFER'
+    assert 'asset' in transfer_transaction
+    assert 'conditions' in transfer_transaction
+    assert 'fulfillments' in transfer_transaction
+    assert 'metadata' in transfer_transaction
+    assert 'operation' in transfer_transaction
+    assert transfer_transaction['operation'] == 'TRANSFER'
 
 
 @mark.parametrize('alice_sk', (
@@ -108,9 +105,9 @@ def test_fulfill_transaction(alice_transaction, alice_sk):
     from bigchaindb_driver.offchain import fulfill_transaction
     fulfilled_transaction = fulfill_transaction(
         alice_transaction, private_keys=alice_sk)
-    fulfillments = fulfilled_transaction['transaction']['fulfillments']
+    fulfillments = fulfilled_transaction['fulfillments']
     assert len(fulfillments) == 1
-    alice_transaction['transaction']['fulfillments'][0]['fulfillment'] = None
+    alice_transaction['fulfillments'][0]['fulfillment'] = None
     message = rapidjson.dumps(
         alice_transaction,
         skipkeys=False,
