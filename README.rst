@@ -41,8 +41,6 @@ Compatibility Matrix
 +=======================+=======================+
 | ``0.8.x``             | ``0.1.x``             |
 +-----------------------+-----------------------+
-| ``master``            | ``master``            |
-+-----------------------+-----------------------+
 
 `Although we do our best to keep the master branches in sync, there may be
 occasional delays.`
