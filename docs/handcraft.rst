@@ -57,7 +57,7 @@ Here is just a quick survey, highlighting key points.
 From the point of view of Python, The transaction payload is simply a
 dictionary with a bit of nested structure.
 
-The first level has three keys;
+The first level has three keys:
 
 * ``id`` -- a ``str``
 * ``version`` -- an ``int``
@@ -136,7 +136,7 @@ Example of an asset payload:
         'id': '7ab63c48-4c24-41df-a1bd-934bb609a7f7',
     }
 
-.. note:: In a many client-server architectures, the values for the keys:
+.. note:: In many client-server architectures, the values for the keys:
 
     * ``'divisible'``
     * ``'refillable'``
@@ -171,7 +171,7 @@ Example of a metadata payload:
         'id': 'ad8c83bd-9192-43b3-b636-af93a3a6b07c',
     }
 
-.. note:: In a many client-server architectures, the value of the ``'id'``
+.. note:: In many client-server architectures, the value of the ``'id'``
     could be generated on the server side.
 
     `In the case of BigchainDB, because we rely on cryptographic signatures,
