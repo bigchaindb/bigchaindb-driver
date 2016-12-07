@@ -1499,7 +1499,7 @@ Say ``alice`` and ``bob`` own a car together:
 
 .. code-block:: python
 
-    sent_car_tx = bdb.transactions.send(signed_car_creation_tx
+    sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
 
 One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
 and realizing they no longer need their car, wish to transfer the ownership of
