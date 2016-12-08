@@ -5,11 +5,6 @@ Handcrafting Transactions
 For those who wish to assemble transaction payloads "by hand", with examples in
 Python.
 
-.. note::
-    The contents are presented for BigchainDB 0.8. The transaction schema is
-    constantly evolving at this stage and the current contents may be outdated
-    by a new release.
-
 .. contents::
     :local:
     :depth: 1
