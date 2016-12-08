@@ -163,7 +163,7 @@ To construct the input:
 
     In [0]: cid = 0
 
-    In [0]: condition = tx['transaction']['conditions'][cid]
+    In [0]: condition = tx['conditions'][cid]
 
     In [0]: input_ = {
        ...:     'fulfillment': condition['condition']['details'],
@@ -178,7 +178,7 @@ The asset, can be directly retrieved from the input ``tx``:
 
 .. ipython::
 
-    In [0]: asset = tx['transaction']['asset']
+    In [0]: asset = tx['asset']
 
 Create a second test user, ``bob``:
 
@@ -231,7 +231,7 @@ More precisely:
 
 .. ipython::
 
-    In [0]: signed_tx_transfer['transaction']['fulfillments'][0]['fulfillment']
+    In [0]: signed_tx_transfer['fulfillments'][0]['fulfillment']
     'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg4S_S7Obu7E-HtL2ZjM3tcKKfoaspMhyx17Eg2KBijylZMxv1NvAD0j8uJP1WOb2AP6ezJorcw6TA5n-cmuwkE'
 
 We have yet to send the transaction over to a BigchainDB node, as both
@@ -350,7 +350,7 @@ input:
 
     In [0]: cid = 0
 
-    In [0]: condition = signed_car_creation_tx['transaction']['conditions'][cid]
+    In [0]: condition = signed_car_creation_tx['conditions'][cid]
 
     In [0]: input_ = {
        ...:     'fulfillment': condition['condition']['details'],
@@ -371,7 +371,7 @@ and the asset:
 
 .. ipython::
 
-    In [0]: asset = signed_car_creation_tx['transaction']['asset']
+    In [0]: asset = signed_car_creation_tx['asset']
 
 then ``alice`` can prepare the transfer:
 
@@ -515,7 +515,7 @@ We'll illustrate this by a threshold condition where 2 out of 3
 ..         cc.Ed25519Fulfillment(public_key=thresholduser3.verifying_key))
 .. 
 ..     # Update the condition in the newly created transaction
-..     threshold_tx['transaction']['conditions'][0]['condition'] = {
+..     threshold_tx['conditions'][0]['condition'] = {
 ..         'details': threshold_condition.to_dict(),
 ..         'uri': threshold_condition.condition.serialize_uri()
 ..     }
@@ -578,7 +578,7 @@ The fulfillment involves:
 .. 
 ..     # Parse the threshold cryptocondition
 ..     threshold_fulfillment = cc.Fulfillment.from_dict(
-..         threshold_tx['transaction']['conditions'][0]['condition']['details'])
+..         threshold_tx['conditions'][0]['condition']['details'])
 .. 
 ..     subfulfillment1 = threshold_fulfillment.get_subcondition_from_vk(thresholduser1.verifying_key)[0]
 ..     subfulfillment2 = threshold_fulfillment.get_subcondition_from_vk(thresholduser2.verifying_key)[0]
@@ -588,7 +588,7 @@ The fulfillment involves:
 ..     # Get the fulfillment message to sign
 ..     threshold_tx_fulfillment_message = util.get_fulfillment_message(
 ..         threshold_tx_transfer,
-..         threshold_tx_transfer['transaction']['fulfillments'][0],
+..         threshold_tx_transfer['fulfillments'][0],
 ..         serialized=True
 ..     )
 .. 
@@ -605,7 +605,7 @@ The fulfillment involves:
 ..     threshold_fulfillment.add_subcondition(subfulfillment3.condition)
 .. 
 ..     # Update the fulfillment
-..     threshold_tx_transfer['transaction']['fulfillments'][0]['fulfillment'] = threshold_fulfillment.serialize_uri()
+..     threshold_tx_transfer['fulfillments'][0]['fulfillment'] = threshold_fulfillment.serialize_uri()
 .. 
 ..     # Optional validation checks
 ..     assert threshold_fulfillment.validate(threshold_tx_fulfillment_message) == True
@@ -657,7 +657,7 @@ the asset to themselves.
 ..     first_tx_condition = cc.PreimageSha256Fulfillment(preimage=secret)
 .. 
 ..     # The conditions list is empty, so we need to append a new condition
-..     hashlock_tx['transaction']['conditions'].append({
+..     hashlock_tx['conditions'].append({
 ..         'condition': {
 ..             'uri': first_tx_condition.condition.serialize_uri()
 ..         },
@@ -704,14 +704,14 @@ correct secret:
 .. 
 ..     # Provide a wrong secret
 ..     hashlock_fulfill_tx_fulfillment = cc.PreimageSha256Fulfillment(preimage=b'')
-..     hashlock_fulfill_tx['transaction']['fulfillments'][0]['fulfillment'] = \
+..     hashlock_fulfill_tx['fulfillments'][0]['fulfillment'] = \
 ..         hashlock_fulfill_tx_fulfillment.serialize_uri()
 .. 
 ..     assert b.is_valid_transaction(hashlock_fulfill_tx) == False
 .. 
 ..     # Provide the right secret
 ..     hashlock_fulfill_tx_fulfillment = cc.PreimageSha256Fulfillment(preimage=secret)
-..     hashlock_fulfill_tx['transaction']['fulfillments'][0]['fulfillment'] = \
+..     hashlock_fulfill_tx['fulfillments'][0]['fulfillment'] = \
 ..         hashlock_fulfill_tx_fulfillment.serialize_uri()
 .. 
 ..     assert b.validate_transaction(hashlock_fulfill_tx) == hashlock_fulfill_tx
@@ -756,7 +756,7 @@ Once expired, the asset is lost and cannot be fulfilled by anyone.
 ..     condition_timeout = cc.TimeoutFulfillment(expire_time=time_expire)
 .. 
 ..     # The conditions list is empty, so we need to append a new condition
-..     tx_timeout['transaction']['conditions'].append({
+..     tx_timeout['conditions'].append({
 ..         'condition': {
 ..             'details': condition_timeout.to_dict(),
 ..             'uri': condition_timeout.condition.serialize_uri()
@@ -799,8 +799,8 @@ occurs:
 .. 
 ..     # Parse the timeout condition and create the corresponding fulfillment
 ..     timeout_fulfillment = cc.Fulfillment.from_dict(
-..         tx_timeout['transaction']['conditions'][0]['condition']['details'])
-..     tx_timeout_transfer['transaction']['fulfillments'][0]['fulfillment'] = timeout_fulfillment.serialize_uri()
+..         tx_timeout['conditions'][0]['condition']['details'])
+..     tx_timeout_transfer['fulfillments'][0]['fulfillment'] = timeout_fulfillment.serialize_uri()
 .. 
 ..     # No need to sign transaction, like with hashlocks
 .. 
@@ -921,7 +921,7 @@ The following code snippet shows how to create an escrow condition:
 ..     condition_escrow.add_subfulfillment(condition_abort)
 .. 
 ..     # Update the condition in the newly created transaction
-..     tx_escrow['transaction']['conditions'][0]['condition'] = {
+..     tx_escrow['conditions'][0]['condition'] = {
 ..         'details': condition_escrow.to_dict(),
 ..         'uri': condition_escrow.condition.serialize_uri()
 ..     }
@@ -964,7 +964,7 @@ The following code snippet shows how to create an escrow condition:
 .. 
 ..     # Parse the Escrow cryptocondition
 ..     escrow_fulfillment = cc.Fulfillment.from_dict(
-..         tx_escrow['transaction']['conditions'][0]['condition']['details'])
+..         tx_escrow['conditions'][0]['condition']['details'])
 .. 
 ..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.verifying_key)[0]
 ..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.verifying_key)[0]
@@ -974,7 +974,7 @@ The following code snippet shows how to create an escrow condition:
 ..     # Get the fulfillment message to sign
 ..     tx_escrow_execute_fulfillment_message = \
 ..         util.get_fulfillment_message(tx_escrow_execute,
-..                                      tx_escrow_execute['transaction']['fulfillments'][0],
+..                                      tx_escrow_execute['fulfillments'][0],
 ..                                      serialized=True)
 .. 
 ..     # Clear the subconditions of the escrow fulfillment
@@ -994,7 +994,7 @@ The following code snippet shows how to create an escrow condition:
 ..     escrow_fulfillment.add_subcondition(condition_abort.condition)  # Adding only the condition here
 .. 
 ..     # Update the execute transaction with the fulfillment
-..     tx_escrow_execute['transaction']['fulfillments'][0]['fulfillment'] = escrow_fulfillment.serialize_uri()
+..     tx_escrow_execute['fulfillments'][0]['fulfillment'] = escrow_fulfillment.serialize_uri()
 
 In the case of ``bob``, we create the ``abort`` fulfillment:
 
@@ -1017,7 +1017,7 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 .. 
 ..     # Parse the threshold cryptocondition
 ..     escrow_fulfillment = cc.Fulfillment.from_dict(
-..         tx_escrow['transaction']['conditions'][0]['condition']['details'])
+..         tx_escrow['conditions'][0]['condition']['details'])
 .. 
 ..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.verifying_key)[0]
 ..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.verifying_key)[0]
@@ -1027,7 +1027,7 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 ..     # Get the fulfillment message to sign
 ..     tx_escrow_abort_fulfillment_message = \
 ..         util.get_fulfillment_message(tx_escrow_abort,
-..                                      tx_escrow_abort['transaction']['fulfillments'][0],
+..                                      tx_escrow_abort['fulfillments'][0],
 ..                                      serialized=True)
 .. 
 ..     # Clear the subconditions of the escrow fulfillment
@@ -1047,7 +1047,7 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 ..     escrow_fulfillment.add_subfulfillment(fulfillment_abort)
 .. 
 ..     # Update the abort transaction with the fulfillment
-..     tx_escrow_abort['transaction']['fulfillments'][0]['fulfillment'] = escrow_fulfillment.serialize_uri()
+..     tx_escrow_abort['fulfillments'][0]['fulfillment'] = escrow_fulfillment.serialize_uri()
 
 The following demonstrates that the transaction validation switches once the
 timeout occurs:
