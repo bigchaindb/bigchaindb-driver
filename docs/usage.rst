@@ -206,7 +206,7 @@ Preparing the transfer transaction:
     
     In [0]: cid = 0
 
-    In [0]: condition = creation_tx['transaction']['conditions'][cid]
+    In [0]: condition = creation_tx['conditions'][cid]
 
     In [0]: transfer_input = {
        ...:     'fulfillment': condition['condition']['details'],
@@ -219,7 +219,7 @@ Preparing the transfer transaction:
 
     In [0]: prepared_transfer_tx = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
-       ...:     asset=creation_tx['transaction']['asset'],
+       ...:     asset=creation_tx['asset'],
        ...:     inputs=transfer_input,
        ...:     owners_after=bob.verifying_key,
        ...: )
@@ -254,13 +254,13 @@ Bob is the new owner:
 
 .. ipython::
 
-    In [0]: fulfilled_transfer_tx['transaction']['conditions'][0]['owners_after'][0] == bob.verifying_key
+    In [0]: fulfilled_transfer_tx['conditions'][0]['owners_after'][0] == bob.verifying_key
 
 Alice is the former owner:
 
 .. ipython::
 
-    In [0]: fulfilled_transfer_tx['transaction']['fulfillments'][0]['owners_before'][0] == alice.verifying_key
+    In [0]: fulfilled_transfer_tx['fulfillments'][0]['owners_before'][0] == alice.verifying_key
 
 
 Transaction Status
@@ -390,15 +390,15 @@ Bob is the issuer:
 
 .. ipython::
 
-    In [0]: fulfilled_token_tx['transaction']['fulfillments'][0]['owners_before'][0] == bob.verifying_key
+    In [0]: fulfilled_token_tx['fulfillments'][0]['owners_before'][0] == bob.verifying_key
 
 Carly is the owner of 10 tokens:
 
 .. ipython::
 
-    In [0]: fulfilled_token_tx['transaction']['conditions'][0]['owners_after'][0] == carly.verifying_key
+    In [0]: fulfilled_token_tx['conditions'][0]['owners_after'][0] == carly.verifying_key
 
-    In [0]: fulfilled_token_tx['transaction']['conditions'][0]['amount'] == 10
+    In [0]: fulfilled_token_tx['conditions'][0]['amount'] == 10
 
 
 Now Carly wants to ride the bicycle for 2 hours so she needs to send 2 tokens
@@ -408,7 +408,7 @@ to Bob:
 
     In [0]: cid = 0
 
-    In [0]: condition = prepared_token_tx['transaction']['conditions'][cid]
+    In [0]: condition = prepared_token_tx['conditions'][cid]
 
     In [0]: transfer_input = {
        ...:     'fulfillment': condition['condition']['details'],
@@ -421,7 +421,7 @@ to Bob:
 
     In [0]: prepared_transfer_tx = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
-       ...:     asset=prepared_token_tx['transaction']['asset'],
+       ...:     asset=prepared_token_tx['asset'],
        ...:     inputs=transfer_input,
        ...:     owners_after=[([bob.verifying_key], 2), ([carly.verifying_key], 8)]
        ...: )
