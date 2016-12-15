@@ -29,7 +29,7 @@ class Transport:
         """
         return self.pool.get_connection()
 
-    def forward_request(self, method, path=None, json=None):
+    def forward_request(self, method, path=None, json=None, params=None):
         """Forwards an http request to a connection.
 
         Args:
@@ -37,11 +37,13 @@ class Transport:
             path (str): Path to be appended to the base url of a node. E.g.:
                 ``'/transactions'``).
             json (dict): Payload to be sent with the HTTP request.
+            params (dict)): Dictionary of URL (query) parameters.
 
         Returns:
             dict: Result of :meth:`requests.models.Response.json`
 
         """
         connection = self.get_connection()
-        response = connection.request(method=method, path=path, json=json)
+        response = connection.request(
+            method=method, path=path, params=params, json=json)
         return response.data

@@ -22,19 +22,20 @@ class Connection:
         self.node_url = node_url
         self.session = Session()
 
-    def request(self, method, *, path=None, json=None, **kwargs):
+    def request(self, method, *, path=None, json=None, params=None, **kwargs):
         """Performs an HTTP requests for the specified arguments.
 
         Args:
             method (str): HTTP method (e.g.: `'GET`').
             path (str): API endpoint path (e.g.: `'/transactions'`).
             json (dict): JSON data to send along with the request.
+            params (dict)): Dictionary of URL (query) parameters.
             kwargs: Optional keyword arguments.
 
         """
         url = self.node_url + path if path else self.node_url
         response = self.session.request(
-            method=method, url=url, json=json, **kwargs)
+            method=method, url=url, json=json, params=params, **kwargs)
         text = response.text
         try:
             json = response.json()
