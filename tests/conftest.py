@@ -1,6 +1,7 @@
 from base64 import b64encode
 from collections import namedtuple
 from os import environ, urandom
+from uuid import uuid4
 
 import requests
 from pytest import fixture
@@ -42,6 +43,17 @@ def bob_keypair(bob_privkey, bob_pubkey):
     keypair.vk = bob_pubkey
     keypair.sk = bob_privkey
     return keypair
+
+
+@fixture
+def carol_keypair():
+    from bigchaindb_driver.crypto import generate_keypair
+    return generate_keypair()
+
+
+@fixture
+def carol_pubkey(carol_keypair):
+    return carol_keypair.public_key
 
 
 @fixture
@@ -100,6 +112,121 @@ def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
     signed_transaction = alice_transaction_obj.sign([alice_privkey])
     json = signed_transaction.to_dict()
     response = requests.post(driver.nodes[0] + '/transactions/', json=json)
+    return response.json()
+
+
+@fixture
+def bicycle_asset():
+    return {
+        'data': {
+            'bicycle': {
+                'manufacturer': 'bkfab',
+                'serial_number': 'abcd1234',
+            },
+        },
+        'divisible': False,
+        'refillable': False,
+        'updatable': False,
+        'id': str(uuid4()),
+    }
+
+
+@fixture
+def car_asset():
+    return {
+        'data': {
+            'car': {
+                'manufacturer': 'bkfab',
+                'vin': '5YJRE11B781000196',
+            },
+        },
+        'divisible': False,
+        'refillable': False,
+        'updatable': False,
+        'id': str(uuid4()),
+    }
+
+
+@fixture
+def prepared_carol_bicycle_transaction(carol_keypair, bicycle_asset):
+    from bigchaindb_driver import utils
+    condition = utils.ed25519_condition(carol_keypair.public_key)
+    fulfillment = utils.fulfillment(carol_keypair.public_key)
+    tx = {
+        'asset': bicycle_asset,
+        'metadata': None,
+        'operation': 'CREATE',
+        'conditions': (condition,),
+        'fulfillments': (fulfillment,),
+        'version': 1,
+    }
+    utils.add_transaction_id(tx)
+    return tx
+
+
+@fixture
+def signed_carol_bicycle_transaction(request, carol_keypair,
+                                     prepared_carol_bicycle_transaction):
+    from bigchaindb_driver import utils
+    fulfillment_uri = utils.sign_transaction(
+        prepared_carol_bicycle_transaction,
+        public_key=carol_keypair.public_key,
+        private_key=carol_keypair.private_key,
+    )
+    prepared_carol_bicycle_transaction['fulfillments'][0].update(
+        {'fulfillment': fulfillment_uri},
+    )
+    return prepared_carol_bicycle_transaction
+
+
+@fixture
+def persisted_carol_bicycle_transaction(driver,
+                                        signed_carol_bicycle_transaction):
+    response = requests.post(
+        driver.nodes[0] + '/transactions/',
+        json=signed_carol_bicycle_transaction,
+    )
+    return response.json()
+
+
+@fixture
+def prepared_carol_car_transaction(carol_keypair, car_asset):
+    from bigchaindb_driver import utils
+    condition = utils.ed25519_condition(carol_keypair.public_key)
+    fulfillment = utils.fulfillment(carol_keypair.public_key)
+    tx = {
+        'asset': car_asset,
+        'metadata': None,
+        'operation': 'CREATE',
+        'conditions': (condition,),
+        'fulfillments': (fulfillment,),
+        'version': 1,
+    }
+    utils.add_transaction_id(tx)
+    return tx
+
+
+@fixture
+def signed_carol_car_transaction(request, carol_keypair,
+                                 prepared_carol_car_transaction):
+    from bigchaindb_driver import utils
+    fulfillment_uri = utils.sign_transaction(
+        prepared_carol_car_transaction,
+        public_key=carol_keypair.public_key,
+        private_key=carol_keypair.private_key,
+    )
+    prepared_carol_car_transaction['fulfillments'][0].update(
+        {'fulfillment': fulfillment_uri},
+    )
+    return prepared_carol_car_transaction
+
+
+@fixture
+def persisted_carol_car_transaction(driver, signed_carol_car_transaction):
+    response = requests.post(
+        driver.nodes[0] + '/transactions/',
+        json=signed_carol_car_transaction,
+    )
     return response.json()
 
 

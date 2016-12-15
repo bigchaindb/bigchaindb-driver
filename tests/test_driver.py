@@ -97,3 +97,21 @@ class TestTransactionsEndpoint:
                                                    private_keys=alice_privkey)
         sent_tx = driver.transactions.send(fulfilled_tx)
         assert sent_tx == fulfilled_tx
+
+
+class TestUnspentsEndpoint:
+
+    def test_get_unspents(self, carol_pubkey, driver,
+                          persisted_alice_transaction,
+                          persisted_carol_bicycle_transaction,
+                          persisted_carol_car_transaction):
+        # FIXME The sleep, or some other approach is required to wait for the
+        # transaction to be available as some processing is being done by the
+        # server.
+        sleep(1.5)
+        unspents = driver.unspents.get(carol_pubkey)
+        assert len(unspents) == 2
+        assert '../transactions/{id}/conditions/0'.format_map(
+            persisted_carol_bicycle_transaction) in unspents
+        assert '../transactions/{id}/conditions/0'.format_map(
+            persisted_carol_car_transaction) in unspents
