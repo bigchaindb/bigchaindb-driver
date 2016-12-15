@@ -18,6 +18,9 @@ Library Reference
 
     .. automethod:: __init__
 
+.. autoclass:: UnspentsEndpoint
+    :members:
+
 .. autoclass:: NamespacedDriver
     :members:
 

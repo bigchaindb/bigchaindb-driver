@@ -36,6 +36,7 @@ class BigchainDB:
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._transport = transport_class(*self._nodes)
         self._transactions = TransactionsEndpoint(self)
+        self._unspents = UnspentsEndpoint(self)
 
     @property
     def nodes(self):
@@ -56,6 +57,13 @@ class BigchainDB:
             Exposes functionalities of the `'/transactions'` endpoint.
         """
         return self._transactions
+
+    @property
+    def unspents(self):
+        """:class:`~bigchaindb_driver.driver.UnspentsEndpoint`:
+            Exposes functionalities of the `'/unspents'` endpoint.
+        """
+        return self._unspents
 
 
 class NamespacedDriver:
@@ -211,3 +219,36 @@ class TransactionsEndpoint(NamespacedDriver):
         """
         path = self.path + txid + '/status'
         return self.transport.forward_request(method='GET', path=path)
+
+
+class UnspentsEndpoint(NamespacedDriver):
+    """Endpoint for unspents.
+
+    Attributes:
+        path (str): The path of the endpoint: ``'/unspents'``
+
+    """
+    path = '/unspents/'
+
+    def get(self, owner_after):
+        """
+
+        Args:
+            owner_after (str): Public key for which unfulfilled
+                conditions are sought.
+
+        Returns:
+            :obj:`list` of :obj:`str`: List of unfulfilled conditions.
+
+        Example:
+            Given a transaction with `id` ``da1b64a907ba54`` having an
+            `ed25519` condition (at index ``0``) with alice's public
+            key::
+
+                >>> bdb = BigchainDB()
+                >>> bdb.unspents.get(alice_pubkey)
+                ... ['../transactions/da1b64a907ba54/conditions/0']
+
+        """
+        return self.transport.forward_request(
+            method='GET', path=self.path, params={'owner_after': owner_after})
