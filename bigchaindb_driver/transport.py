@@ -33,9 +33,9 @@ class Transport:
         """Forwards an http request to a connection.
 
         Args:
-            method (str): HTTP method name (e.g.: ``'GET'``.
+            method (str): HTTP method name (e.g.: ``'GET'``).
             path (str): Path to be appended to the base url of a node. E.g.:
-                ``'/transactions'``.
+                ``'/transactions'``).
             json (dict): Payload to be sent with the HTTP request.
 
         Returns:

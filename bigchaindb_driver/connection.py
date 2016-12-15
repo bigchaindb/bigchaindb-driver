@@ -26,8 +26,8 @@ class Connection:
         """Performs an HTTP requests for the specified arguments.
 
         Args:
-            method (str): HTTP method (e.g.: `'GET`'.
-            path (str): API endpoint path (e.g.: `'/transactions'`.
+            method (str): HTTP method (e.g.: `'GET`').
+            path (str): API endpoint path (e.g.: `'/transactions'`).
             json (dict): JSON data to send along with the request.
             kwargs: Optional keyword arguments.
 
