@@ -66,12 +66,6 @@ def driver(bdb_node):
 
 
 @fixture
-def alice_driver(bdb_node, alice_privkey, alice_pubkey):
-    from bigchaindb_driver import BigchainDB
-    return BigchainDB(bdb_node)
-
-
-@fixture
 def mock_requests_post(monkeypatch):
     class MockResponse:
         def __init__(self, json):
@@ -102,12 +96,10 @@ def alice_transaction(alice_transaction_obj):
 
 
 @fixture
-def persisted_alice_transaction(alice_privkey, alice_driver,
-                                alice_transaction_obj):
+def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
     signed_transaction = alice_transaction_obj.sign([alice_privkey])
     json = signed_transaction.to_dict()
-    response = requests.post(
-        alice_driver.nodes[0] + '/transactions/', json=json)
+    response = requests.post(driver.nodes[0] + '/transactions/', json=json)
     return response.json()
 
 
