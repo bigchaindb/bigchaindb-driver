@@ -105,18 +105,18 @@ def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
 
 @fixture
 def unsigned_transaction():
-
     return {
         'asset': {
-            'data': {'serial_number': '0pG9pH37e9SrWg=='},
+            'data': {
+                'serial_number': 'NNP43x-DaYoSWg==',
+            },
             'divisible': False,
-            'id': '9fada0cc-424e-45c3-b85d-3c50ef189738',
+            'id': '05b8f3a6-1183-46b6-98d8-ab3dd05d73f8',
             'refillable': False,
             'updatable': False,
         },
         'conditions': [{
             'amount': 1,
-            'cid': 0,
             'condition': {
                 'details': {
                     'bitmask': 32,
@@ -125,12 +125,10 @@ def unsigned_transaction():
                     'type': 'fulfillment',
                     'type_id': 4,
                 },
-                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96',    # noqa E501
-            },
+                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96'},   # noqa E501
             'owners_after': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
         }],
         'fulfillments': [{
-            'fid': 0,
             'fulfillment': {
                 'bitmask': 32,
                 'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
@@ -141,7 +139,7 @@ def unsigned_transaction():
             'input': None,
             'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
         }],
-        'id': '25cf61930abe77c78c9a95bf45e8689ee10f0bb5f9292b90859861cdde321749',   # noqa E501
+        'id': 'da1b64a907ba540e7c9359cf5d1010b939b5c5f5abe9667d4c5fa9fe8d6ac467',   # noqa E501
         'metadata': None,
         'operation': 'CREATE',
         'version': 1,
