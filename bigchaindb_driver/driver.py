@@ -230,11 +230,11 @@ class UnspentsEndpoint(NamespacedDriver):
     """
     path = '/unspents/'
 
-    def get(self, owner_after):
+    def get(self, public_key):
         """
 
         Args:
-            owner_after (str): Public key for which unfulfilled
+            public_key (str): Public key for which unfulfilled
                 conditions are sought.
 
         Returns:
@@ -251,4 +251,4 @@ class UnspentsEndpoint(NamespacedDriver):
 
         """
         return self.transport.forward_request(
-            method='GET', path=self.path, params={'owner_after': owner_after})
+            method='GET', path=self.path, params={'public_key': public_key})
