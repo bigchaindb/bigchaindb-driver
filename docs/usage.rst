@@ -98,10 +98,9 @@ For example:
 
 Cryptographic Identities Generation
 -----------------------------------
-Alice, and Bob are represented by signing/verifying key pairs. The signing
-(private) key is used to sign transactions, meanwhile the verifying (public)
-key is used to verify that a signed transaction was indeed signed by the one
-who claims to be the signee. 
+Alice, and Bob are represented by public/private key pairs. The private key is
+used to sign transactions, meanwhile the public key is used to verify that a
+signed transaction was indeed signed by the one who claims to be the signee. 
 
 .. ipython::
 
@@ -118,7 +117,7 @@ We're now ready to create the digital asset. First we prepare the transaction:
 
    In [0]: prepared_creation_tx = bdb.transactions.prepare(
       ...:     operation='CREATE',
-      ...:     owners_before=alice.verifying_key,
+      ...:     owners_before=alice.public_key,
       ...:     asset=bicycle,
       ...:     metadata=metadata,
       ...: )
@@ -135,7 +134,7 @@ The transaction needs to be fulfilled:
 .. ipython::
 
     In [0]: fulfilled_creation_tx = bdb.transactions.fulfill(
-       ...:     prepared_creation_tx, private_keys=alice.signing_key)
+       ...:     prepared_creation_tx, private_keys=alice.private_key)
 
 .. ipython::
 
@@ -221,7 +220,7 @@ Preparing the transfer transaction:
        ...:     operation='TRANSFER',
        ...:     asset=creation_tx['asset'],
        ...:     inputs=transfer_input,
-       ...:     owners_after=bob.verifying_key,
+       ...:     owners_after=bob.public_key,
        ...: )
 
 and then fulfills the prepared transfer:
@@ -230,7 +229,7 @@ and then fulfills the prepared transfer:
 
     In [0]: fulfilled_transfer_tx = bdb.transactions.fulfill(
        ...:     prepared_transfer_tx,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
 and finally sends the fulfilled transaction to the connected BigchainDB node:
@@ -254,13 +253,13 @@ Bob is the new owner:
 
 .. ipython::
 
-    In [0]: fulfilled_transfer_tx['conditions'][0]['owners_after'][0] == bob.verifying_key
+    In [0]: fulfilled_transfer_tx['conditions'][0]['owners_after'][0] == bob.public_key
 
 Alice is the former owner:
 
 .. ipython::
 
-    In [0]: fulfilled_transfer_tx['fulfillments'][0]['owners_before'][0] == alice.verifying_key
+    In [0]: fulfilled_transfer_tx['fulfillments'][0]['owners_before'][0] == alice.public_key
 
 
 Transaction Status
@@ -338,13 +337,13 @@ Bob has now decided to issue 10 tokens and assign them to Carly.
 
     In [0]: prepared_token_tx = bdb.transactions.prepare(
        ...:     operation='CREATE',
-       ...:     owners_before=bob.verifying_key,
-       ...:     owners_after=[([carly.verifying_key], 10)],
+       ...:     owners_before=bob.public_key,
+       ...:     owners_after=[([carly.public_key], 10)],
        ...:     asset=bicycle_token
        ...: )
 
     In [0]: fulfilled_token_tx = bdb.transactions.fulfill(
-       ...:     prepared_token_tx, private_keys=bob.signing_key)
+       ...:     prepared_token_tx, private_keys=bob.private_key)
 
 Sending the transaction:
 
@@ -364,7 +363,7 @@ Sending the transaction:
 
     .. code-block:: python
 
-        owners_after=[([carly.verifying_key], 5), ([carly.verifying_key], 5)]
+        owners_after=[([carly.public_key], 5), ([carly.public_key], 5)]
 
     The reason why the addresses are contained in ``lists`` is because each
     condition can have multiple ownership. For instance we can create a
@@ -373,7 +372,7 @@ Sending the transaction:
 
     .. code-block:: python
 
-        owners_after=[([carly.verifying_key, alice.verifying_key], 10)]
+        owners_after=[([carly.public_key, alice.public_key], 10)]
 
 .. code-block:: python
 
@@ -390,13 +389,13 @@ Bob is the issuer:
 
 .. ipython::
 
-    In [0]: fulfilled_token_tx['fulfillments'][0]['owners_before'][0] == bob.verifying_key
+    In [0]: fulfilled_token_tx['fulfillments'][0]['owners_before'][0] == bob.public_key
 
 Carly is the owner of 10 tokens:
 
 .. ipython::
 
-    In [0]: fulfilled_token_tx['conditions'][0]['owners_after'][0] == carly.verifying_key
+    In [0]: fulfilled_token_tx['conditions'][0]['owners_after'][0] == carly.public_key
 
     In [0]: fulfilled_token_tx['conditions'][0]['amount'] == 10
 
@@ -423,11 +422,11 @@ to Bob:
        ...:     operation='TRANSFER',
        ...:     asset=prepared_token_tx['asset'],
        ...:     inputs=transfer_input,
-       ...:     owners_after=[([bob.verifying_key], 2), ([carly.verifying_key], 8)]
+       ...:     owners_after=[([bob.public_key], 2), ([carly.public_key], 8)]
        ...: )
 
     In [0]: fulfilled_transfer_tx = bdb.transactions.fulfill(
-       ...:     prepared_transfer_tx, private_keys=carly.signing_key)
+       ...:     prepared_transfer_tx, private_keys=carly.private_key)
 
 .. code-block:: python
 

@@ -141,7 +141,7 @@ to:
 
     In [0]: prepared_creation_tx = prepare_transaction(
        ...:     operation='CREATE',
-       ...:     owners_before=alice.verifying_key,
+       ...:     owners_before=alice.public_key,
        ...:     asset=bicycle,
        ...:     metadata=metadata,
        ...: )
@@ -156,7 +156,7 @@ Note ``alice``'s public key:
 
 .. ipython::
 
-    In [0]: alice.verifying_key
+    In [0]: alice.public_key
 
 We are now going to craft this payload by hand.
 
@@ -220,7 +220,7 @@ generate them using the ``cryptoconditions`` library:
 
     In [0]: from cryptoconditions import Ed25519Fulfillment
 
-    In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.verifying_key)
+    In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
 generate the condition uri:
 
@@ -247,7 +247,7 @@ We can now easily assemble the ``dict`` for the condition:
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
        ...:     },
-       ...:     'owners_after': (alice.verifying_key,),
+       ...:     'owners_after': (alice.public_key,),
        ...: }
 
 Let's recap and set the ``conditions`` key:
@@ -256,7 +256,7 @@ Let's recap and set the ``conditions`` key:
 
     In [0]: from cryptoconditions import Ed25519Fulfillment
 
-    In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.verifying_key)
+    In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
     In [0]: condition = {
        ...:     'amount': 1,
@@ -265,7 +265,7 @@ Let's recap and set the ``conditions`` key:
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
        ...:     },
-       ...:     'owners_after': (alice.verifying_key,),
+       ...:     'owners_after': (alice.public_key,),
        ...: }
 
     In [0]: conditions = (condition,)
@@ -290,7 +290,7 @@ The fulfillment for a ``CREATE`` operation is somewhat special:
        ...:     'fid': 0,
        ...:     'fulfillment': None,
        ...:     'input': None,
-       ...:     'owners_before': (alice.verifying_key,)
+       ...:     'owners_before': (alice.public_key,)
        ...: }
 
 * The input field is empty because it's a ``CREATE`` operation;
@@ -347,8 +347,8 @@ recap how we've put all the code together to generate the above payload:
     from bigchaindb_driver.crypto import CryptoKeypair
 
     alice = CryptoKeypair(
-        verifying_key=alice.verifying_key,
-        signing_key=alice.signing_key,
+        public_key=alice.public_key,
+        private_key=alice.private_key,
     )
 
     operation = 'CREATE'
@@ -368,7 +368,7 @@ recap how we've put all the code together to generate the above payload:
 
     metadata = {'planet': 'earth'}
 
-    ed25519 = Ed25519Fulfillment(public_key=alice.verifying_key)
+    ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
     condition = {
         'amount': 1,
@@ -377,7 +377,7 @@ recap how we've put all the code together to generate the above payload:
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (alice.verifying_key,),
+        'owners_after': (alice.public_key,),
     }
     conditions = (condition,)
 
@@ -385,7 +385,7 @@ recap how we've put all the code together to generate the above payload:
         'fid': 0,
         'fulfillment': None,
         'input': None,
-        'owners_before': (alice.verifying_key,)
+        'owners_before': (alice.public_key,)
     }
     fulfillments = (fulfillment,)
 
@@ -479,10 +479,10 @@ The Fulfilled Transaction
 
     In [0]: fulfilled_creation_tx = fulfill_transaction(
        ...:     prepared_creation_tx,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
-    In [0]: sk = Ed25519SigningKey(alice.signing_key)
+    In [0]: sk = Ed25519SigningKey(alice.private_key)
 
     In [0]: message = json.dumps(
        ...:     handcrafted_creation_tx,
@@ -542,7 +542,7 @@ Handcrafting a ``'CREATE'`` transaction can be done as follows:
 
     metadata = {'planet': 'earth'}
 
-    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.verifying_key)
+    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
 
     condition = {
         'amount': 1,
@@ -551,7 +551,7 @@ Handcrafting a ``'CREATE'`` transaction can be done as follows:
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (alice.verifying_key,),
+        'owners_after': (alice.public_key,),
     }
     conditions = (condition,)
 
@@ -559,7 +559,7 @@ Handcrafting a ``'CREATE'`` transaction can be done as follows:
         'fid': 0,
         'fulfillment': None,
         'input': None,
-        'owners_before': (alice.verifying_key,)
+        'owners_before': (alice.public_key,)
     }
     fulfillments = (fulfillment,)
 
@@ -583,7 +583,7 @@ Handcrafting a ``'CREATE'`` transaction can be done as follows:
 
     handcrafted_creation_tx['id'] = creation_txid
 
-    sk = cryptoconditions.crypto.Ed25519SigningKey(alice.signing_key)
+    sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
 
     message = json.dumps(
         handcrafted_creation_tx,
@@ -654,12 +654,12 @@ transfer transaction was prepared and fulfilled as follows:
        ...:     operation='TRANSFER',
        ...:     asset=creation_tx['asset'],
        ...:     inputs=transfer_input,
-       ...:     owners_after=bob.verifying_key,
+       ...:     owners_after=bob.public_key,
        ...: )
 
     In [0]: fulfilled_transfer_tx = fulfill_transaction(
        ...:     prepared_transfer_tx,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
     In [0]: fulfilled_transfer_tx
@@ -700,7 +700,7 @@ conditions
 
     In [0]: from cryptoconditions import Ed25519Fulfillment
 
-    In [0]: ed25519 = Ed25519Fulfillment(public_key=bob.verifying_key)
+    In [0]: ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
     In [0]: condition = {
        ...:     'amount': 1,
@@ -709,7 +709,7 @@ conditions
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
        ...:     },
-       ...:     'owners_after': (bob.verifying_key,),
+       ...:     'owners_after': (bob.public_key,),
        ...: }
 
     In [0]: conditions = (condition,)
@@ -725,7 +725,7 @@ fulfillments
        ...:         'txid': creation_tx['id'],
        ...:         'cid': 0,
        ...:     },
-       ...:     'owners_before': (alice.verifying_key,)
+       ...:     'owners_before': (alice.public_key,)
        ...: }
 
     In [0]: fulfillments = (fulfillment,)
@@ -761,15 +761,15 @@ we've put all the code together to generate the above payload:
     from bigchaindb_driver.crypto import CryptoKeypair
 
     bob = CryptoKeypair(
-        verifying_key=bob.verifying_key,
-        signing_key=bob.signing_key,
+        public_key=bob.public_key,
+        private_key=bob.private_key,
     )
 
     operation = 'TRANSFER'
     asset = {'id': asset_id}
     metadata = None
 
-    ed25519 = Ed25519Fulfillment(public_key=bob.verifying_key)
+    ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
     condition = {
         'amount': 1,
@@ -778,7 +778,7 @@ we've put all the code together to generate the above payload:
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (bob.verifying_key,),
+        'owners_after': (bob.public_key,),
     }
     conditions = (condition,)
 
@@ -789,7 +789,7 @@ we've put all the code together to generate the above payload:
             'txid': creation_tx['id'],
             'cid': 0,
         },
-        'owners_before': (alice.verifying_key,)
+        'owners_before': (alice.public_key,)
     }
     fulfillments = (fulfillment,)
 
@@ -883,10 +883,10 @@ The Fulfilled Transaction
 
     In [0]: fulfilled_transfer_tx = fulfill_transaction(
        ...:     prepared_transfer_tx,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
-    In [0]: sk = Ed25519SigningKey(alice.signing_key)
+    In [0]: sk = Ed25519SigningKey(alice.private_key)
 
     In [0]: message = json.dumps(
        ...:     handcrafted_transfer_tx,
@@ -929,7 +929,7 @@ In a nutshell
     asset = {'id': asset_id}
     metadata = None
 
-    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.verifying_key)
+    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
 
     condition = {
         'amount': 1,
@@ -938,7 +938,7 @@ In a nutshell
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (bob.verifying_key,),
+        'owners_after': (bob.public_key,),
     }
     conditions = (condition,)
 
@@ -949,7 +949,7 @@ In a nutshell
             'txid': creation_txid,
             'cid': 0,
         },
-        'owners_before': (alice.verifying_key,)
+        'owners_before': (alice.public_key,)
     }
     fulfillments = (fulfillment,)
 
@@ -973,7 +973,7 @@ In a nutshell
 
     handcrafted_transfer_tx['id'] = transfer_txid
 
-    sk = cryptoconditions.crypto.Ed25519SigningKey(alice.signing_key)
+    sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
 
     message = json.dumps(
         handcrafted_transfer_tx,
@@ -1050,7 +1050,7 @@ Handcrafting the ``'CREATE'`` transaction:
     }
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for carly
-    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carly.verifying_key)
+    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carly.public_key)
 
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = ed25519.condition.serialize_uri()
@@ -1065,14 +1065,14 @@ Handcrafting the ``'CREATE'`` transaction:
             'details': unsigned_fulfillment_dict,
             'uri': condition_uri,
         },
-        'owners_after': (carly.verifying_key,),
+        'owners_after': (carly.public_key,),
     }
 
     fulfillment = {
         'fid': 0,
         'fulfillment': None,
         'input': None,
-        'owners_before': (bob.verifying_key,)
+        'owners_before': (bob.public_key,)
     }
 
     token_creation_tx = {
@@ -1107,7 +1107,7 @@ Handcrafting the ``'CREATE'`` transaction:
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
     ed25519.sign(message.encode(),
-                 cryptoconditions.crypto.Ed25519SigningKey(bob.signing_key))
+                 cryptoconditions.crypto.Ed25519SigningKey(bob.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = ed25519.serialize_uri()
@@ -1131,10 +1131,10 @@ A few checks:
     >>> json.dumps(returned_creation_tx, sort_keys=True) == json.dumps(token_creation_tx, sort_keys=True)
     True
 
-    >>> token_creation_tx['fulfillments'][0]['owners_before'][0] == bob.verifying_key
+    >>> token_creation_tx['fulfillments'][0]['owners_before'][0] == bob.public_key
     True
 
-    >>> token_creation_tx['conditions'][0]['owners_after'][0] == carly.verifying_key
+    >>> token_creation_tx['conditions'][0]['owners_after'][0] == carly.public_key
     True
 
     >>> token_creation_tx['conditions'][0]['amount'] == 10
@@ -1156,10 +1156,10 @@ to Bob:
 .. code-block:: python
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for carly
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.verifying_key)
+    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for carly
-    carly_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carly.verifying_key)
+    carly_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carly.public_key)
 
     # CRYPTO-CONDITIONS: generate the condition uris
     bob_condition_uri = bob_ed25519.condition.serialize_uri()
@@ -1176,7 +1176,7 @@ to Bob:
             'details': bob_unsigned_fulfillment_dict,
             'uri': bob_condition_uri,
         },
-        'owners_after': (bob.verifying_key,),
+        'owners_after': (bob.public_key,),
     }
     carly_condition = {
         'amount': 8,
@@ -1185,7 +1185,7 @@ to Bob:
             'details': carly_unsigned_fulfillment_dict,
             'uri': carly_condition_uri,
         },
-        'owners_after': (carly.verifying_key,),
+        'owners_after': (carly.public_key,),
     }
 
     fulfillment = {
@@ -1195,7 +1195,7 @@ to Bob:
             'txid': token_creation_tx['id'],
             'cid': 0,
         },
-        'owners_before': (carly.verifying_key,)
+        'owners_before': (carly.public_key,)
     }
 
     token_transfer_tx = {
@@ -1231,7 +1231,7 @@ to Bob:
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id for bob
     carly_ed25519.sign(message.encode(),
-                     cryptoconditions.crypto.Ed25519SigningKey(carly.signing_key))
+                     cryptoconditions.crypto.Ed25519SigningKey(carly.private_key))
 
     # CRYPTO-CONDITIONS: generate bob's fulfillment uri
     fulfillment_uri = carly_ed25519.serialize_uri()
@@ -1253,7 +1253,7 @@ A few checks:
     >>> json.dumps(returned_transfer_tx, sort_keys=True) == json.dumps(token_transfer_tx, sort_keys=True)
     True
 
-    >>> token_transfer_tx['fulfillments'][0]['owners_before'][0] == carly.verifying_key
+    >>> token_transfer_tx['fulfillments'][0]['owners_before'][0] == carly.public_key
     True
 
 
@@ -1288,14 +1288,14 @@ Say ``alice`` and ``bob`` own a car together:
 
     In [0]: car_creation_tx = offchain.prepare_transaction(
        ...:     operation='CREATE',
-       ...:     owners_before=alice.verifying_key,
-       ...:     owners_after=(alice.verifying_key, bob.verifying_key),
+       ...:     owners_before=alice.public_key,
+       ...:     owners_after=(alice.public_key, bob.public_key),
        ...:     asset=car_asset,
        ...: )
 
     In [0]: signed_car_creation_tx = offchain.fulfill_transaction(
        ...:     car_creation_tx,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
     In [0]: signed_car_creation_tx
@@ -1330,13 +1330,13 @@ their car over to ``carol``:
 
     In [0]: car_transfer_tx = offchain.prepare_transaction(
        ...:     operation='TRANSFER',
-       ...:     owners_after=carol.verifying_key,
+       ...:     owners_after=carol.public_key,
        ...:     asset=asset,
        ...:     inputs=input_,
        ...: )
 
     In [0]: signed_car_transfer_tx = offchain.fulfill_transaction(
-       ...:     car_transfer_tx, private_keys=[alice.signing_key, bob.signing_key]
+       ...:     car_transfer_tx, private_keys=[alice.private_key, bob.private_key]
        ...: )
 
     In [0]: signed_car_transfer_tx
@@ -1378,9 +1378,9 @@ Generate the condition:
 
 .. ipython::
 
-    In [0]: alice_ed25519 = Ed25519Fulfillment(public_key=alice.verifying_key)
+    In [0]: alice_ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
-    In [0]: bob_ed25519 = Ed25519Fulfillment(public_key=bob.verifying_key)
+    In [0]: bob_ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
     In [0]: threshold_sha256 = ThresholdSha256Fulfillment(threshold=2)
 
@@ -1399,7 +1399,7 @@ Generate the condition:
        ...:         'details': unsigned_subfulfillments_dict,
        ...:         'uri': condition_uri,
        ...:     },
-       ...:     'owners_after': (alice.verifying_key, bob.verifying_key),
+       ...:     'owners_after': (alice.public_key, bob.public_key),
        ...: }
 
 .. tip:: The condition ``uri`` could have been generated in a slightly
@@ -1427,7 +1427,7 @@ The yet to be fulfilled fulfillment:
        ...:     'fid': 0,
        ...:     'fulfillment': None,
        ...:     'input': None,
-       ...:     'owners_before': (alice.verifying_key,),
+       ...:     'owners_before': (alice.public_key,),
        ...: }
 
 Craft the payload:
@@ -1476,7 +1476,7 @@ Sign the transaction:
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: alice_ed25519.sign(message.encode(), Ed25519SigningKey(alice.signing_key))
+    In [0]: alice_ed25519.sign(message.encode(), Ed25519SigningKey(alice.private_key))
 
     In [0]: fulfillment_uri = alice_ed25519.serialize_uri()
 
@@ -1493,11 +1493,11 @@ The transfer:
 
 .. ipython::
 
-    In [0]: alice_ed25519 = Ed25519Fulfillment(public_key=alice.verifying_key)
+    In [0]: alice_ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
-    In [0]: bob_ed25519 = Ed25519Fulfillment(public_key=bob.verifying_key)
+    In [0]: bob_ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
-    In [0]: carol_ed25519 = Ed25519Fulfillment(public_key=carol.verifying_key)
+    In [0]: carol_ed25519 = Ed25519Fulfillment(public_key=carol.public_key)
 
     In [0]: unsigned_fulfillments_dict = carol_ed25519.to_dict()
 
@@ -1510,7 +1510,7 @@ The transfer:
        ...:         'details': unsigned_fulfillments_dict,
        ...:         'uri': condition_uri,
        ...:     },
-       ...:     'owners_after': (carol.verifying_key,),
+       ...:     'owners_after': (carol.public_key,),
        ...: }
 
 The yet to be fulfilled fulfillments:
@@ -1524,7 +1524,7 @@ The yet to be fulfilled fulfillments:
        ...:         'txid': handcrafted_car_creation_tx['id'],
        ...:         'cid': 0,
        ...:     },
-       ...:     'owners_before': (alice.verifying_key, bob.verifying_key),
+       ...:     'owners_before': (alice.public_key, bob.public_key),
        ...: }
 
 Craft the payload:
@@ -1573,9 +1573,9 @@ Sign the transaction:
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: alice_sk = Ed25519SigningKey(alice.signing_key)
+    In [0]: alice_sk = Ed25519SigningKey(alice.private_key)
 
-    In [0]: bob_sk = Ed25519SigningKey(bob.signing_key)
+    In [0]: bob_sk = Ed25519SigningKey(bob.private_key)
 
     In [0]: threshold_sha256 = ThresholdSha256Fulfillment(threshold=2)
 
@@ -1583,9 +1583,9 @@ Sign the transaction:
 
     In [0]: threshold_sha256.add_subfulfillment(bob_ed25519)
 
-    In [102]: alice_condition = threshold_sha256.get_subcondition_from_vk(alice.verifying_key)[0]
+    In [102]: alice_condition = threshold_sha256.get_subcondition_from_vk(alice.public_key)[0]
 
-    In [103]: bob_condition = threshold_sha256.get_subcondition_from_vk(bob.verifying_key)[0]
+    In [103]: bob_condition = threshold_sha256.get_subcondition_from_vk(bob.public_key)[0]
 
     In [106]: alice_condition.sign(message.encode(), private_key=alice_sk)
 
@@ -1633,10 +1633,10 @@ Handcrafting the ``'CREATE'`` transaction
     alice, bob = generate_keypair(), generate_keypair()
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for alice
-    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.verifying_key)
+    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for bob
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.verifying_key)
+    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
 
     # CRYPTO-CONDITIONS: instantiate a threshold SHA 256 crypto-condition
     threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=2)
@@ -1660,7 +1660,7 @@ Handcrafting the ``'CREATE'`` transaction
             'details': unsigned_subfulfillments_dict,
             'uri': threshold_sha256.condition_uri,
         },
-        'owners_after': (alice.verifying_key, bob.verifying_key),
+        'owners_after': (alice.public_key, bob.public_key),
     }
 
     # The yet to be fulfilled fulfillment:
@@ -1668,7 +1668,7 @@ Handcrafting the ``'CREATE'`` transaction
         'fid': 0,
         'fulfillment': None,
         'input': None,
-        'owners_before': (alice.verifying_key,),
+        'owners_before': (alice.public_key,),
     }
 
     # Craft the payload:
@@ -1707,7 +1707,7 @@ Handcrafting the ``'CREATE'`` transaction
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
     alice_ed25519.sign(message.encode(),
-                       cryptoconditions.crypto.Ed25519SigningKey(alice.signing_key))
+                       cryptoconditions.crypto.Ed25519SigningKey(alice.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = alice_ed25519.serialize_uri()
@@ -1739,11 +1739,11 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     carol = generate_keypair()
 
-    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.verifying_key)
+    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
 
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.verifying_key)
+    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
 
-    carol_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carol.verifying_key)
+    carol_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carol.public_key)
 
     unsigned_fulfillments_dict = carol_ed25519.to_dict()
 
@@ -1756,7 +1756,7 @@ Handcrafting the ``'TRANSFER'`` transaction
             'details': unsigned_fulfillments_dict,
             'uri': condition_uri,
         },
-        'owners_after': (carol.verifying_key,),
+        'owners_after': (carol.public_key,),
     }
 
     # The yet to be fulfilled fulfillments:
@@ -1767,7 +1767,7 @@ Handcrafting the ``'TRANSFER'`` transaction
             'txid': handcrafted_car_creation_tx['id'],
             'cid': 0,
         },
-        'owners_before': (alice.verifying_key, bob.verifying_key),
+        'owners_before': (alice.public_key, bob.public_key),
     }
 
     # Craft the payload:
@@ -1801,9 +1801,9 @@ Handcrafting the ``'TRANSFER'`` transaction
         ensure_ascii=False,
     )
 
-    alice_sk = cryptoconditions.crypto.Ed25519SigningKey(alice.signing_key)
+    alice_sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
 
-    bob_sk = cryptoconditions.crypto.Ed25519SigningKey(bob.signing_key)
+    bob_sk = cryptoconditions.crypto.Ed25519SigningKey(bob.private_key)
 
     threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=2)
 
@@ -1811,9 +1811,9 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     threshold_sha256.add_subfulfillment(bob_ed25519)
 
-    alice_condition = threshold_sha256.get_subcondition_from_vk(alice.verifying_key)[0]
+    alice_condition = threshold_sha256.get_subcondition_from_vk(alice.public_key)[0]
 
-    bob_condition = threshold_sha256.get_subcondition_from_vk(bob.verifying_key)[0]
+    bob_condition = threshold_sha256.get_subcondition_from_vk(bob.public_key)[0]
 
     alice_condition.sign(message.encode(), private_key=alice_sk)
 

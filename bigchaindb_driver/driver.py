@@ -20,7 +20,7 @@ class BigchainDB:
                  transport_class=Transport):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
-        If a :attr:`verifying_key` or :attr:`signing_key` are given, this
+        If a :attr:`public_key` or :attr:`private_key` are given, this
         instance will be bound to the keys and applied them as defaults
         whenever a verifying and/or signing key are needed.
 
