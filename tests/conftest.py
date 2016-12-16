@@ -1,12 +1,65 @@
+import json
 from base64 import b64encode
 from collections import namedtuple
 from os import environ, urandom
 from uuid import uuid4
 
 import requests
+from cryptoconditions import Ed25519Fulfillment
+from cryptoconditions.crypto import Ed25519SigningKey
 from pytest import fixture
+from sha3 import sha3_256
 
 from bigchaindb.common.transaction import Asset, Transaction
+
+
+def make_ed25519_condition(public_key, *, amount=1):
+    ed25519 = Ed25519Fulfillment(public_key=public_key)
+    return {
+        'amount': amount,
+        'condition': {
+            'details': ed25519.to_dict(),
+            'uri': ed25519.condition_uri,
+        },
+        'owners_after': (public_key,),
+    }
+
+
+def make_fulfillment(*public_keys, input_=None):
+    return {
+        'fulfillment': None,
+        'input': input_,
+        'owners_before': public_keys,
+    }
+
+
+def serialize_transaction(transaction):
+    return json.dumps(
+        transaction,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+
+def hash_transaction(transaction):
+    return sha3_256(serialize_transaction(transaction).encode()).hexdigest()
+
+
+def add_transaction_id(transaction):
+    transaction['id'] = hash_transaction(transaction)
+
+
+def sign_transaction(transaction, *, public_key, private_key):
+    ed25519 = Ed25519Fulfillment(public_key=public_key)
+    message = json.dumps(
+        transaction,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+    ed25519.sign(message.encode(), Ed25519SigningKey(private_key))
+    return ed25519.serialize_uri()
 
 
 @fixture
@@ -149,9 +202,8 @@ def car_asset():
 
 @fixture
 def prepared_carol_bicycle_transaction(carol_keypair, bicycle_asset):
-    from bigchaindb_driver import utils
-    condition = utils.ed25519_condition(carol_keypair.public_key)
-    fulfillment = utils.fulfillment(carol_keypair.public_key)
+    condition = make_ed25519_condition(carol_keypair.public_key)
+    fulfillment = make_fulfillment(carol_keypair.public_key)
     tx = {
         'asset': bicycle_asset,
         'metadata': None,
@@ -160,15 +212,14 @@ def prepared_carol_bicycle_transaction(carol_keypair, bicycle_asset):
         'fulfillments': (fulfillment,),
         'version': 1,
     }
-    utils.add_transaction_id(tx)
+    add_transaction_id(tx)
     return tx
 
 
 @fixture
 def signed_carol_bicycle_transaction(request, carol_keypair,
                                      prepared_carol_bicycle_transaction):
-    from bigchaindb_driver import utils
-    fulfillment_uri = utils.sign_transaction(
+    fulfillment_uri = sign_transaction(
         prepared_carol_bicycle_transaction,
         public_key=carol_keypair.public_key,
         private_key=carol_keypair.private_key,
@@ -191,9 +242,8 @@ def persisted_carol_bicycle_transaction(driver,
 
 @fixture
 def prepared_carol_car_transaction(carol_keypair, car_asset):
-    from bigchaindb_driver import utils
-    condition = utils.ed25519_condition(carol_keypair.public_key)
-    fulfillment = utils.fulfillment(carol_keypair.public_key)
+    condition = make_ed25519_condition(carol_keypair.public_key)
+    fulfillment = make_fulfillment(carol_keypair.public_key)
     tx = {
         'asset': car_asset,
         'metadata': None,
@@ -202,15 +252,14 @@ def prepared_carol_car_transaction(carol_keypair, car_asset):
         'fulfillments': (fulfillment,),
         'version': 1,
     }
-    utils.add_transaction_id(tx)
+    add_transaction_id(tx)
     return tx
 
 
 @fixture
 def signed_carol_car_transaction(request, carol_keypair,
                                  prepared_carol_car_transaction):
-    from bigchaindb_driver import utils
-    fulfillment_uri = utils.sign_transaction(
+    fulfillment_uri = sign_transaction(
         prepared_carol_car_transaction,
         public_key=carol_keypair.public_key,
         private_key=carol_keypair.private_key,

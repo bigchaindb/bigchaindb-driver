@@ -6,12 +6,7 @@ Attributes:
         :class:`~.CreateOperation`.
 
 """
-import json
-
 from bigchaindb.common.transaction import Asset
-from cryptoconditions import Ed25519Fulfillment
-from cryptoconditions.crypto import Ed25519SigningKey
-from sha3 import sha3_256
 
 
 class CreateOperation:
@@ -96,57 +91,3 @@ def _normalize_asset(asset, is_transfer=False):
             if not asset:
                 asset = None
     return asset
-
-
-def ed25519_condition(public_key, *, amount=1):
-    ed25519 = Ed25519Fulfillment(public_key=public_key)
-    return {
-        'amount': amount,
-        'condition': {
-            'details': ed25519.to_dict(),
-            'uri': ed25519.condition_uri,
-        },
-        'owners_after': (public_key,),
-    }
-
-
-def fulfillment(*public_keys, input_=None):
-    return {
-        'fulfillment': None,
-        'input': input_,
-        'owners_before': public_keys,
-    }
-
-
-def asset(data=None, divisible=False,
-          refillable=False, updatable=False, id=None):
-    return locals()
-
-
-def serialize_transaction(transaction):
-    return json.dumps(
-        transaction,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-
-def hash_transaction(transaction):
-    return sha3_256(serialize_transaction(transaction).encode()).hexdigest()
-
-
-def add_transaction_id(transaction):
-    transaction['id'] = hash_transaction(transaction)
-
-
-def sign_transaction(transaction, *, public_key, private_key):
-    ed25519 = Ed25519Fulfillment(public_key=public_key)
-    message = json.dumps(
-        transaction,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-    ed25519.sign(message.encode(), Ed25519SigningKey(private_key))
-    return ed25519.serialize_uri()
