@@ -3,7 +3,7 @@ from collections import namedtuple
 from cryptoconditions import crypto
 
 
-CryptoKeypair = namedtuple('CryptoKeypair', ('signing_key', 'verifying_key'))
+CryptoKeypair = namedtuple('CryptoKeypair', ('private_key', 'public_key'))
 
 
 def generate_keypair():
@@ -12,8 +12,8 @@ def generate_keypair():
     Returns:
         :class:`~bigchaindb_driver.crypto.CryptoKeypair`: A
         :obj:`collections.namedtuple` with named fields
-        :attr:`~bigchaindb_driver.crypto.CryptoKeypair.signing_key` and
-        :attr:`~bigchaindb_driver.crypto.CryptoKeypair.verifying_key`.
+        :attr:`~bigchaindb_driver.crypto.CryptoKeypair.private_key` and
+        :attr:`~bigchaindb_driver.crypto.CryptoKeypair.public_key`.
 
     """
     return CryptoKeypair(

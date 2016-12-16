@@ -76,14 +76,14 @@ Define a digital asset data payload
     In [0]: digital_asset_payload = {'data': {'msg': 'Hello BigchainDB!'}}
 
     In [0]: tx = bdb.transactions.prepare(operation='CREATE',
-       ...:                               owners_before=alice.verifying_key,
+       ...:                               owners_before=alice.public_key,
        ...:                               asset=digital_asset_payload)
 
 All transactions need to be signed by the user creating the transaction.
 
 .. ipython::
 
-    In [0]: signed_tx = bdb.transactions.fulfill(tx, private_keys=alice.signing_key)
+    In [0]: signed_tx = bdb.transactions.fulfill(tx, private_keys=alice.private_key)
 
 Write the transaction to the bigchain. The transaction will be stored in a
 backlog where it will be validated, included in a block, and written to the
@@ -123,7 +123,7 @@ verifying key of ``alice``.
 
 .. ipython::
 
-    In [0]: alice.verifying_key
+    In [0]: alice.public_key
 
 
 Transfer the Digital Asset
@@ -186,7 +186,7 @@ Create a second test user, ``bob``:
 
     In [0]: bob = generate_keypair()
 
-    In [0]: bob.verifying_key
+    In [0]: bob.public_key
 
 And prepare the transfer transaction:
 
@@ -196,7 +196,7 @@ And prepare the transfer transaction:
        ...:     operation='TRANSFER',
        ...:     inputs=input_,
        ...:     asset=asset,
-       ...:     owners_after=bob.verifying_key,
+       ...:     owners_after=bob.public_key,
        ...: )
 
 The ``tx_transfer`` dictionary should look something like:
@@ -209,7 +209,7 @@ Notice, ``bob``'s verifying key (public key), appearing in the above ``dict``.
 
 .. ipython::
 
-    In [0]: bob.verifying_key
+    In [0]: bob.public_key
 
 The transaction now needs to be fulfilled by ``alice``:
 
@@ -217,7 +217,7 @@ The transaction now needs to be fulfilled by ``alice``:
 
     In [0]: signed_tx_transfer = bdb.transactions.fulfill(
        ...:     tx_transfer,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
 If you look at the content of ``signed_tx_transfer`` you should see the added
@@ -276,7 +276,7 @@ Create another transfer transaction with the same input
        ...:     operation='TRANSFER',
        ...:     inputs=input_,
        ...:     asset=asset,
-       ...:     owners_after=alice_secret_stash.verifying_key,
+       ...:     owners_after=alice_secret_stash.public_key,
        ...: )
 
 Fulfill the transaction
@@ -285,7 +285,7 @@ Fulfill the transaction
 
     In [0]: fulfilled_tx_transfer_2 = bdb.transactions.fulfill(
        ...:     tx_transfer_2,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
 Send the transaction over to the node
@@ -321,14 +321,14 @@ list of ``owners_after``:
 
     In [0]: car_creation_tx = bdb.transactions.prepare(
        ...:     operation='CREATE',
-       ...:     owners_before=alice.verifying_key,
-       ...:     owners_after=(alice.verifying_key, bob.verifying_key),
+       ...:     owners_before=alice.public_key,
+       ...:     owners_after=(alice.public_key, bob.public_key),
        ...:     asset=car_asset,
        ...: )
 
     In [0]: signed_car_creation_tx = bdb.transactions.fulfill(
        ...:     car_creation_tx,
-       ...:     private_keys=alice.signing_key,
+       ...:     private_keys=alice.private_key,
        ...: )
 
 .. code-block:: python
@@ -379,7 +379,7 @@ then ``alice`` can prepare the transfer:
 
     In [0]: car_transfer_tx = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
-       ...:     owners_after=carol.verifying_key,
+       ...:     owners_after=carol.public_key,
        ...:     asset=asset,
        ...:     inputs=input_,
        ...: )
@@ -397,7 +397,7 @@ To do so, simply provide a list of all private keys to the fulfill method.
 .. ipython::
 
     In [0]: signed_car_transfer_tx = bdb.transactions.fulfill(
-       ...:     car_transfer_tx, private_keys=[alice.signing_key, bob.signing_key]
+       ...:     car_transfer_tx, private_keys=[alice.private_key, bob.private_key]
        ...: )
 
 Note, that if one the signing keys is missing, the fulfillment will fail. If we
@@ -410,7 +410,7 @@ omit ``bob``:
     In [0]: try:
        ...:     signed_car_transfer_tx = bdb.transactions.fulfill(
        ...:         car_transfer_tx,
-       ...:         private_keys=alice.signing_key,
+       ...:         private_keys=alice.private_key,
        ...:     )
        ...: except MissingSigningKeyError as e:
        ...:     print(e, e.__cause__, sep='\n')
@@ -419,7 +419,7 @@ Notice ``bob``'s public key in the above message:
 
 .. ipython::
 
-    In [0]:  bob.verifying_key
+    In [0]:  bob.public_key
 
 And the same goes for ``alice``. Try it!
 
@@ -508,11 +508,11 @@ We'll illustrate this by a threshold condition where 2 out of 3
 ..     # Create a Threshold Cryptocondition
 ..     threshold_condition = cc.ThresholdSha256Fulfillment(threshold=2)
 ..     threshold_condition.add_subfulfillment(
-..         cc.Ed25519Fulfillment(public_key=thresholduser1.verifying_key))
+..         cc.Ed25519Fulfillment(public_key=thresholduser1.public_key))
 ..     threshold_condition.add_subfulfillment(
-..         cc.Ed25519Fulfillment(public_key=thresholduser2.verifying_key))
+..         cc.Ed25519Fulfillment(public_key=thresholduser2.public_key))
 ..     threshold_condition.add_subfulfillment(
-..         cc.Ed25519Fulfillment(public_key=thresholduser3.verifying_key))
+..         cc.Ed25519Fulfillment(public_key=thresholduser3.public_key))
 .. 
 ..     # Update the condition in the newly created transaction
 ..     threshold_tx['conditions'][0]['condition'] = {
@@ -564,14 +564,14 @@ The fulfillment involves:
 ..     thresholduser4 = generate_keypair()
 .. 
 ..     # Retrieve the last transaction of thresholduser1_pub
-..     tx_retrieved_id = b.get_owned_ids(thresholduser1.verifying_key).pop()
+..     tx_retrieved_id = b.get_owned_ids(thresholduser1.public_key).pop()
 .. 
 ..     # Create a base template for a 2-input/1-output transaction
 ..     threshold_tx_transfer = b.create_transaction(
-..         [thresholduser1.verifying_key,
-..          thresholduser2.verifying_key,
-..          thresholduser3.verifying_key],
-..         thresholduser4.verifying_key,
+..         [thresholduser1.public_key,
+..          thresholduser2.public_key,
+..          thresholduser3.public_key],
+..         thresholduser4.public_key,
 ..         tx_retrieved_id,
 ..         'TRANSFER'
 ..     )
@@ -580,9 +580,9 @@ The fulfillment involves:
 ..     threshold_fulfillment = cc.Fulfillment.from_dict(
 ..         threshold_tx['conditions'][0]['condition']['details'])
 .. 
-..     subfulfillment1 = threshold_fulfillment.get_subcondition_from_vk(thresholduser1.verifying_key)[0]
-..     subfulfillment2 = threshold_fulfillment.get_subcondition_from_vk(thresholduser2.verifying_key)[0]
-..     subfulfillment3 = threshold_fulfillment.get_subcondition_from_vk(thresholduser3.verifying_key)[0]
+..     subfulfillment1 = threshold_fulfillment.get_subcondition_from_vk(thresholduser1.public_key)[0]
+..     subfulfillment2 = threshold_fulfillment.get_subcondition_from_vk(thresholduser2.public_key)[0]
+..     subfulfillment3 = threshold_fulfillment.get_subcondition_from_vk(thresholduser3.public_key)[0]
 .. 
 .. 
 ..     # Get the fulfillment message to sign
@@ -697,7 +697,7 @@ correct secret:
 ..     # Create hashlock fulfillment tx
 ..     hashlock_fulfill_tx = b.create_transaction(
 ..         None,
-..         hashlockuser.verifying_key,
+..         hashlockuser.public_key,
 ..         {'txid': hashlock_tx['id'], 'cid': 0},
 ..         'TRANSFER'
 ..     )
@@ -795,7 +795,7 @@ occurs:
 ..     from time import sleep
 .. 
 ..     # Create a timeout fulfillment tx
-..     tx_timeout_transfer = b.create_transaction(None, alice.verifying_key, {'txid': tx_timeout['id'], 'cid': 0}, 'TRANSFER')
+..     tx_timeout_transfer = b.create_transaction(None, alice.public_key, {'txid': tx_timeout['id'], 'cid': 0}, 'TRANSFER')
 .. 
 ..     # Parse the timeout condition and create the corresponding fulfillment
 ..     timeout_fulfillment = cc.Fulfillment.from_dict(
@@ -892,11 +892,11 @@ The following code snippet shows how to create an escrow condition:
 
 .. .. code-block:: python
 .. 
-..     # Retrieve the last transaction of bob.verifying_key (or create a new asset)
-..     tx_retrieved_id = b.get_owned_ids(bob.verifying_key).pop()
+..     # Retrieve the last transaction of bob.public_key (or create a new asset)
+..     tx_retrieved_id = b.get_owned_ids(bob.public_key).pop()
 .. 
 ..     # Create a base template with the execute and abort address
-..     tx_escrow = b.create_transaction(bob.verifying_key, [bob.verifying_key, alice.verifying_key], tx_retrieved_id, 'TRANSFER')
+..     tx_escrow = b.create_transaction(bob.public_key, [bob.public_key, alice.public_key], tx_retrieved_id, 'TRANSFER')
 .. 
 ..     # Set expiry time - the execute address needs to fulfill before expiration
 ..     time_sleep = 12
@@ -910,13 +910,13 @@ The following code snippet shows how to create an escrow condition:
 .. 
 ..     # Create the execute branch
 ..     condition_execute = cc.ThresholdSha256Fulfillment(threshold=2)  # AND gate
-..     condition_execute.add_subfulfillment(cc.Ed25519Fulfillment(public_key=alice.verifying_key))  # execute address
+..     condition_execute.add_subfulfillment(cc.Ed25519Fulfillment(public_key=alice.public_key))  # execute address
 ..     condition_execute.add_subfulfillment(condition_timeout)  # federation checks on expiry
 ..     condition_escrow.add_subfulfillment(condition_execute)
 .. 
 ..     # Create the abort branch
 ..     condition_abort = cc.ThresholdSha256Fulfillment(threshold=2)  # AND gate
-..     condition_abort.add_subfulfillment(cc.Ed25519Fulfillment(public_key=bob.verifying_key))  # abort address
+..     condition_abort.add_subfulfillment(cc.Ed25519Fulfillment(public_key=bob.public_key))  # abort address
 ..     condition_abort.add_subfulfillment(condition_timeout_inverted)
 ..     condition_escrow.add_subfulfillment(condition_abort)
 .. 
@@ -930,7 +930,7 @@ The following code snippet shows how to create an escrow condition:
 ..     tx_escrow['id'] = util.get_hash_data(tx_escrow)
 .. 
 ..     # The asset needs to be signed by the owner_before
-..     tx_escrow_signed = b.sign_transaction(tx_escrow, bob.signing_key)
+..     tx_escrow_signed = b.sign_transaction(tx_escrow, bob.private_key)
 .. 
 ..     # Some validations
 ..     assert b.validate_transaction(tx_escrow_signed) == tx_escrow_signed
@@ -960,14 +960,14 @@ The following code snippet shows how to create an escrow condition:
 .. .. code-block:: python
 .. 
 ..     # Create a base template for execute fulfillment
-..     tx_escrow_execute = b.create_transaction([bob.verifying_key, alice.verifying_key], alice.verifying_key, {'txid': tx_escrow_signed['id'], 'cid': 0}, 'TRANSFER')
+..     tx_escrow_execute = b.create_transaction([bob.public_key, alice.public_key], alice.public_key, {'txid': tx_escrow_signed['id'], 'cid': 0}, 'TRANSFER')
 .. 
 ..     # Parse the Escrow cryptocondition
 ..     escrow_fulfillment = cc.Fulfillment.from_dict(
 ..         tx_escrow['conditions'][0]['condition']['details'])
 .. 
-..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.verifying_key)[0]
-..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.verifying_key)[0]
+..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.public_key)[0]
+..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.public_key)[0]
 ..     subfulfillment_timeout = escrow_fulfillment.subconditions[0]['body'].subconditions[1]['body']
 ..     subfulfillment_timeout_inverted = escrow_fulfillment.subconditions[1]['body'].subconditions[1]['body']
 .. 
@@ -982,7 +982,7 @@ The following code snippet shows how to create an escrow condition:
 .. 
 ..     # Fulfill the execute branch
 ..     fulfillment_execute = cc.ThresholdSha256Fulfillment(threshold=2)
-..     subfulfillment_alice.sign(tx_escrow_execute_fulfillment_message, crypto.SigningKey(alice.signing_key))
+..     subfulfillment_alice.sign(tx_escrow_execute_fulfillment_message, crypto.SigningKey(alice.private_key))
 ..     fulfillment_execute.add_subfulfillment(subfulfillment_alice)
 ..     fulfillment_execute.add_subfulfillment(subfulfillment_timeout)
 ..     escrow_fulfillment.add_subfulfillment(fulfillment_execute)
@@ -1009,8 +1009,8 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 .. 
 ..     # Create a base template for execute fulfillment
 ..     tx_escrow_abort = b.create_transaction(
-..         [bob.verifying_key, alice.verifying_key],
-..         bob.verifying_key,
+..         [bob.public_key, alice.public_key],
+..         bob.public_key,
 ..         {'txid': tx_escrow_signed['id'], 'cid': 0},
 ..         'TRANSFER'
 ..     )
@@ -1019,8 +1019,8 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 ..     escrow_fulfillment = cc.Fulfillment.from_dict(
 ..         tx_escrow['conditions'][0]['condition']['details'])
 .. 
-..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.verifying_key)[0]
-..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.verifying_key)[0]
+..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.public_key)[0]
+..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.public_key)[0]
 ..     subfulfillment_timeout = escrow_fulfillment.subconditions[0]['body'].subconditions[1]['body']
 ..     subfulfillment_timeout_inverted = escrow_fulfillment.subconditions[1]['body'].subconditions[1]['body']
 .. 
@@ -1041,7 +1041,7 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 .. 
 ..     # Fulfill the abort branch
 ..     fulfillment_abort = cc.ThresholdSha256Fulfillment(threshold=2)
-..     subfulfillment_bob.sign(tx_escrow_abort_fulfillment_message, crypto.SigningKey(bob.signing_key))
+..     subfulfillment_bob.sign(tx_escrow_abort_fulfillment_message, crypto.SigningKey(bob.private_key))
 ..     fulfillment_abort.add_subfulfillment(subfulfillment_bob)
 ..     fulfillment_abort.add_subfulfillment(subfulfillment_timeout_inverted)
 ..     escrow_fulfillment.add_subfulfillment(fulfillment_abort)
