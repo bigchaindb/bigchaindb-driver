@@ -3,26 +3,34 @@
 from time import sleep
 
 import rapidjson
-from pytest import raises
-from pytest import mark
+from pytest import mark, raises
+from requests.utils import default_headers
 
 from cryptoconditions import Ed25519Fulfillment
 from cryptoconditions.crypto import Ed25519SigningKey
 
 
-def test_driver_init_basic(bdb_node):
-    from bigchaindb_driver.driver import BigchainDB
-    driver = BigchainDB(bdb_node)
-    assert driver.nodes[0] == bdb_node
-    assert driver.transport.nodes == driver.nodes
-    assert driver.transactions
+class TestBigchainDB:
 
-
-def test_driver_init_without_nodes():
-    from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
-    driver = BigchainDB()
-    assert driver.nodes == (DEFAULT_NODE,)
-    assert driver.transport.nodes == (DEFAULT_NODE,)
+    @mark.parametrize('nodes,headers', (
+        ((), None),
+        (('node-1',), None),
+        (('node-1', 'node-2'), None),
+        (('node-1', 'node-2'), {'app_id': 'id'}),
+    ))
+    def test_driver_init(self, nodes, headers):
+        from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
+        driver = BigchainDB(*nodes, headers=headers)
+        nodes = (DEFAULT_NODE,) if not nodes else nodes
+        headers = {} if not headers else headers
+        assert driver.nodes == nodes
+        assert driver.transport.nodes == nodes
+        expected_headers = default_headers()
+        expected_headers.update(headers)
+        for conn in driver.transport.pool.connections:
+            conn.session.headers == expected_headers
+        assert driver.transactions
+        assert driver.unspents
 
 
 class TestTransactionsEndpoint:
