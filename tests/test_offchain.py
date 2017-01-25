@@ -12,7 +12,7 @@ def test_prepare_transaction(operation, return_value, function, monkeypatch):
     from bigchaindb_driver import offchain
     from bigchaindb_driver.offchain import prepare_transaction
 
-    def mock(tx_signers=None, recipients=None,
+    def mock(signers=None, recipients=None,
              inputs=None, asset=None, metadata=None):
         return return_value
     monkeypatch.setattr(offchain, function, mock)
@@ -28,7 +28,7 @@ def test_prepare_transaction_raises():
 
 def test_prepare_create_transaction_default(alice_pubkey):
     from bigchaindb_driver.offchain import prepare_create_transaction
-    create_transaction = prepare_create_transaction(tx_signers=alice_pubkey)
+    create_transaction = prepare_create_transaction(signers=alice_pubkey)
     assert 'id' in create_transaction
     assert 'version' in create_transaction
     assert 'asset' in create_transaction
@@ -42,7 +42,7 @@ def test_prepare_create_transaction_default(alice_pubkey):
 @mark.parametrize('asset', (
     None, {}, {'data': {'msg': 'Hello BigchainDB!'}},
 ))
-@mark.parametrize('tx_signers', (
+@mark.parametrize('signers', (
     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
     ('G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',),
     ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
@@ -52,10 +52,10 @@ def test_prepare_create_transaction_default(alice_pubkey):
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
     [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
-def test_prepare_create_transaction(asset, tx_signers, recipients):
+def test_prepare_create_transaction(asset, signers, recipients):
     from bigchaindb_driver.offchain import prepare_create_transaction
     create_transaction = prepare_create_transaction(
-        tx_signers=tx_signers, recipients=recipients, asset=asset)
+        signers=signers, recipients=recipients, asset=asset)
     assert 'id' in create_transaction
     assert 'version' in create_transaction
     assert 'asset' in create_transaction

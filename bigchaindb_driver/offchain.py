@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @singledispatch
 def _prepare_transaction(operation,
-                         tx_signers=None,
+                         signers=None,
                          recipients=None,
                          asset=None,
                          metadata=None,
@@ -44,11 +44,11 @@ def _prepare_create_transaction_dispatcher(operation, **kwargs):
 
 @_prepare_transaction.register(TransferOperation)
 def _prepare_transfer_transaction_dispatcher(operation, **kwargs):
-    del kwargs['tx_signers']
+    del kwargs['signers']
     return prepare_transfer_transaction(**kwargs)
 
 
-def prepare_transaction(*, operation='CREATE', tx_signers=None,
+def prepare_transaction(*, operation='CREATE', signers=None,
                         recipients=None, asset=None, metadata=None,
                         inputs=None):
     """
@@ -60,7 +60,7 @@ def prepare_transaction(*, operation='CREATE', tx_signers=None,
     Args:
         operation (str): The operation to perform. Must be ``'CREATE'``
             or ``'TRANSFER'``. Case insensitive. Defaults to ``'CREATE'``.
-        tx_signers (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+        signers (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
             One or more public keys representing the issuer(s) of the
             asset being created. Only applies for ``'CREATE'``
             operations. Defaults to ``None``.
@@ -89,26 +89,26 @@ def prepare_transaction(*, operation='CREATE', tx_signers=None,
 
         **CREATE operations**
 
-        * ``tx_signers`` MUST be set.
+        * ``signers`` MUST be set.
         * ``recipients``, ``asset``, and ``metadata`` MAY be set.
         * The argument ``inputs`` is ignored.
         * If ``recipients`` is not given, or evaluates to
-          ``False``, it will be set equal to ``tx_signers``::
+          ``False``, it will be set equal to ``signers``::
 
             if not recipients:
-                recipients = tx_signers
+                recipients = signers
 
         **TRANSFER operations**
 
         * ``recipients``, ``asset``, and ``inputs`` MUST be set.
         * ``metadata`` MAY be set.
-        * The argument ``tx_signers`` is ignored.
+        * The argument ``signers`` is ignored.
 
     """
     operation = _normalize_operation(operation)
     return _prepare_transaction(
         operation,
-        tx_signers=tx_signers,
+        signers=signers,
         recipients=recipients,
         asset=asset,
         metadata=metadata,
@@ -117,7 +117,7 @@ def prepare_transaction(*, operation='CREATE', tx_signers=None,
 
 
 def prepare_create_transaction(*,
-                               tx_signers,
+                               signers,
                                recipients=None,
                                asset=None,
                                metadata=None):
@@ -126,7 +126,7 @@ def prepare_create_transaction(*,
     fulfilled.
 
     Args:
-        tx_signers (:obj:`list` | :obj:`tuple` | :obj:`str`): One
+        signers (:obj:`list` | :obj:`tuple` | :obj:`str`): One
             or more public keys representing the issuer(s) of the asset
             being created.
         recipients (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
@@ -141,21 +141,21 @@ def prepare_create_transaction(*,
         dict: The prepared ``"CREATE"`` transaction.
 
     .. important:: If ``recipients`` is not given, or evaluates to
-        ``False``, it will be set equal to ``tx_signers``::
+        ``False``, it will be set equal to ``signers``::
 
             if not recipients:
-                recipients = tx_signers
+                recipients = signers
 
     """
-    if not isinstance(tx_signers, (list, tuple)):
-        tx_signers = [tx_signers]
+    if not isinstance(signers, (list, tuple)):
+        signers = [signers]
     # NOTE: Needed for the time being. See
     # https://github.com/bigchaindb/bigchaindb/issues/797
-    elif isinstance(tx_signers, tuple):
-        tx_signers = list(tx_signers)
+    elif isinstance(signers, tuple):
+        signers = list(signers)
 
     if not recipients:
-        recipients = [(tx_signers, 1)]
+        recipients = [(signers, 1)]
     elif not isinstance(recipients, (list, tuple)):
             recipients = [([recipients], 1)]
     # NOTE: Needed for the time being. See
@@ -164,7 +164,7 @@ def prepare_create_transaction(*,
         recipients = [(list(recipients), 1)]
 
     transaction = Transaction.create(
-        tx_signers,
+        signers,
         recipients,
         metadata=metadata,
         asset=asset,

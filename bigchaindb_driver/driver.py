@@ -96,7 +96,7 @@ class TransactionsEndpoint(NamespacedDriver):
     path = '/transactions/'
 
     @staticmethod
-    def prepare(*, operation='CREATE', tx_signers=None,
+    def prepare(*, operation='CREATE', signers=None,
                 recipients=None, asset=None, metadata=None, inputs=None):
         """
         Prepares a transaction payload, ready to be fulfilled.
@@ -104,7 +104,7 @@ class TransactionsEndpoint(NamespacedDriver):
         Args:
             operation (str): The operation to perform. Must be ``'CREATE'``
                 or ``'TRANSFER'``. Case insensitive. Defaults to ``'CREATE'``.
-            tx_signers (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+            signers (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
                 One or more public keys representing the issuer(s) of
                 the asset being created. Only applies for ``'CREATE'``
                 operations. Defaults to ``None``.
@@ -133,25 +133,25 @@ class TransactionsEndpoint(NamespacedDriver):
 
             **CREATE operations**
 
-            * ``tx_signers`` MUST be set.
+            * ``signers`` MUST be set.
             * ``recipients``, ``asset``, and ``metadata`` MAY be set.
             * The argument ``inputs`` is ignored.
             * If ``recipients`` is not given, or evaluates to
-              ``False``, it will be set equal to ``tx_signers``::
+              ``False``, it will be set equal to ``signers``::
 
                 if not recipients:
-                    recipients = tx_signers
+                    recipients = signers
 
             **TRANSFER operations**
 
             * ``recipients``, ``asset``, and ``inputs`` MUST be set.
             * ``metadata`` MAY be set.
-            * The argument ``tx_signers`` is ignored.
+            * The argument ``signers`` is ignored.
 
         """
         return prepare_transaction(
             operation=operation,
-            tx_signers=tx_signers,
+            signers=signers,
             recipients=recipients,
             asset=asset,
             metadata=metadata,

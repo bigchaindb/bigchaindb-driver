@@ -60,7 +60,7 @@ class TestTransactionsEndpoint:
             driver.transactions.status(txid)
 
     def test_prepare(self, driver, alice_pubkey):
-        transaction = driver.transactions.prepare(tx_signers=[alice_pubkey])
+        transaction = driver.transactions.prepare(signers=[alice_pubkey])
         assert 'id' in transaction
         assert 'version' in transaction
         assert 'asset' in transaction
