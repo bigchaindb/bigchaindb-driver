@@ -132,7 +132,7 @@ def prepare_create_transaction(*,
         recipients (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
             One or more public keys representing the new owner(s) of the
             asset being created. Defaults to ``None``.
-        asset (:obj:`dict`, optional): The metadata associated with the
+        asset (:obj:`dict`, optional): The data associated with the
             asset being created with this transaction. Defaults to ``None``.
         metadata (:obj:`dict`, optional): Metadata associated with the
             transaction. Defaults to ``None``.
