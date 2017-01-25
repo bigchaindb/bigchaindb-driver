@@ -2,7 +2,6 @@ import json
 from base64 import b64encode
 from collections import namedtuple
 from os import environ, urandom
-from uuid import uuid4
 
 import requests
 from cryptoconditions import Ed25519Fulfillment
@@ -10,7 +9,7 @@ from cryptoconditions.crypto import Ed25519SigningKey
 from pytest import fixture
 from sha3 import sha3_256
 
-from bigchaindb.common.transaction import Asset, Transaction
+from bigchaindb.common.transaction import Transaction
 
 
 def make_ed25519_condition(public_key, *, amount=1):
@@ -21,14 +20,14 @@ def make_ed25519_condition(public_key, *, amount=1):
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (public_key,),
+        'public_keys': (public_key,),
     }
 
 
 def make_fulfillment(*public_keys, input_=None):
     return {
         'fulfillment': None,
-        'input': input_,
+        'fulfills': input_,
         'owners_before': public_keys,
     }
 
@@ -47,7 +46,9 @@ def hash_transaction(transaction):
 
 
 def add_transaction_id(transaction):
-    transaction['id'] = hash_transaction(transaction)
+    tx_id = hash_transaction(transaction)
+    transaction['id'] = tx_id
+    transaction['asset']['id'] = tx_id
 
 
 def sign_transaction(transaction, *, public_key, private_key):
@@ -149,9 +150,9 @@ def mock_requests_post(monkeypatch):
 def alice_transaction_obj(alice_pubkey):
     serial_number = b64encode(urandom(10), altchars=b'-_').decode()
     return Transaction.create(
-        owners_before=[alice_pubkey],
-        owners_after=[([alice_pubkey], 1)],
-        asset=Asset(data={'serial_number': serial_number}),
+        tx_signers=[alice_pubkey],
+        recipients=[([alice_pubkey], 1)],
+        asset={'serial_number': serial_number},
     )
 
 
@@ -169,43 +170,33 @@ def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
 
 
 @fixture
-def bicycle_asset():
+def bicycle_asset_payload():
     return {
-        'data': {
-            'bicycle': {
-                'manufacturer': 'bkfab',
-                'serial_number': 'abcd1234',
-            },
+        'bicycle': {
+            'manufacturer': 'bkfab',
+            'serial_number': 'abcd1234',
         },
-        'divisible': False,
-        'refillable': False,
-        'updatable': False,
-        'id': str(uuid4()),
     }
 
 
 @fixture
-def car_asset():
+def car_asset_payload():
     return {
-        'data': {
-            'car': {
-                'manufacturer': 'bkfab',
-                'vin': '5YJRE11B781000196',
-            },
+        'car': {
+            'manufacturer': 'bkfab',
+            'vin': '5YJRE11B781000196',
         },
-        'divisible': False,
-        'refillable': False,
-        'updatable': False,
-        'id': str(uuid4()),
     }
 
 
 @fixture
-def prepared_carol_bicycle_transaction(carol_keypair, bicycle_asset):
+def prepared_carol_bicycle_transaction(carol_keypair, bicycle_asset_payload):
     condition = make_ed25519_condition(carol_keypair.public_key)
     fulfillment = make_fulfillment(carol_keypair.public_key)
     tx = {
-        'asset': bicycle_asset,
+        'asset': {
+            'data': bicycle_asset_payload,
+        },
         'metadata': None,
         'operation': 'CREATE',
         'conditions': (condition,),
@@ -241,11 +232,13 @@ def persisted_carol_bicycle_transaction(driver,
 
 
 @fixture
-def prepared_carol_car_transaction(carol_keypair, car_asset):
+def prepared_carol_car_transaction(carol_keypair, car_asset_payload):
     condition = make_ed25519_condition(carol_keypair.public_key)
     fulfillment = make_fulfillment(carol_keypair.public_key)
     tx = {
-        'asset': car_asset,
+        'asset': {
+            'data': car_asset_payload,
+        },
         'metadata': None,
         'operation': 'CREATE',
         'conditions': (condition,),
@@ -286,12 +279,10 @@ def unsigned_transaction():
             'data': {
                 'serial_number': 'NNP43x-DaYoSWg==',
             },
-            'divisible': False,
-            'id': '05b8f3a6-1183-46b6-98d8-ab3dd05d73f8',
-            'refillable': False,
-            'updatable': False,
+            'id':
+            'e0efa8f985f91871cd7547f3b06a81a0237f4a21dcffd081ac0a282c28f79c43',
         },
-        'conditions': [{
+        'outputs': [{
             'amount': 1,
             'condition': {
                 'details': {
@@ -301,10 +292,11 @@ def unsigned_transaction():
                     'type': 'fulfillment',
                     'type_id': 4,
                 },
-                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96'},   # noqa E501
-            'owners_after': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
+                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96',   # noqa E501
+            },
+            'public_keys': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
         }],
-        'fulfillments': [{
+        'inputs': [{
             'fulfillment': {
                 'bitmask': 32,
                 'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
@@ -312,11 +304,11 @@ def unsigned_transaction():
                 'type': 'fulfillment',
                 'type_id': 4,
             },
-            'input': None,
+            'fulfills': None,
             'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
         }],
-        'id': 'da1b64a907ba540e7c9359cf5d1010b939b5c5f5abe9667d4c5fa9fe8d6ac467',   # noqa E501
+        'id': 'e0efa8f985f91871cd7547f3b06a81a0237f4a21dcffd081ac0a282c28f79c43',   # noqa E501
         'metadata': None,
         'operation': 'CREATE',
-        'version': 1,
+        'version': '0.9',
     }

@@ -96,19 +96,19 @@ class TransactionsEndpoint(NamespacedDriver):
     path = '/transactions/'
 
     @staticmethod
-    def prepare(*, operation='CREATE', owners_before=None,
-                owners_after=None, asset=None, metadata=None, inputs=None):
+    def prepare(*, operation='CREATE', tx_signers=None,
+                recipients=None, asset=None, metadata=None, inputs=None):
         """
         Prepares a transaction payload, ready to be fulfilled.
 
         Args:
             operation (str): The operation to perform. Must be ``'CREATE'``
                 or ``'TRANSFER'``. Case insensitive. Defaults to ``'CREATE'``.
-            owners_before (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+            tx_signers (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
                 One or more public keys representing the issuer(s) of
                 the asset being created. Only applies for ``'CREATE'``
                 operations. Defaults to ``None``.
-            owners_after (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
+            recipients (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
                 One or more public keys representing the new owner(s) of the
                 asset being created or transferred. Defaults to ``None``.
             asset (:obj:`dict`, optional): The asset being created or
@@ -133,26 +133,26 @@ class TransactionsEndpoint(NamespacedDriver):
 
             **CREATE operations**
 
-            * ``owners_before`` MUST be set.
-            * ``owners_after``, ``asset``, and ``metadata`` MAY be set.
+            * ``tx_signers`` MUST be set.
+            * ``recipients``, ``asset``, and ``metadata`` MAY be set.
             * The argument ``inputs`` is ignored.
-            * If ``owners_after`` is not given, or evaluates to
-              ``False``, it will be set equal to ``owners_before``::
+            * If ``recipients`` is not given, or evaluates to
+              ``False``, it will be set equal to ``tx_signers``::
 
-                if not owners_after:
-                    owners_after = owners_before
+                if not recipients:
+                    recipients = tx_signers
 
             **TRANSFER operations**
 
-            * ``owners_after``, ``asset``, and ``inputs`` MUST be set.
+            * ``recipients``, ``asset``, and ``inputs`` MUST be set.
             * ``metadata`` MAY be set.
-            * The argument ``owners_before`` is ignored.
+            * The argument ``tx_signers`` is ignored.
 
         """
         return prepare_transaction(
             operation=operation,
-            owners_before=owners_before,
-            owners_after=owners_after,
+            tx_signers=tx_signers,
+            recipients=recipients,
             asset=asset,
             metadata=metadata,
             inputs=inputs,
