@@ -12,7 +12,7 @@ def test_prepare_transaction(operation, return_value, function, monkeypatch):
     from bigchaindb_driver import offchain
     from bigchaindb_driver.offchain import prepare_transaction
 
-    def mock(owners_before=None, owners_after=None,
+    def mock(tx_signers=None, recipients=None,
              inputs=None, asset=None, metadata=None):
         return return_value
     monkeypatch.setattr(offchain, function, mock)
@@ -28,74 +28,75 @@ def test_prepare_transaction_raises():
 
 def test_prepare_create_transaction_default(alice_pubkey):
     from bigchaindb_driver.offchain import prepare_create_transaction
-    create_transaction = prepare_create_transaction(owners_before=alice_pubkey)
+    create_transaction = prepare_create_transaction(tx_signers=alice_pubkey)
     assert 'id' in create_transaction
     assert 'version' in create_transaction
     assert 'asset' in create_transaction
-    assert 'conditions' in create_transaction
-    assert 'fulfillments' in create_transaction
+    assert 'outputs' in create_transaction
+    assert 'inputs' in create_transaction
     assert 'metadata' in create_transaction
     assert 'operation' in create_transaction
     assert create_transaction['operation'] == 'CREATE'
 
 
 @mark.parametrize('asset', (
-    None, {}, '', {'data': {'msg': 'Hello BigchainDB!'}},
+    None, {}, {'data': {'msg': 'Hello BigchainDB!'}},
 ))
-@mark.parametrize('owners_before', (
+@mark.parametrize('tx_signers', (
     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
     ('G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',),
     ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
 ))
-@mark.parametrize('owners_after', (
+@mark.parametrize('recipients', (
     '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
     [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
-def test_prepare_create_transaction(asset, owners_before, owners_after):
+def test_prepare_create_transaction(asset, tx_signers, recipients):
     from bigchaindb_driver.offchain import prepare_create_transaction
     create_transaction = prepare_create_transaction(
-        owners_before=owners_before, owners_after=owners_after, asset=asset)
+        tx_signers=tx_signers, recipients=recipients, asset=asset)
     assert 'id' in create_transaction
     assert 'version' in create_transaction
     assert 'asset' in create_transaction
-    assert 'conditions' in create_transaction
-    assert 'fulfillments' in create_transaction
+    assert 'outputs' in create_transaction
+    assert 'inputs' in create_transaction
     assert 'metadata' in create_transaction
     assert 'operation' in create_transaction
     assert create_transaction['operation'] == 'CREATE'
 
 
-@mark.parametrize('owners_after', (
+@mark.parametrize('recipients', (
     '2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
     [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
-def test_prepare_transfer_transaction(alice_transaction, owners_after):
+def test_prepare_transfer_transaction(alice_transaction, recipients):
     from bigchaindb_driver.offchain import prepare_transfer_transaction
     condition_index = 0
-    condition = alice_transaction['conditions'][condition_index]
+    condition = alice_transaction['outputs'][condition_index]
     input_ = {
         'fulfillment': condition['condition']['details'],
-        'input': {
-            'cid': condition_index,
+        'fulfills': {
+            'output': condition_index,
             'txid': alice_transaction['id'],
         },
-        'owners_before': condition['owners_after']
+        'owners_before': condition['public_keys']
     }
     asset = alice_transaction['asset']
     transfer_transaction = prepare_transfer_transaction(
-        inputs=input_, owners_after=owners_after, asset=asset)
+        inputs=input_, recipients=recipients, asset=asset)
     assert 'id' in transfer_transaction
     assert 'version' in transfer_transaction
     assert 'asset' in transfer_transaction
-    assert 'conditions' in transfer_transaction
-    assert 'fulfillments' in transfer_transaction
+    assert 'outputs' in transfer_transaction
+    assert 'inputs' in transfer_transaction
     assert 'metadata' in transfer_transaction
     assert 'operation' in transfer_transaction
     assert transfer_transaction['operation'] == 'TRANSFER'
 
 
+@mark.skip(reason='See bigchaindb/issues/1089')
 @mark.parametrize('alice_sk', (
     'CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP',
     ('CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP',),
@@ -105,16 +106,16 @@ def test_fulfill_transaction(alice_transaction, alice_sk):
     from bigchaindb_driver.offchain import fulfill_transaction
     fulfilled_transaction = fulfill_transaction(
         alice_transaction, private_keys=alice_sk)
-    fulfillments = fulfilled_transaction['fulfillments']
-    assert len(fulfillments) == 1
-    alice_transaction['fulfillments'][0]['fulfillment'] = None
+    inputs = fulfilled_transaction['inputs']
+    assert len(inputs) == 1
+    alice_transaction['inputs'][0]['fulfillment'] = None
     message = rapidjson.dumps(
         alice_transaction,
         skipkeys=False,
         ensure_ascii=False,
         sort_keys=True,
     ).encode()
-    fulfillment_uri = fulfillments[0]['fulfillment']
+    fulfillment_uri = inputs[0]['fulfillment']
     assert Fulfillment.from_uri(fulfillment_uri).validate(message=message)
 
 

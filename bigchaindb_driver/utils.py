@@ -6,7 +6,6 @@ Attributes:
         :class:`~.CreateOperation`.
 
 """
-from bigchaindb.common.transaction import Asset
 
 
 class CreateOperation:
@@ -56,38 +55,3 @@ def _normalize_operation(operation):
         pass
 
     return operation
-
-
-def _normalize_asset(asset, is_transfer=False):
-    """
-    Normalizes the given asset dictionary.
-
-    For now, this means converting the given asset dictionary to a
-    :class:`~.bigchaindb.common.transaction.Asset` class.
-
-    Args:
-        asset (dict): The asset to normalize.
-        is_transfer (boal, optional): Flag used to indicate whether the
-            asset is to be used as part of a `'TRANSFER'` operation or
-            not. Defaults to ``False``.
-
-    Returns:
-        The :class:`~.bigchaindb.common.transaction.Asset` class,
-        instantiated from the given asset dictionary.
-
-        .. important:: If the instantiation step fails, ``None`` may be
-            returned.
-
-    .. danger:: For specific internal usage only. The behavior is tricky,
-        and is subject to change.
-
-    """
-    if is_transfer:
-        asset = Asset.from_dict(asset)
-    else:
-        try:
-            asset = Asset(**asset)
-        except (AttributeError, TypeError):
-            if not asset:
-                asset = None
-    return asset
