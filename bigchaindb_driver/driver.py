@@ -15,9 +15,7 @@ class BigchainDB:
     :class:`~bigchaindb_driver.BigchainDB` driver instance might connect to
     ``>1`` nodes.
     """
-    def __init__(self,
-                 *nodes,
-                 transport_class=Transport):
+    def __init__(self, *nodes, transport_class=Transport, headers=None):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
         If a :attr:`public_key` or :attr:`private_key` are given, this
@@ -31,10 +29,14 @@ class BigchainDB:
                 ``'http://localhost:9984/api/v1'``.
             transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
+            headers (dict): Optional headers that will be passed with
+                each request. To pass headers only on a per-request
+                basis, you can pass the headers to the method of choice
+                (e.g. :meth:`~.TransactionsEndpoint.send`).
 
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
-        self._transport = transport_class(*self._nodes)
+        self._transport = transport_class(*self._nodes, headers=headers)
         self._transactions = TransactionsEndpoint(self)
         self._unspents = UnspentsEndpoint(self)
 
@@ -181,45 +183,50 @@ class TransactionsEndpoint(NamespacedDriver):
         """
         return fulfill_transaction(transaction, private_keys=private_keys)
 
-    def send(self, transaction):
+    def send(self, transaction, headers=None):
         """Submit a transaction to the Federation.
 
         Args:
             transaction (dict): the transaction to be sent
                 to the Federation node(s).
+            headers (dict): Optional headers to pass to the request.
 
         Returns:
             dict: The transaction sent to the Federation node(s).
 
         """
         return self.transport.forward_request(
-            method='POST', path=self.path, json=transaction)
+            method='POST', path=self.path, json=transaction, headers=headers)
 
-    def retrieve(self, txid):
+    def retrieve(self, txid, headers=None):
         """Retrieves the transaction with the given id.
 
         Args:
             txid (str): Id of the transaction to retrieve.
+            headers (dict): Optional headers to pass to the request.
 
         Returns:
             dict: The transaction with the given id.
 
         """
         path = self.path + txid
-        return self.transport.forward_request(method='GET', path=path)
+        return self.transport.forward_request(
+            method='GET', path=path, headers=None)
 
-    def status(self, txid):
+    def status(self, txid, headers=None):
         """Retrieves the status of the transaction with the given id.
 
         Args:
             txid (str): Id of the transaction to retrieve the status for.
+            headers (dict): Optional headers to pass to the request.
 
         Returns:
             dict: A dict containing a 'status' item for the transaction.
 
         """
         path = self.path + txid + '/status'
-        return self.transport.forward_request(method='GET', path=path)
+        return self.transport.forward_request(
+            method='GET', path=path, headers=headers)
 
 
 class UnspentsEndpoint(NamespacedDriver):
@@ -231,12 +238,13 @@ class UnspentsEndpoint(NamespacedDriver):
     """
     path = '/unspents/'
 
-    def get(self, public_key):
+    def get(self, public_key, headers=None):
         """
 
         Args:
             public_key (str): Public key for which unfulfilled
                 conditions are sought.
+            headers (dict): Optional headers to pass to the request.
 
         Returns:
             :obj:`list` of :obj:`str`: List of unfulfilled conditions.
@@ -252,4 +260,8 @@ class UnspentsEndpoint(NamespacedDriver):
 
         """
         return self.transport.forward_request(
-            method='GET', path=self.path, params={'public_key': public_key})
+            method='GET',
+            path=self.path,
+            params={'public_key': public_key},
+            headers=headers,
+        )
