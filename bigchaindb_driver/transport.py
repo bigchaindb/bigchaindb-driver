@@ -5,20 +5,24 @@ from .pool import Pool
 class Transport:
     """Transport class."""
 
-    def __init__(self, *nodes):
+    def __init__(self, *nodes, headers=None):
         """Initializes an instance of
         :class:`~bigchaindb_driver.transport.Transport`.
 
         Args:
             nodes: nodes
+            headers (dict): Optional headers to pass to the
+                :class:`~.connection.Connection` instances, which will
+                add it to the headers to be sent with each request.
 
         """
         self.nodes = nodes
-        self.init_pool(nodes)
+        self.init_pool(nodes, headers=headers)
 
-    def init_pool(self, nodes):
+    def init_pool(self, nodes, headers=None):
         """Initializes the pool of connections."""
-        connections = [Connection(node_url=node) for node in nodes]
+        connections = [
+            Connection(node_url=node, headers=headers) for node in nodes]
         self.pool = Pool(connections)
 
     def get_connection(self):
@@ -29,7 +33,8 @@ class Transport:
         """
         return self.pool.get_connection()
 
-    def forward_request(self, method, path=None, json=None, params=None):
+    def forward_request(self, method, path=None,
+                        json=None, params=None, headers=None):
         """Forwards an http request to a connection.
 
         Args:
@@ -38,6 +43,7 @@ class Transport:
                 ``'/transactions'``).
             json (dict): Payload to be sent with the HTTP request.
             params (dict)): Dictionary of URL (query) parameters.
+            headers (dict): Optional headers to pass to the request.
 
         Returns:
             dict: Result of :meth:`requests.models.Response.json`
@@ -45,5 +51,10 @@ class Transport:
         """
         connection = self.get_connection()
         response = connection.request(
-            method=method, path=path, params=params, json=json)
+            method=method,
+            path=path,
+            params=params,
+            json=json,
+            headers=headers,
+        )
         return response.data
