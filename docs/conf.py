@@ -70,5 +70,5 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'bigchaindb-server': (
-        'https://docs.bigchaindb.com/projects/server/en/v0.8.0/', None),
+        'https://docs.bigchaindb.com/projects/server/en/latest/', None),
 }
