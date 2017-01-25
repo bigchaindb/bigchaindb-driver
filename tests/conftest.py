@@ -170,7 +170,7 @@ def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
 
 
 @fixture
-def bicycle_asset_payload():
+def bicycle_data():
     return {
         'bicycle': {
             'manufacturer': 'bkfab',
@@ -180,7 +180,7 @@ def bicycle_asset_payload():
 
 
 @fixture
-def car_asset_payload():
+def car_data():
     return {
         'car': {
             'manufacturer': 'bkfab',
@@ -190,12 +190,12 @@ def car_asset_payload():
 
 
 @fixture
-def prepared_carol_bicycle_transaction(carol_keypair, bicycle_asset_payload):
+def prepared_carol_bicycle_transaction(carol_keypair, bicycle_data):
     condition = make_ed25519_condition(carol_keypair.public_key)
     fulfillment = make_fulfillment(carol_keypair.public_key)
     tx = {
         'asset': {
-            'data': bicycle_asset_payload,
+            'data': bicycle_data,
         },
         'metadata': None,
         'operation': 'CREATE',
@@ -232,12 +232,12 @@ def persisted_carol_bicycle_transaction(driver,
 
 
 @fixture
-def prepared_carol_car_transaction(carol_keypair, car_asset_payload):
+def prepared_carol_car_transaction(carol_keypair, car_data):
     condition = make_ed25519_condition(carol_keypair.public_key)
     fulfillment = make_fulfillment(carol_keypair.public_key)
     tx = {
         'asset': {
-            'data': car_asset_payload,
+            'data': car_data,
         },
         'metadata': None,
         'operation': 'CREATE',
