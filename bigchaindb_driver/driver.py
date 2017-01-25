@@ -109,8 +109,9 @@ class TransactionsEndpoint(NamespacedDriver):
                 the asset being created. Only applies for ``'CREATE'``
                 operations. Defaults to ``None``.
             recipients (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
-                One or more public keys representing the new owner(s) of the
-                asset being created or transferred. Defaults to ``None``.
+                One or more public keys representing the new recipients(s)
+                of the asset being created or transferred.
+                Defaults to ``None``.
             asset (:obj:`dict`, optional): The asset being created or
                 transferred. MUST be supplied for ``'TRANSFER'`` operations.
                 Defaults to ``None``.

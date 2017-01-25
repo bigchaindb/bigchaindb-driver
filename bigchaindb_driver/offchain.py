@@ -130,8 +130,8 @@ def prepare_create_transaction(*,
             or more public keys representing the issuer(s) of the asset
             being created.
         recipients (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
-            One or more public keys representing the new owner(s) of the
-            asset being created. Defaults to ``None``.
+            One or more public keys representing the new recipients(s)
+            of the asset being created. Defaults to ``None``.
         asset (:obj:`dict`, optional): The data associated with the
             asset being created with this transaction. Defaults to ``None``.
         metadata (:obj:`dict`, optional): Metadata associated with the
@@ -187,8 +187,8 @@ def prepare_transfer_transaction(*,
             intends to fulfill. Each input is expected to be a
             :obj:`dict`.
         recipients (:obj:`str` | :obj:`list` | :obj:`tuple`): One or
-            more public keys representing the new owner(s) of the asset
-            being transferred.
+            more public keys representing the new recipients(s) of the
+            asset being transferred.
         asset (:obj:`dict`): The asset being transferred with this
             transaction.
         metadata (:obj:`dict`): Metadata associated with the
