@@ -189,8 +189,8 @@ def prepare_transfer_transaction(*,
         recipients (:obj:`str` | :obj:`list` | :obj:`tuple`): One or
             more public keys representing the new recipients(s) of the
             asset being transferred.
-        asset (:obj:`dict`): The asset being transferred with this
-            transaction.
+        asset (:obj:`dict`): A single-key dictionary holding the ``id``
+            of the asset being transferred with this transaction.
         metadata (:obj:`dict`): Metadata associated with the
             transaction. Defaults to ``None``.
 
