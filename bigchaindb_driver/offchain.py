@@ -61,13 +61,14 @@ def prepare_transaction(*, operation='CREATE', signers=None,
         operation (str): The operation to perform. Must be ``'CREATE'``
             or ``'TRANSFER'``. Case insensitive. Defaults to ``'CREATE'``.
         signers (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
-            One or more public keys representing the issuer(s) of the
-            asset being created. Only applies for ``'CREATE'``
+            One or more public keys representing the issuer(s) of
+            the asset being created. Only applies for ``'CREATE'``
             operations. Defaults to ``None``.
         recipients (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
-            One or more public keys representing the new owner(s) of the
-            asset being created or transferred. Defaults to ``None``.
-        asset (:obj:`dict`, optional): The asset being created or
+            One or more public keys representing the new recipients(s)
+            of the asset being created or transferred.
+            Defaults to ``None``.
+        asset (:obj:`dict`, optional): The asset to be created or
             transferred. MUST be supplied for ``'TRANSFER'`` operations.
             Defaults to ``None``.
         metadata (:obj:`dict`, optional): Metadata associated with the
@@ -132,8 +133,8 @@ def prepare_create_transaction(*,
         recipients (:obj:`list` | :obj:`tuple` | :obj:`str`, optional):
             One or more public keys representing the new recipients(s)
             of the asset being created. Defaults to ``None``.
-        asset (:obj:`dict`, optional): The data associated with the
-            asset being created with this transaction. Defaults to ``None``.
+        asset (:obj:`dict`, optional): The asset to be created.
+            Defaults to ``None``.
         metadata (:obj:`dict`, optional): Metadata associated with the
             transaction. Defaults to ``None``.
 
