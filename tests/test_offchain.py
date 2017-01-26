@@ -32,6 +32,7 @@ def test_prepare_create_transaction_default(alice_pubkey):
     assert 'id' in create_transaction
     assert 'version' in create_transaction
     assert 'asset' in create_transaction
+    assert create_transaction['asset'] == {'data': None}
     assert 'outputs' in create_transaction
     assert 'inputs' in create_transaction
     assert 'metadata' in create_transaction
@@ -40,7 +41,7 @@ def test_prepare_create_transaction_default(alice_pubkey):
 
 
 @mark.parametrize('asset', (
-    None, {}, {'data': {'msg': 'Hello BigchainDB!'}},
+    None, {'data': None}, {'data': {'msg': 'Hello BigchainDB!'}},
 ))
 @mark.parametrize('signers', (
     'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
@@ -59,6 +60,7 @@ def test_prepare_create_transaction(asset, signers, recipients):
     assert 'id' in create_transaction
     assert 'version' in create_transaction
     assert 'asset' in create_transaction
+    assert create_transaction['asset'] == asset or {'data': None}
     assert 'outputs' in create_transaction
     assert 'inputs' in create_transaction
     assert 'metadata' in create_transaction
@@ -89,6 +91,7 @@ def test_prepare_transfer_transaction(alice_transaction, recipients):
     assert 'id' in transfer_transaction
     assert 'version' in transfer_transaction
     assert 'asset' in transfer_transaction
+    assert 'id' in transfer_transaction['asset']
     assert 'outputs' in transfer_transaction
     assert 'inputs' in transfer_transaction
     assert 'metadata' in transfer_transaction
