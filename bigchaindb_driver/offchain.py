@@ -167,7 +167,7 @@ def prepare_create_transaction(*,
         signers,
         recipients,
         metadata=metadata,
-        asset=asset,
+        asset=asset['data'] if asset else None,
     )
     return transaction.to_dict()
 
