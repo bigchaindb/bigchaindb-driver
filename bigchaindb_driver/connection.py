@@ -45,7 +45,7 @@ class Connection:
             json=json,
             params=params,
             headers=headers,
-            **kwargs,
+            **kwargs
         )
         text = response.text
         try:
