@@ -138,6 +138,14 @@ class TransactionsEndpoint(NamespacedDriver):
 
             * ``signers`` MUST be set.
             * ``recipients``, ``asset``, and ``metadata`` MAY be set.
+            * If ``asset`` is set, it MUST be in the form of::
+
+                {
+                    'data': {
+                        ...
+                    }
+                }
+
             * The argument ``inputs`` is ignored.
             * If ``recipients`` is not given, or evaluates to
               ``False``, it will be set equal to ``signers``::
@@ -148,6 +156,12 @@ class TransactionsEndpoint(NamespacedDriver):
             **TRANSFER operations**
 
             * ``recipients``, ``asset``, and ``inputs`` MUST be set.
+            * ``asset`` MUST be in the form of::
+
+                {
+                    'id': '<Asset ID (i.e. TX ID of its CREATE transaction)>'
+                }
+
             * ``metadata`` MAY be set.
             * The argument ``signers`` is ignored.
 

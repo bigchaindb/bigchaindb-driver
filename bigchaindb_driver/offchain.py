@@ -92,6 +92,14 @@ def prepare_transaction(*, operation='CREATE', signers=None,
 
         * ``signers`` MUST be set.
         * ``recipients``, ``asset``, and ``metadata`` MAY be set.
+        * If ``asset`` is set, it MUST be in the form of::
+
+            {
+                'data': {
+                    ...
+                }
+            }
+
         * The argument ``inputs`` is ignored.
         * If ``recipients`` is not given, or evaluates to
           ``False``, it will be set equal to ``signers``::
@@ -102,6 +110,12 @@ def prepare_transaction(*, operation='CREATE', signers=None,
         **TRANSFER operations**
 
         * ``recipients``, ``asset``, and ``inputs`` MUST be set.
+        * ``asset`` MUST be in the form of::
+
+            {
+                'id': '<Asset ID (i.e. TX ID of its CREATE transaction)>'
+            }
+
         * ``metadata`` MAY be set.
         * The argument ``signers`` is ignored.
 
@@ -141,8 +155,18 @@ def prepare_create_transaction(*,
     Returns:
         dict: The prepared ``"CREATE"`` transaction.
 
-    .. important:: If ``recipients`` is not given, or evaluates to
-        ``False``, it will be set equal to ``signers``::
+    .. important::
+
+        * If ``asset`` is set, it MUST be in the form of::
+
+                {
+                    'data': {
+                        ...
+                    }
+                }
+
+        * If ``recipients`` is not given, or evaluates to
+          ``False``, it will be set equal to ``signers``::
 
             if not recipients:
                 recipients = signers
@@ -197,6 +221,14 @@ def prepare_transfer_transaction(*,
 
     Returns:
         dict: The prepared ``"TRANSFER"`` transaction.
+
+    .. important::
+
+        * ``asset`` MUST be in the form of::
+
+            {
+                'id': '<Asset ID (i.e. TX ID of its CREATE transaction)>'
+            }
 
     Example:
 
