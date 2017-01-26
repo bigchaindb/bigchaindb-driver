@@ -114,7 +114,7 @@ class TransactionsEndpoint(NamespacedDriver):
                 One or more public keys representing the new recipients(s)
                 of the asset being created or transferred.
                 Defaults to ``None``.
-            asset (:obj:`dict`, optional): The asset being created or
+            asset (:obj:`dict`, optional): The asset to be created or
                 transferred. MUST be supplied for ``'TRANSFER'`` operations.
                 Defaults to ``None``.
             metadata (:obj:`dict`, optional): Metadata associated with the
@@ -178,7 +178,7 @@ class TransactionsEndpoint(NamespacedDriver):
 
         Raises:
             :exc:`~.exceptions.MissingSigningKeyError`: If a private
-                key, (aka signing key), is missing.
+                key (aka signing key) is missing.
 
         """
         return fulfill_transaction(transaction, private_keys=private_keys)
