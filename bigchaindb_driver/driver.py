@@ -56,14 +56,14 @@ class BigchainDB:
     @property
     def transactions(self):
         """:class:`~bigchaindb_driver.driver.TransactionsEndpoint`:
-            Exposes functionalities of the `'/transactions'` endpoint.
+            Exposes functionalities of the ``'/transactions'`` endpoint.
         """
         return self._transactions
 
     @property
     def unspents(self):
         """:class:`~bigchaindb_driver.driver.UnspentsEndpoint`:
-            Exposes functionalities of the `'/unspents'` endpoint.
+            Exposes functionalities of the ``'/unspents'`` endpoint.
         """
         return self._unspents
 
