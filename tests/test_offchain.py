@@ -83,7 +83,7 @@ def test_prepare_transfer_transaction(alice_transaction, recipients):
         },
         'owners_before': condition['public_keys']
     }
-    asset = alice_transaction['asset']
+    asset = {'id': alice_transaction['id']}
     transfer_transaction = prepare_transfer_transaction(
         inputs=input_, recipients=recipients, asset=asset)
     assert 'id' in transfer_transaction
@@ -96,7 +96,6 @@ def test_prepare_transfer_transaction(alice_transaction, recipients):
     assert transfer_transaction['operation'] == 'TRANSFER'
 
 
-@mark.skip(reason='See bigchaindb/issues/1089')
 @mark.parametrize('alice_sk', (
     'CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP',
     ('CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP',),

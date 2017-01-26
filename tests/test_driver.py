@@ -50,7 +50,7 @@ class TestTransactionsEndpoint:
         with raises(NotFoundError):
             driver.transactions.retrieve(txid)
 
-    @mark.skip
+    @mark.skip(reason='bigchaindb/bigchaindb-driver/issues/229')
     def test_status(self, driver, persisted_alice_transaction):
         txid = persisted_alice_transaction['id']
         # FIXME The sleep, or some other approach is required to wait for the
@@ -60,7 +60,7 @@ class TestTransactionsEndpoint:
         status = driver.transactions.status(txid)
         assert status['status'] == 'valid'
 
-    @mark.skip
+    @mark.skip(reason='bigchaindb/bigchaindb-driver/issues/229')
     def test_status_not_found(self, driver):
         from bigchaindb_driver.exceptions import NotFoundError
         txid = 'dummy_id'
@@ -88,7 +88,6 @@ class TestTransactionsEndpoint:
         assert inputs[0]['owners_before'][0] == alice_pubkey
         assert not transaction['metadata']
 
-    @mark.skip(reason='See bigchaindb/issues/1089')
     def test_fulfill(self, driver, alice_keypair, unsigned_transaction):
         signed_transaction = driver.transactions.fulfill(
             unsigned_transaction, private_keys=alice_keypair.sk)

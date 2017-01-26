@@ -48,7 +48,6 @@ def hash_transaction(transaction):
 def add_transaction_id(transaction):
     tx_id = hash_transaction(transaction)
     transaction['id'] = tx_id
-    transaction['asset']['id'] = tx_id
 
 
 def sign_transaction(transaction, *, public_key, private_key):
@@ -199,9 +198,9 @@ def prepared_carol_bicycle_transaction(carol_keypair, bicycle_data):
         },
         'metadata': None,
         'operation': 'CREATE',
-        'conditions': (condition,),
-        'fulfillments': (fulfillment,),
-        'version': 1,
+        'outputs': (condition,),
+        'inputs': (fulfillment,),
+        'version': '0.9',
     }
     add_transaction_id(tx)
     return tx
@@ -215,7 +214,7 @@ def signed_carol_bicycle_transaction(request, carol_keypair,
         public_key=carol_keypair.public_key,
         private_key=carol_keypair.private_key,
     )
-    prepared_carol_bicycle_transaction['fulfillments'][0].update(
+    prepared_carol_bicycle_transaction['inputs'][0].update(
         {'fulfillment': fulfillment_uri},
     )
     return prepared_carol_bicycle_transaction
@@ -241,9 +240,9 @@ def prepared_carol_car_transaction(carol_keypair, car_data):
         },
         'metadata': None,
         'operation': 'CREATE',
-        'conditions': (condition,),
-        'fulfillments': (fulfillment,),
-        'version': 1,
+        'outputs': (condition,),
+        'inputs': (fulfillment,),
+        'version': '0.9',
     }
     add_transaction_id(tx)
     return tx
@@ -257,7 +256,7 @@ def signed_carol_car_transaction(request, carol_keypair,
         public_key=carol_keypair.public_key,
         private_key=carol_keypair.private_key,
     )
-    prepared_carol_car_transaction['fulfillments'][0].update(
+    prepared_carol_car_transaction['inputs'][0].update(
         {'fulfillment': fulfillment_uri},
     )
     return prepared_carol_car_transaction
@@ -279,8 +278,6 @@ def unsigned_transaction():
             'data': {
                 'serial_number': 'NNP43x-DaYoSWg==',
             },
-            'id':
-            'e0efa8f985f91871cd7547f3b06a81a0237f4a21dcffd081ac0a282c28f79c43',
         },
         'outputs': [{
             'amount': 1,
