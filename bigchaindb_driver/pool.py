@@ -30,7 +30,7 @@ class RoundRobinPicker(AbstractPicker):
     """
     def __init__(self):
         """Initializes a :class:`~bigchaindb_driver.pool.RoundRobinPicker`
-        instance. Sets :attr:`picked` to `-1`.
+        instance. Sets :attr:`picked` to ``-1``.
 
         """
         self.picked = -1
