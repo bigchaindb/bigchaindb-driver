@@ -25,7 +25,7 @@ Connecting to a BigchainDB node is done via the
     bdb = BigchainDB('<api_endpoint>')
 
 where ``<api_endpoint>`` is the root URL of the BigchainDB server API you wish
-to connect to. 
+to connect to.
 
 For the simplest case in which a BigchainDB node would be running locally, (and
 the ``BIGCHAINDB_SERVER_BIND`` setting wouldn't have been changed), you would
@@ -48,7 +48,7 @@ Alternatively, you may connect to the containerized BigchainDB node from
 "outside", in which case you need to know the port binding:
 
 .. code-block:: bash
-    
+
     $ docker-compose port bdb-server 9984
     0.0.0.0:32780
 
@@ -71,7 +71,7 @@ As an example, let's consider the creation and transfer of a digital asset that
 represents a bicycle:
 
 .. ipython::
-    
+
     In [0]: bicycle = {
        ...:     'data': {
        ...:         'bicycle': {
@@ -100,7 +100,7 @@ Cryptographic Identities Generation
 -----------------------------------
 Alice, and Bob are represented by public/private key pairs. The private key is
 used to sign transactions, meanwhile the public key is used to verify that a
-signed transaction was indeed signed by the one who claims to be the signee. 
+signed transaction was indeed signed by the one who claims to be the signee.
 
 .. ipython::
 
@@ -202,7 +202,7 @@ or simply use ``fulfilled_creation_tx``:
 Preparing the transfer transaction:
 
 .. ipython::
-    
+
     In [0]: cid = 0
 
     In [0]: condition = creation_tx['conditions'][cid]
@@ -249,7 +249,7 @@ The ``fulfilled_transfer_tx`` dictionary should look something like:
 
     In [0]: fulfilled_transfer_tx
 
-Bob is the new owner: 
+Bob is the new owner:
 
 .. ipython::
 
@@ -348,7 +348,7 @@ Bob has now decided to issue 10 tokens and assign them to Carly.
 Sending the transaction:
 
 .. code-block:: python
- 
+
     >>> sent_token_tx = bdb.transactions.send(fulfilled_token_tx)
 
 .. note:: Defining ``owners_after``.
@@ -385,7 +385,7 @@ The ``fulfilled_token_tx`` dictionary should look something like:
 
     In [0]: fulfilled_token_tx
 
-Bob is the issuer: 
+Bob is the issuer:
 
 .. ipython::
 
