@@ -117,7 +117,7 @@ We're now ready to create the digital asset. First we prepare the transaction:
 
    In [0]: prepared_creation_tx = bdb.transactions.prepare(
       ...:     operation='CREATE',
-      ...:     owners_before=alice.public_key,
+      ...:     signers=alice.public_key,
       ...:     asset=bicycle,
       ...:     metadata=metadata,
       ...: )
@@ -199,31 +199,44 @@ or simply use ``fulfilled_creation_tx``:
 
     In [0]: creation_tx = fulfilled_creation_tx
 
-Preparing the transfer transaction:
+In order to prepare the transfer transaction, we first need to know the id of
+the asset we'll be transferring. Here, because Alice is consuming a ``CREATE``
+transaction, we have a special case in that the asset id is NOT found on the
+``asset`` itself, but is simply the ``CREATE`` transaction's id:
 
 .. ipython::
 
-    In [0]: cid = 0
+    In [0]: asset_id = creation_tx['id']
 
-    In [0]: condition = creation_tx['conditions'][cid]
+    In [0]: transfer_asset = {
+       ...:     'id': asset_id,
+       ...: }
+
+Let's now prepare the transfer transaction:
+
+.. ipython::
+
+    In [0]: output_index = 0
+
+    In [0]: output = creation_tx['outputs'][output_index]
 
     In [0]: transfer_input = {
-       ...:     'fulfillment': condition['condition']['details'],
-       ...:     'input': {
-       ...:          'cid': cid,
+       ...:     'fulfillment': output['condition']['details'],
+       ...:     'fulfills': {
+       ...:          'output': output_index,
        ...:          'txid': creation_tx['id'],
        ...:      },
-       ...:      'owners_before': condition['owners_after'],
+       ...:      'owners_before': output['public_keys'],
        ...: }
 
     In [0]: prepared_transfer_tx = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
-       ...:     asset=creation_tx['asset'],
+       ...:     asset=transfer_asset,
        ...:     inputs=transfer_input,
-       ...:     owners_after=bob.public_key,
+       ...:     recipients=bob.public_key,
        ...: )
 
-and then fulfills the prepared transfer:
+fulfill it:
 
 .. ipython::
 
@@ -232,7 +245,7 @@ and then fulfills the prepared transfer:
        ...:     private_keys=alice.private_key,
        ...: )
 
-and finally sends the fulfilled transaction to the connected BigchainDB node:
+and finally send it to the connected BigchainDB node:
 
 .. code-block:: python
 
@@ -253,13 +266,28 @@ Bob is the new owner:
 
 .. ipython::
 
-    In [0]: fulfilled_transfer_tx['conditions'][0]['owners_after'][0] == bob.public_key
+    In [0]: fulfilled_transfer_tx['outputs'][0]['public_keys'][0] == bob.public_key
 
 Alice is the former owner:
 
 .. ipython::
 
-    In [0]: fulfilled_transfer_tx['fulfillments'][0]['owners_before'][0] == alice.public_key
+    In [0]: fulfilled_transfer_tx['inputs'][0]['owners_before'][0] == alice.public_key
+
+.. note:: Obtaining asset ids:
+
+    You might have noticed that we considered Alice's case of consuming a
+    ``CREATE`` transaction as a special case. In order to obtain the asset id
+    of a ``CREATE`` transaction, we had to use the ``CREATE`` transaction's
+    id::
+
+        transfer_asset_id = create_tx['id']
+
+    If you instead wanted to consume ``TRANSFER`` transactions (for example,
+    ``fulfilled_transfer_tx``), you could obtain the asset id to transfer from
+    the ``asset.id`` property::
+
+        transfer_asset_id = transfer_tx['asset']['id']
 
 
 Transaction Status
@@ -307,8 +335,8 @@ Running the above code should give something similar to:
 Divisible Assets
 ----------------
 
-In BigchainDB all assets are non-divisible by default so if we want to make a
-divisible asset we need to explicitly mark it as divisible.
+All assets in BigchainDB become implicitly divisible if a transaction contains
+more than one of that asset (we'll see how this happens shortly).
 
 Let's continue with the bicycle example. Bob is now the proud owner of the
 bicycle and he decides he wants to rent the bicycle. Bob starts by creating a
@@ -317,7 +345,6 @@ time sharing token in which 1 token corresponds to 1 hour of riding time:
 .. ipython::
 
     In [0]: bicycle_token = {
-       ...:     'divisible': True,
        ...:     'data': {
        ...:         'token_for': {
        ...:             'bicycle': {
@@ -337,9 +364,9 @@ Bob has now decided to issue 10 tokens and assign them to Carly.
 
     In [0]: prepared_token_tx = bdb.transactions.prepare(
        ...:     operation='CREATE',
-       ...:     owners_before=bob.public_key,
-       ...:     owners_after=[([carly.public_key], 10)],
-       ...:     asset=bicycle_token
+       ...:     signers=bob.public_key,
+       ...:     recipients=[([carly.public_key], 10)],
+       ...:     asset=bicycle_token,
        ...: )
 
     In [0]: fulfilled_token_tx = bdb.transactions.fulfill(
@@ -351,33 +378,32 @@ Sending the transaction:
 
     >>> sent_token_tx = bdb.transactions.send(fulfilled_token_tx)
 
-.. note:: Defining ``owners_after``.
-
-    For divisible assets we need to specify the amounts togheter with the
-    public keys. The way we do this is by passing a ``list`` of ``tuples`` in
-    ``owners_after`` in which each ``tuple`` corresponds to a condition.
-
-    For instance instead of creating a transaction with 1 condition with
-    ``amount=10`` we could have created a transaction with 2 conditions with
-    ``amount=5`` with:
-
-    .. code-block:: python
-
-        owners_after=[([carly.public_key], 5), ([carly.public_key], 5)]
-
-    The reason why the addresses are contained in ``lists`` is because each
-    condition can have multiple ownership. For instance we can create a
-    condition with ``amount=10`` in which both Carly and Alice are owners
-    with:
-
-    .. code-block:: python
-
-        owners_after=[([carly.public_key, alice.public_key], 10)]
-
-.. code-block:: python
-
     >>> sent_token_tx == fulfilled_token_tx
     True
+
+.. note:: Defining ``recipients``:
+
+    To create divisible assets, we need to specify an amount ``>1`` together
+    with the public keys. The way we do this is by passing a ``list`` of
+    ``tuples`` in ``recipients`` where each ``tuple`` corresponds to an output.
+
+    For instance, instead of creating a transaction with one output containing
+    ``amount=10`` we could have created a transaction with two outputs each
+    holding ``amount=5``:
+
+    .. code-block:: python
+
+        recipients=[([carly.public_key], 5), ([carly.public_key], 5)]
+
+    The reason why the addresses are contained in ``lists`` is because each
+    output can have multiple recipients. For instance, we can create an
+    output with ``amount=10`` in which both Carly and Alice are recipients
+    (of the same asset):
+
+    .. code-block:: python
+
+        recipients=[([carly.public_key, alice.public_key], 10)]
+
 
 The ``fulfilled_token_tx`` dictionary should look something like:
 
@@ -389,15 +415,15 @@ Bob is the issuer:
 
 .. ipython::
 
-    In [0]: fulfilled_token_tx['fulfillments'][0]['owners_before'][0] == bob.public_key
+    In [0]: fulfilled_token_tx['inputs'][0]['owners_before'][0] == bob.public_key
 
 Carly is the owner of 10 tokens:
 
 .. ipython::
 
-    In [0]: fulfilled_token_tx['conditions'][0]['owners_after'][0] == carly.public_key
+    In [0]: fulfilled_token_tx['outputs'][0]['public_keys'][0] == carly.public_key
 
-    In [0]: fulfilled_token_tx['conditions'][0]['amount'] == 10
+    In [0]: fulfilled_token_tx['outputs'][0]['amount'] == 10
 
 
 Now Carly wants to ride the bicycle for 2 hours so she needs to send 2 tokens
@@ -405,24 +431,24 @@ to Bob:
 
 .. ipython::
 
-    In [0]: cid = 0
+    In [0]: output_index = 0
 
-    In [0]: condition = prepared_token_tx['conditions'][cid]
+    In [0]: output = prepared_token_tx['outputs'][output_index]
 
     In [0]: transfer_input = {
-       ...:     'fulfillment': condition['condition']['details'],
-       ...:     'input': {
-       ...:         'cid': cid,
+       ...:     'fulfillment': output['condition']['details'],
+       ...:     'fulfills': {
+       ...:         'output': output_index,
        ...:         'txid': prepared_token_tx['id'],
        ...:     },
-       ...:     'owners_before': condition['owners_after'],
+       ...:     'owners_before': output['public_keys'],
        ...: }
 
     In [0]: prepared_transfer_tx = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
        ...:     asset=prepared_token_tx['asset'],
        ...:     inputs=transfer_input,
-       ...:     owners_after=[([bob.public_key], 2), ([carly.public_key], 8)]
+       ...:     recipients=[([bob.public_key], 2), ([carly.public_key], 8)]
        ...: )
 
     In [0]: fulfilled_transfer_tx = bdb.transactions.fulfill(
