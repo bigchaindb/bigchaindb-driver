@@ -16,8 +16,6 @@ Library Reference
 .. autoclass:: TransactionsEndpoint
     :members:
 
-    .. automethod:: __init__
-
 .. autoclass:: OutputsEndpoint
     :members:
 
