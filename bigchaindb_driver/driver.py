@@ -8,25 +8,20 @@ DEFAULT_NODE = 'http://localhost:9984/api/v1'
 class BigchainDB:
     """BigchainDB driver class.
 
-    A :class:`~bigchaindb_driver.BigchainDB` driver is initialized with a
-    keypair and is able to create, sign, and submit transactions to a Node in
-    the Federation. At the moment, a BigchainDB driver instance is bounded to
-    a specific ``node`` in the Federation. In the future, a
-    :class:`~bigchaindb_driver.BigchainDB` driver instance might connect to
-    ``>1`` nodes.
+    A :class:`~bigchaindb_driver.BigchainDB` driver is able to create, sign,
+    and submit transactions to one or more nodes in a Federation.
+
+    If initialized with ``>1`` nodes, the driver will send successive requests
+    to different nodes in a round-robin fashion (this will be customizable in
+    the future).
     """
     def __init__(self, *nodes, transport_class=Transport, headers=None):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
-        If a :attr:`public_key` or :attr:`private_key` are given, this
-        instance will be bound to the keys and applied them as defaults
-        whenever a verifying and/or signing key are needed.
-
         Args:
             *nodes (str): BigchainDB nodes to connect to. Currently, the full
-                URL must be given. In the absence of any node, the default of
-                the :attr:`transport_class` will be used, e.g.:
-                ``'http://localhost:9984/api/v1'``.
+                URL must be given. In the absence of any node, the default
+                will be used, e.g.: ``'http://localhost:9984/api/v1'``.
             transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
             headers (dict): Optional headers that will be passed with
