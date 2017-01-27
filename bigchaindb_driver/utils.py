@@ -1,10 +1,12 @@
 """Set of utilities to support various functionalities of the driver.
 
+.. danger:: This module is meant for specific internal usage only and its
+    behaviour is subject to change.
+
 Attributes:
     ops_map (dict): Mapping between operation strings and classes.
         E.g.: The string ``'CREATE'`` is mapped to
         :class:`~.CreateOperation`.
-
 """
 
 
@@ -39,9 +41,6 @@ def _normalize_operation(operation):
         .. important:: If the :meth:`str.upper` step, or the
             :attr:`~.ops_map` lookup fails, the given ``operation``
             argument is returned.
-
-    .. danger:: For specific internal usage only. The behavior is tricky,
-        and is subject to change.
 
     """
     try:
