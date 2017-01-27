@@ -94,9 +94,9 @@ Library Reference
 
 .. autoexception:: KeypairNotFoundException
 
-.. autoexception:: InvalidSigningKey
+.. autoexception:: InvalidPrivateKey
 
-.. autoexception:: InvalidVerifyingKey
+.. autoexception:: InvalidPublicKey
 
 .. autoexception:: MissingPrivateKeyError
 

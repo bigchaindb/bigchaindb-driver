@@ -10,12 +10,12 @@ class KeypairNotFoundException(BigchaindbException):
     """
 
 
-class InvalidSigningKey(BigchaindbException):
-    """Raised if a signing key is invalid. E.g.: :obj:`None`."""
+class InvalidPrivateKey(BigchaindbException):
+    """Raised if a private key is invalid. E.g.: :obj:`None`."""
 
 
-class InvalidVerifyingKey(BigchaindbException):
-    """Raised if a verifying key is invalid. E.g.: :obj:`None`."""
+class InvalidPublicKey(BigchaindbException):
+    """Raised if a public key is invalid. E.g.: :obj:`None`."""
 
 
 class MissingPrivateKeyError(BigchaindbException):
