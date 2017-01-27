@@ -191,8 +191,8 @@ class TransactionsEndpoint(NamespacedDriver):
             BigchainDB federation.
 
         Raises:
-            :exc:`~.exceptions.MissingSigningKeyError`: If a private
-                key (aka signing key) is missing.
+            :exc:`~.exceptions.MissingPrivateKeyError`: If a private
+                key is missing.
 
         """
         return fulfill_transaction(transaction, private_keys=private_keys)
