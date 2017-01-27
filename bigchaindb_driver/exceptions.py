@@ -18,8 +18,8 @@ class InvalidVerifyingKey(BigchaindbException):
     """Raised if a verifying key is invalid. E.g.: :obj:`None`."""
 
 
-class MissingSigningKeyError(BigchaindbException):
-    """Raised if a signing key is missing."""
+class MissingPrivateKeyError(BigchaindbException):
+    """Raised if a private key is missing."""
 
 
 class TransportError(BigchaindbException):

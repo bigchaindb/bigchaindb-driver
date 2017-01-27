@@ -123,6 +123,6 @@ def test_fulfill_transaction(alice_transaction, alice_sk):
 
 def test_fulfill_transaction_raises(alice_transaction, bob_privkey):
     from bigchaindb_driver.offchain import fulfill_transaction
-    from bigchaindb_driver.exceptions import MissingSigningKeyError
-    with raises(MissingSigningKeyError):
+    from bigchaindb_driver.exceptions import MissingPrivateKeyError
+    with raises(MissingPrivateKeyError):
         fulfill_transaction(alice_transaction, private_keys=bob_privkey)

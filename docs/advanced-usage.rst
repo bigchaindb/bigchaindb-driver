@@ -405,14 +405,14 @@ omit ``bob``:
 
 .. ipython::
 
-    In [0]: from bigchaindb_driver.exceptions import MissingSigningKeyError
+    In [0]: from bigchaindb_driver.exceptions import MissingPrivateKeyError
 
     In [0]: try:
        ...:     signed_car_transfer_tx = bdb.transactions.fulfill(
        ...:         car_transfer_tx,
        ...:         private_keys=alice.private_key,
        ...:     )
-       ...: except MissingSigningKeyError as e:
+       ...: except MissingPrivateKeyError as e:
        ...:     print(e, e.__cause__, sep='\n')
 
 Notice ``bob``'s public key in the above message:

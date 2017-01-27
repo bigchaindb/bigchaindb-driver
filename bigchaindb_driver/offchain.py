@@ -14,7 +14,7 @@ from bigchaindb.common.transaction import (
 from bigchaindb.common.exceptions import KeypairMismatchException
 from cryptoconditions import Fulfillment
 
-from .exceptions import BigchaindbException, MissingSigningKeyError
+from .exceptions import BigchaindbException, MissingPrivateKeyError
 from .utils import (
     CreateOperation,
     TransferOperation,
@@ -341,8 +341,8 @@ def fulfill_transaction(transaction, *, private_keys):
         BigchainDB federation.
 
     Raises:
-        :exc:`~.exceptions.MissingSigningKeyError`: If a private
-            key, (aka signing key), is missing.
+        :exc:`~.exceptions.MissingPrivateKeyError`: If a private
+            key is missing.
 
     """
     if not isinstance(private_keys, (list, tuple)):
@@ -357,6 +357,6 @@ def fulfill_transaction(transaction, *, private_keys):
     try:
         signed_transaction = transaction_obj.sign(private_keys)
     except KeypairMismatchException as exc:
-        raise MissingSigningKeyError('A signing key is missing!') from exc
+        raise MissingPrivateKeyError('A private key is missing!') from exc
 
     return signed_transaction.to_dict()
