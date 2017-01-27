@@ -53,7 +53,7 @@ def prepare_transaction(*, operation='CREATE', signers=None,
                         inputs=None):
     """
     Prepares a transaction payload, ready to be fulfilled. Depending on
-    the value of ``operation`` simply dispatches to either
+    the value of ``operation``, simply dispatches to either
     :func:`~.prepare_create_transaction` or
     :func:`~.prepare_transfer_transaction`.
 

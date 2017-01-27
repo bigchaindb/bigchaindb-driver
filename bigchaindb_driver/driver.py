@@ -32,7 +32,7 @@ class BigchainDB:
             headers (dict): Optional headers that will be passed with
                 each request. To pass headers only on a per-request
                 basis, you can pass the headers to the method of choice
-                (e.g. :meth:`~.TransactionsEndpoint.send`).
+                (e.g. :meth:`.TransactionsEndpoint.send`).
 
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
@@ -89,7 +89,7 @@ class NamespacedDriver:
 
 
 class TransactionsEndpoint(NamespacedDriver):
-    """Endpoint for transactions.
+    """Exposes functionality of the ``'/transactions/'`` endpoint.
 
     Attributes:
         path (str): The path of the endpoint.
@@ -244,10 +244,10 @@ class TransactionsEndpoint(NamespacedDriver):
 
 
 class OutputsEndpoint(NamespacedDriver):
-    """Endpoint for unspents.
+    """Exposes functionality of the ``'/outputs'`` endpoint.
 
     Attributes:
-        path (str): The path of the endpoint: ``'/unspents'``
+        path (str): The path of the endpoint.
 
     """
     path = '/outputs/'
