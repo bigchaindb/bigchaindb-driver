@@ -12,11 +12,12 @@ Basic Usage Examples
 
 
 The BigchainDB driver's main purpose is to connect to one or more BigchainDB
-server nodes, in order to perform supported API calls documented under
-:doc:`drivers-clients/http-client-server-api`.
+server nodes, in order to perform supported API calls (see the server's
+`HTTP API docs <https://docs.bigchaindb.com/projects/server/en/latest/drivers-clients/http-client-server-api.html>`_
+for the full list of API endpoints).
 
 Connecting to a BigchainDB node is done via the
-:class:`BigchainDB class <bigchaindb_driver.BigchainDB>`:
+:class:`BigchainDB <bigchaindb_driver.BigchainDB>` class:
 
 .. code-block:: python
 
@@ -42,7 +43,7 @@ information), and wish to connect to it from the ``bdb-driver`` linked
 
 .. code-block:: python
 
-    >>> bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984/api/v1')
 
 Alternatively, you may connect to the containerized BigchainDB node from
 "outside", in which case you need to know the port binding:
@@ -54,16 +55,15 @@ Alternatively, you may connect to the containerized BigchainDB node from
 
 .. code-block:: python
 
-    >>> bdb = BigchainDB('http://0.0.0.0:32780/api/v1')
+    bdb = BigchainDB('http://0.0.0.0:32780/api/v1')
 
-For the sake of this example:
+For the sake of this example, we'll assume:
 
 .. ipython::
 
     In [0]: from bigchaindb_driver import BigchainDB
 
     In [0]: bdb = BigchainDB('http://bdb-server:9984/api/v1')
-
 
 Digital Asset Definition
 ------------------------
@@ -84,6 +84,8 @@ represents a bicycle:
 We'll suppose that the bike belongs to Alice, and that it will be transferred
 to Bob.
 
+In general, you may use any dictionary for the ``'data'`` property.
+
 
 Metadata Definition (*optional*)
 --------------------------------
@@ -98,7 +100,7 @@ For example:
 
 Cryptographic Identities Generation
 -----------------------------------
-Alice, and Bob are represented by public/private key pairs. The private key is
+Alice and Bob are represented by public/private key pairs. The private key is
 used to sign transactions, meanwhile the public key is used to verify that a
 signed transaction was indeed signed by the one who claims to be the signee.
 
@@ -111,7 +113,8 @@ signed transaction was indeed signed by the one who claims to be the signee.
 
 Asset Creation
 --------------
-We're now ready to create the digital asset. First we prepare the transaction:
+We're now ready to create the digital asset. First, let's prepare the
+transaction:
 
 .. ipython::
 
@@ -129,7 +132,8 @@ The ``prepared_creation_tx`` dictionary should be similar to:
    In [0]: prepared_creation_tx
 
 
-The transaction needs to be fulfilled:
+The transaction now needs to be fulfilled by signing it with Alice's private
+key:
 
 .. ipython::
 
@@ -251,8 +255,6 @@ and finally send it to the connected BigchainDB node:
 
     >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
 
-.. code-block:: python
-
     >>> sent_transfer_tx == fulfilled_transfer_tx
     True
 
@@ -285,7 +287,7 @@ Alice is the former owner:
 
     If you instead wanted to consume ``TRANSFER`` transactions (for example,
     ``fulfilled_transfer_tx``), you could obtain the asset id to transfer from
-    the ``asset.id`` property::
+    the ``asset['id']`` property::
 
         transfer_asset_id = transfer_tx['asset']['id']
 
@@ -340,7 +342,7 @@ more than one of that asset (we'll see how this happens shortly).
 
 Let's continue with the bicycle example. Bob is now the proud owner of the
 bicycle and he decides he wants to rent the bicycle. Bob starts by creating a
-time sharing token in which 1 token corresponds to 1 hour of riding time:
+time sharing token in which one token corresponds to one hour of riding time:
 
 .. ipython::
 
@@ -352,11 +354,13 @@ time sharing token in which 1 token corresponds to 1 hour of riding time:
        ...:                 'manufacturer': 'bkfab'
        ...:             }
        ...:         },
-       ...:         'description': 'Time share token. Each token equals 1 hour of riding.'
-       ...:     }
+       ...:         'description': 'Time share token. Each token equals one hour of riding.',
+       ...:     },
        ...: }
 
-Bob has now decided to issue 10 tokens and assign them to Carly.
+Bob has now decided to issue 10 tokens and assigns them to Carly. Notice how we
+denote Carly as receiving 10 tokens by using a tuple:
+``([carly.public_key], 10)``.
 
 .. ipython::
 
@@ -426,8 +430,8 @@ Carly is the owner of 10 tokens:
     In [0]: fulfilled_token_tx['outputs'][0]['amount'] == 10
 
 
-Now Carly wants to ride the bicycle for 2 hours so she needs to send 2 tokens
-to Bob:
+Now in possession of the tokens, Carly wants to ride the bicycle for two hours.
+To do so, she needs to send two tokens to Bob:
 
 .. ipython::
 
@@ -458,18 +462,21 @@ to Bob:
 
     >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
 
-.. code-block:: python
-
     >>> sent_transfer_tx == fulfilled_transfer_tx
     True
 
-When transferring divisible assets BigchainDB makes sure that the amount being
-used is the same as the amount being spent. This ensures that no amounts are
-lost. For this reason, if Carly wants to transfer 2 tokens of her 10 tokens she
-needs to reassign the remaining 8 tokens to herself.
+Notice how Carly needs to reassign the remaining eight tokens to herself if she
+wants to only transfer two tokens (out of the available 10) to Bob. BigchainDB
+ensures that the amount being consumed in each transaction (with divisible
+assets) is the same as the amount being output. This ensures that no amounts
+are lost.
 
-The ``fulfilled_transfer_tx`` with 2 conditions, one with ``amount=2`` and the other
-with ``amount=8`` dictionary should look something like:
+Also note how, because we were consuming a ``TRANSFER`` transaction, we were
+able to directly use the ``TRANSFER`` transaction's ``asset`` as the new
+transaction's ``asset`` because it already contained the asset's id.
+
+The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
+``amount=2`` and the other with ``amount=8``:
 
 .. ipython::
 
