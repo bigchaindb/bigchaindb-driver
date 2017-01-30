@@ -491,20 +491,20 @@ We'll illustrate this by a threshold condition where 2 out of 3
     is taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     import cryptoconditions as cc
-.. 
+..
 ..     # Create some new testusers
 ..     thresholduser1 = generate_keypair()
 ..     thresholduser2 = generate_keypair()
 ..     thresholduser3 = generate_keypair()
-.. 
+..
 ..     # Retrieve the last transaction of bob
 ..     tx_retrieved_id = b.get_owned_ids(bob).pop()
-.. 
+..
 ..     # Create a base template for a 1-input/2-output transaction
 ..     # todo: Needs https://github.com/bigchaindb/bigchaindb-driver/issues/109
-.. 
+..
 ..     # Create a Threshold Cryptocondition
 ..     threshold_condition = cc.ThresholdSha256Fulfillment(threshold=2)
 ..     threshold_condition.add_subfulfillment(
@@ -513,31 +513,31 @@ We'll illustrate this by a threshold condition where 2 out of 3
 ..         cc.Ed25519Fulfillment(public_key=thresholduser2.public_key))
 ..     threshold_condition.add_subfulfillment(
 ..         cc.Ed25519Fulfillment(public_key=thresholduser3.public_key))
-.. 
+..
 ..     # Update the condition in the newly created transaction
 ..     threshold_tx['conditions'][0]['condition'] = {
 ..         'details': threshold_condition.to_dict(),
 ..         'uri': threshold_condition.condition.serialize_uri()
 ..     }
-.. 
+..
 ..     # Conditions have been updated, so the transaction hash (ID) needs updating
 ..     # todo: Replace with ? (common, driver util)
 ..     threshold_tx['id'] = util.get_hash_data(threshold_tx)
-.. 
+..
 ..     # Sign the transaction
 ..     # todo: Needs https://github.com/bigchaindb/bigchaindb-driver/issues/109
 ..     threshold_tx_signed = bdb.transactions.sign(threshold_tx, bob)
-.. 
+..
 ..     # Write the transaction
 ..     # todo: Needs https://github.com/bigchaindb/bigchaindb-driver/issues/109
 ..     b.write_transaction(threshold_tx_signed)
-.. 
+..
 ..     # Check if the transaction is already in the bigchain
 ..     tx_threshold_retrieved = bdb.transactions.retrieve(threshold_tx_signed['id'])
 ..     tx_threshold_retrieved
-.. 
+..
 .. .. code-block:: python
-.. 
+..
 ..     { ... }
 
 The transaction can now be transfered by fulfilling the threshold condition.
@@ -559,13 +559,13 @@ The fulfillment involves:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     # Create a new testuser to receive
 ..     thresholduser4 = generate_keypair()
-.. 
+..
 ..     # Retrieve the last transaction of thresholduser1_pub
 ..     tx_retrieved_id = b.get_owned_ids(thresholduser1.public_key).pop()
-.. 
+..
 ..     # Create a base template for a 2-input/1-output transaction
 ..     threshold_tx_transfer = b.create_transaction(
 ..         [thresholduser1.public_key,
@@ -575,48 +575,48 @@ The fulfillment involves:
 ..         tx_retrieved_id,
 ..         'TRANSFER'
 ..     )
-.. 
+..
 ..     # Parse the threshold cryptocondition
 ..     threshold_fulfillment = cc.Fulfillment.from_dict(
 ..         threshold_tx['conditions'][0]['condition']['details'])
-.. 
+..
 ..     subfulfillment1 = threshold_fulfillment.get_subcondition_from_vk(thresholduser1.public_key)[0]
 ..     subfulfillment2 = threshold_fulfillment.get_subcondition_from_vk(thresholduser2.public_key)[0]
 ..     subfulfillment3 = threshold_fulfillment.get_subcondition_from_vk(thresholduser3.public_key)[0]
-.. 
-.. 
+..
+..
 ..     # Get the fulfillment message to sign
 ..     threshold_tx_fulfillment_message = util.get_fulfillment_message(
 ..         threshold_tx_transfer,
 ..         threshold_tx_transfer['fulfillments'][0],
 ..         serialized=True
 ..     )
-.. 
+..
 ..     # Clear the subconditions of the threshold fulfillment, they will be added again after signing
 ..     threshold_fulfillment.subconditions = []
-.. 
+..
 ..     # Sign and add the subconditions until threshold of 2 is reached
 ..     subfulfillment1.sign(threshold_tx_fulfillment_message, crypto.SigningKey(thresholduser1_priv))
 ..     threshold_fulfillment.add_subfulfillment(subfulfillment1)
 ..     subfulfillment2.sign(threshold_tx_fulfillment_message, crypto.SigningKey(thresholduser2_priv))
 ..     threshold_fulfillment.add_subfulfillment(subfulfillment2)
-.. 
+..
 ..     # Add remaining (unfulfilled) fulfillment as a condition
 ..     threshold_fulfillment.add_subcondition(subfulfillment3.condition)
-.. 
+..
 ..     # Update the fulfillment
 ..     threshold_tx_transfer['fulfillments'][0]['fulfillment'] = threshold_fulfillment.serialize_uri()
-.. 
+..
 ..     # Optional validation checks
 ..     assert threshold_fulfillment.validate(threshold_tx_fulfillment_message) == True
 ..     assert b.validate_fulfillments(threshold_tx_transfer) == True
 ..     assert b.validate_transaction(threshold_tx_transfer)
-.. 
+..
 ..     b.write_transaction(threshold_tx_transfer)
 ..     threshold_tx_transfer
-.. 
+..
 .. .. code-block:: python
-.. 
+..
 ..     { ... }
 
 
@@ -648,14 +648,14 @@ the asset to themselves.
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     # Create a hash-locked asset without any owners_after
 ..     hashlock_tx = b.create_transaction(b.me, None, None, 'CREATE')
-.. 
+..
 ..     # Define a secret that will be hashed - fulfillments need to guess the secret
 ..     secret = b'much secret! wow!'
 ..     first_tx_condition = cc.PreimageSha256Fulfillment(preimage=secret)
-.. 
+..
 ..     # The conditions list is empty, so we need to append a new condition
 ..     hashlock_tx['conditions'].append({
 ..         'condition': {
@@ -664,21 +664,21 @@ the asset to themselves.
 ..         'cid': 0,
 ..         'owners_after': None
 ..     })
-.. 
+..
 ..     # Conditions have been updated, so the hash needs updating
 ..     hashlock_tx['id'] = util.get_hash_data(hashlock_tx)
-.. 
+..
 ..     # The asset needs to be signed by the owner_before
 ..     hashlock_tx_signed = b.sign_transaction(hashlock_tx, b.me_private)
-.. 
+..
 ..     # Some validations
 ..     assert b.validate_transaction(hashlock_tx_signed) == hashlock_tx_signed
-.. 
+..
 ..     b.write_transaction(hashlock_tx_signed)
 ..     hashlock_tx_signed
-.. 
+..
 .. .. code-block:: python
-.. 
+..
 ..     { ... }
 
 In order to redeem the asset, one needs to create a fulfillment with the
@@ -691,9 +691,9 @@ correct secret:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     hashlockuser = crypto.generate_keypair()
-.. 
+..
 ..     # Create hashlock fulfillment tx
 ..     hashlock_fulfill_tx = b.create_transaction(
 ..         None,
@@ -701,26 +701,26 @@ correct secret:
 ..         {'txid': hashlock_tx['id'], 'cid': 0},
 ..         'TRANSFER'
 ..     )
-.. 
+..
 ..     # Provide a wrong secret
 ..     hashlock_fulfill_tx_fulfillment = cc.PreimageSha256Fulfillment(preimage=b'')
 ..     hashlock_fulfill_tx['fulfillments'][0]['fulfillment'] = \
 ..         hashlock_fulfill_tx_fulfillment.serialize_uri()
-.. 
+..
 ..     assert b.is_valid_transaction(hashlock_fulfill_tx) == False
-.. 
+..
 ..     # Provide the right secret
 ..     hashlock_fulfill_tx_fulfillment = cc.PreimageSha256Fulfillment(preimage=secret)
 ..     hashlock_fulfill_tx['fulfillments'][0]['fulfillment'] = \
 ..         hashlock_fulfill_tx_fulfillment.serialize_uri()
-.. 
+..
 ..     assert b.validate_transaction(hashlock_fulfill_tx) == hashlock_fulfill_tx
-.. 
+..
 ..     b.write_transaction(hashlock_fulfill_tx)
 ..     hashlock_fulfill_tx
-.. 
+..
 .. .. code-block:: python
-.. 
+..
 ..     { ... }
 
 Timeout Conditions
@@ -746,15 +746,15 @@ Once expired, the asset is lost and cannot be fulfilled by anyone.
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     # Create a timeout asset without any owners_after
 ..     tx_timeout = b.create_transaction(b.me, None, None, 'CREATE')
-.. 
+..
 ..     # Set expiry time - the asset needs to be transfered before expiration
 ..     time_sleep = 12
 ..     time_expire = str(float(util.timestamp()) + time_sleep)  # 12 secs from now
 ..     condition_timeout = cc.TimeoutFulfillment(expire_time=time_expire)
-.. 
+..
 ..     # The conditions list is empty, so we need to append a new condition
 ..     tx_timeout['conditions'].append({
 ..         'condition': {
@@ -764,21 +764,21 @@ Once expired, the asset is lost and cannot be fulfilled by anyone.
 ..         'cid': 0,
 ..         'owners_after': None
 ..     })
-.. 
+..
 ..     # Conditions have been updated, so the hash needs updating
 ..     tx_timeout['id'] = util.get_hash_data(tx_timeout)
-.. 
+..
 ..     # The asset needs to be signed by the owner_before
 ..     tx_timeout_signed = b.sign_transaction(tx_timeout, b.me_private)
-.. 
+..
 ..     # Some validations
 ..     assert b.validate_transaction(tx_timeout_signed) == tx_timeout_signed
-.. 
+..
 ..     b.write_transaction(tx_timeout_signed)
 ..     tx_timeout_signed
-.. 
+..
 .. .. code-block:: python
-.. 
+..
 ..     { ... }
 
 The following demonstrates that the transaction invalidates once the timeout
@@ -791,19 +791,19 @@ occurs:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     from time import sleep
-.. 
+..
 ..     # Create a timeout fulfillment tx
 ..     tx_timeout_transfer = b.create_transaction(None, alice.public_key, {'txid': tx_timeout['id'], 'cid': 0}, 'TRANSFER')
-.. 
+..
 ..     # Parse the timeout condition and create the corresponding fulfillment
 ..     timeout_fulfillment = cc.Fulfillment.from_dict(
 ..         tx_timeout['conditions'][0]['condition']['details'])
 ..     tx_timeout_transfer['fulfillments'][0]['fulfillment'] = timeout_fulfillment.serialize_uri()
-.. 
+..
 ..     # No need to sign transaction, like with hashlocks
-.. 
+..
 ..     # Small test to see the state change
 ..     for i in range(time_sleep - 4):
 ..         tx_timeout_valid = b.is_valid_transaction(tx_timeout_transfer) == tx_timeout_transfer
@@ -820,7 +820,7 @@ If you were fast enough, you should see the following output:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     tx_timeout valid: True (3s to timeout)
 ..     tx_timeout valid: True (2s to timeout)
 ..     tx_timeout valid: True (1s to timeout)
@@ -891,55 +891,55 @@ The following code snippet shows how to create an escrow condition:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     # Retrieve the last transaction of bob.public_key (or create a new asset)
 ..     tx_retrieved_id = b.get_owned_ids(bob.public_key).pop()
-.. 
+..
 ..     # Create a base template with the execute and abort address
 ..     tx_escrow = b.create_transaction(bob.public_key, [bob.public_key, alice.public_key], tx_retrieved_id, 'TRANSFER')
-.. 
+..
 ..     # Set expiry time - the execute address needs to fulfill before expiration
 ..     time_sleep = 12
 ..     time_expire = str(float(util.timestamp()) + time_sleep)  # 12 secs from now
-.. 
+..
 ..     # Create the escrow and timeout condition
 ..     condition_escrow = cc.ThresholdSha256Fulfillment(threshold=1)  # OR Gate
 ..     condition_timeout = cc.TimeoutFulfillment(expire_time=time_expire)  # only valid if now() <= time_expire
 ..     condition_timeout_inverted = cc.InvertedThresholdSha256Fulfillment(threshold=1)
 ..     condition_timeout_inverted.add_subfulfillment(condition_timeout)  # invert the timeout condition
-.. 
+..
 ..     # Create the execute branch
 ..     condition_execute = cc.ThresholdSha256Fulfillment(threshold=2)  # AND gate
 ..     condition_execute.add_subfulfillment(cc.Ed25519Fulfillment(public_key=alice.public_key))  # execute address
 ..     condition_execute.add_subfulfillment(condition_timeout)  # federation checks on expiry
 ..     condition_escrow.add_subfulfillment(condition_execute)
-.. 
+..
 ..     # Create the abort branch
 ..     condition_abort = cc.ThresholdSha256Fulfillment(threshold=2)  # AND gate
 ..     condition_abort.add_subfulfillment(cc.Ed25519Fulfillment(public_key=bob.public_key))  # abort address
 ..     condition_abort.add_subfulfillment(condition_timeout_inverted)
 ..     condition_escrow.add_subfulfillment(condition_abort)
-.. 
+..
 ..     # Update the condition in the newly created transaction
 ..     tx_escrow['conditions'][0]['condition'] = {
 ..         'details': condition_escrow.to_dict(),
 ..         'uri': condition_escrow.condition.serialize_uri()
 ..     }
-.. 
+..
 ..     # Conditions have been updated, so the hash needs updating
 ..     tx_escrow['id'] = util.get_hash_data(tx_escrow)
-.. 
+..
 ..     # The asset needs to be signed by the owner_before
 ..     tx_escrow_signed = b.sign_transaction(tx_escrow, bob.private_key)
-.. 
+..
 ..     # Some validations
 ..     assert b.validate_transaction(tx_escrow_signed) == tx_escrow_signed
-.. 
+..
 ..     b.write_transaction(tx_escrow_signed)
 ..     tx_escrow_signed
-.. 
+..
 .. .. code-block:: python
-.. 
+..
 ..     { ... }
 
     At any given moment ``alice`` and ``bob`` can try to fulfill the
@@ -958,41 +958,41 @@ The following code snippet shows how to create an escrow condition:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     # Create a base template for execute fulfillment
 ..     tx_escrow_execute = b.create_transaction([bob.public_key, alice.public_key], alice.public_key, {'txid': tx_escrow_signed['id'], 'cid': 0}, 'TRANSFER')
-.. 
+..
 ..     # Parse the Escrow cryptocondition
 ..     escrow_fulfillment = cc.Fulfillment.from_dict(
 ..         tx_escrow['conditions'][0]['condition']['details'])
-.. 
+..
 ..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.public_key)[0]
 ..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.public_key)[0]
 ..     subfulfillment_timeout = escrow_fulfillment.subconditions[0]['body'].subconditions[1]['body']
 ..     subfulfillment_timeout_inverted = escrow_fulfillment.subconditions[1]['body'].subconditions[1]['body']
-.. 
+..
 ..     # Get the fulfillment message to sign
 ..     tx_escrow_execute_fulfillment_message = \
 ..         util.get_fulfillment_message(tx_escrow_execute,
 ..                                      tx_escrow_execute['fulfillments'][0],
 ..                                      serialized=True)
-.. 
+..
 ..     # Clear the subconditions of the escrow fulfillment
 ..     escrow_fulfillment.subconditions = []
-.. 
+..
 ..     # Fulfill the execute branch
 ..     fulfillment_execute = cc.ThresholdSha256Fulfillment(threshold=2)
 ..     subfulfillment_alice.sign(tx_escrow_execute_fulfillment_message, crypto.SigningKey(alice.private_key))
 ..     fulfillment_execute.add_subfulfillment(subfulfillment_alice)
 ..     fulfillment_execute.add_subfulfillment(subfulfillment_timeout)
 ..     escrow_fulfillment.add_subfulfillment(fulfillment_execute)
-.. 
+..
 ..     # Do not fulfill the abort branch
 ..     condition_abort = cc.ThresholdSha256Fulfillment(threshold=2)
 ..     condition_abort.add_subfulfillment(subfulfillment_bob)
 ..     condition_abort.add_subfulfillment(subfulfillment_timeout_inverted)
 ..     escrow_fulfillment.add_subcondition(condition_abort.condition)  # Adding only the condition here
-.. 
+..
 ..     # Update the execute transaction with the fulfillment
 ..     tx_escrow_execute['fulfillments'][0]['fulfillment'] = escrow_fulfillment.serialize_uri()
 
@@ -1006,7 +1006,7 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     # Create a base template for execute fulfillment
 ..     tx_escrow_abort = b.create_transaction(
 ..         [bob.public_key, alice.public_key],
@@ -1014,38 +1014,38 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 ..         {'txid': tx_escrow_signed['id'], 'cid': 0},
 ..         'TRANSFER'
 ..     )
-.. 
+..
 ..     # Parse the threshold cryptocondition
 ..     escrow_fulfillment = cc.Fulfillment.from_dict(
 ..         tx_escrow['conditions'][0]['condition']['details'])
-.. 
+..
 ..     subfulfillment_alice = escrow_fulfillment.get_subcondition_from_vk(alice.public_key)[0]
 ..     subfulfillment_bob = escrow_fulfillment.get_subcondition_from_vk(bob.public_key)[0]
 ..     subfulfillment_timeout = escrow_fulfillment.subconditions[0]['body'].subconditions[1]['body']
 ..     subfulfillment_timeout_inverted = escrow_fulfillment.subconditions[1]['body'].subconditions[1]['body']
-.. 
+..
 ..     # Get the fulfillment message to sign
 ..     tx_escrow_abort_fulfillment_message = \
 ..         util.get_fulfillment_message(tx_escrow_abort,
 ..                                      tx_escrow_abort['fulfillments'][0],
 ..                                      serialized=True)
-.. 
+..
 ..     # Clear the subconditions of the escrow fulfillment
 ..     escrow_fulfillment.subconditions = []
-.. 
+..
 ..     # Do not fulfill the execute branch
 ..     condition_execute = cc.ThresholdSha256Fulfillment(threshold=2)
 ..     condition_execute.add_subfulfillment(subfulfillment_alice)
 ..     condition_execute.add_subfulfillment(subfulfillment_timeout)
 ..     escrow_fulfillment.add_subcondition(condition_execute.condition) # Adding only the condition here
-.. 
+..
 ..     # Fulfill the abort branch
 ..     fulfillment_abort = cc.ThresholdSha256Fulfillment(threshold=2)
 ..     subfulfillment_bob.sign(tx_escrow_abort_fulfillment_message, crypto.SigningKey(bob.private_key))
 ..     fulfillment_abort.add_subfulfillment(subfulfillment_bob)
 ..     fulfillment_abort.add_subfulfillment(subfulfillment_timeout_inverted)
 ..     escrow_fulfillment.add_subfulfillment(fulfillment_abort)
-.. 
+..
 ..     # Update the abort transaction with the fulfillment
 ..     tx_escrow_abort['fulfillments'][0]['fulfillment'] = escrow_fulfillment.serialize_uri()
 
@@ -1060,11 +1060,11 @@ timeout occurs:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     for i in range(time_sleep - 4):
 ..         valid_execute = b.is_valid_transaction(tx_escrow_execute) == tx_escrow_execute
 ..         valid_abort = b.is_valid_transaction(tx_escrow_abort) == tx_escrow_abort
-.. 
+..
 ..         seconds_to_timeout = int(float(time_expire) - float(util.timestamp()))
 ..         print('tx_execute valid: {} - tx_abort valid {} ({}s to timeout)'.format(valid_execute, valid_abort, seconds_to_timeout))
 ..         sleep(1)
@@ -1079,7 +1079,7 @@ If you execute in a timely fashion, you should see the following:
     are taken care of.
 
 .. .. code-block:: python
-.. 
+..
 ..     tx_execute valid: True - tx_abort valid False (3s to timeout)
 ..     tx_execute valid: True - tx_abort valid False (2s to timeout)
 ..     tx_execute valid: True - tx_abort valid False (1s to timeout)
