@@ -76,7 +76,7 @@ Define a digital asset data payload
     In [0]: digital_asset_payload = {'data': {'msg': 'Hello BigchainDB!'}}
 
     In [0]: tx = bdb.transactions.prepare(operation='CREATE',
-       ...:                               owners_before=alice.public_key,
+       ...:                               signers=alice.public_key,
        ...:                               asset=digital_asset_payload)
 
 All transactions need to be signed by the user creating the transaction.
@@ -85,9 +85,10 @@ All transactions need to be signed by the user creating the transaction.
 
     In [0]: signed_tx = bdb.transactions.fulfill(tx, private_keys=alice.private_key)
 
-Write the transaction to the bigchain. The transaction will be stored in a
-backlog where it will be validated, included in a block, and written to the
-bigchain.
+    In [0]: signed_tx
+
+Write the transaction to BigchainDB. The transaction will be stored in a
+backlog where it will be validated before being included in a block.
 
 .. code-block:: python
 
@@ -100,10 +101,6 @@ to the signed transaction payload.
 
     >>> sent_tx == signed_tx
     True
-
-.. ipython::
-
-    In [0]: signed_tx
 
 
 Read the Creation Transaction from the DB
@@ -137,14 +134,15 @@ case is
 
     In [0]: signed_tx['id']
 
-BigchainDB makes use of the crypto-conditions library to both cryptographically
-lock and unlock transactions. The locking script is referred to as a
-``condition`` and a corresponding ``fulfillment`` unlocks the condition of the
+BigchainDB makes use of the `crypto-conditions library <https://github.com/bigchaindb/cryptoconditions>`_
+to cryptographically lock and unlock transactions. The locking script is
+referred to as a ``condition`` (put inside an "output") and a corresponding
+``fulfillment`` (put inside an "input") unlocks the output condition of an
 ``input_tx``.
 
-Since a transaction can have multiple outputs with each its own
-(crypto)condition, each transaction input should also refer to the condition
-index ``cid``.
+Since a transaction can have multiple outputs each with their own
+(crypto)condition, each transaction input is required to refer to the output
+condition that they fulfill via ``fulfills.output``.
 
 .. image:: _static/tx_single_condition_single_fulfillment_v1.png
     :scale: 70%
@@ -153,32 +151,41 @@ index ``cid``.
 In order to prepare a transfer transaction, alice needs to provide at least
 three things:
 
-1. ``inputs`` -- one or more conditions that will be fulfilled.
-2. ``asset`` -- the asset being transferred.
-3. ``owners_after`` -- one or more public keys representing the new owner(s).
+1. ``inputs`` -- one or more fulfillments that fulfill a prior transaction's
+   output conditions.
+2. ``asset.id`` -- the id of the asset being transferred.
+3. Recipient ``public_keys`` -- one or more public keys representing the new
+   recipients(s).
 
 To construct the input:
 
 .. ipython::
 
-    In [0]: cid = 0
+    In [0]: output_index = 0
 
-    In [0]: condition = tx['conditions'][cid]
+    In [0]: output = tx['outputs'][output_index]
 
     In [0]: input_ = {
-       ...:     'fulfillment': condition['condition']['details'],
-       ...:     'input': {
-       ...:         'cid': cid,
+       ...:     'fulfillment': output['condition']['details'],
+       ...:     'fulfills': {
+       ...:         'output': output_index,
        ...:         'txid': tx['id'],
        ...:     },
-       ...:     'owners_before': condition['owners_after'],
+       ...:     'owners_before': output['public_keys'],
        ...: }
 
-The asset, can be directly retrieved from the input ``tx``:
+The asset in a ``TRANSFER`` transaction must be a dictionary with an ``id`` key
+denoting the asset to transfer. This asset id can either be the id of the
+``CREATE`` transaction of the asset (as it is in this case), or found inside
+the ``asset`` of a ``TRANSFER`` transaction:
 
 .. ipython::
 
-    In [0]: asset = tx['asset']
+    In [0]: transfer_asset_id = tx['id']
+
+    In [0]: transfer_asset = {
+       ...:     'id': transfer_asset_id,
+       ...: }
 
 Create a second test user, ``bob``:
 
@@ -195,8 +202,8 @@ And prepare the transfer transaction:
     In [0]: tx_transfer = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
        ...:     inputs=input_,
-       ...:     asset=asset,
-       ...:     owners_after=bob.public_key,
+       ...:     asset=transfer_asset,
+       ...:     recipients=bob.public_key,
        ...: )
 
 The ``tx_transfer`` dictionary should look something like:
@@ -275,8 +282,8 @@ Create another transfer transaction with the same input
     In [0]: tx_transfer_2 = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
        ...:     inputs=input_,
-       ...:     asset=asset,
-       ...:     owners_after=alice_secret_stash.public_key,
+       ...:     asset=transfer_asset,
+       ...:     recipients=alice_secret_stash.public_key,
        ...: )
 
 Fulfill the transaction
@@ -311,18 +318,24 @@ Say ``alice`` and ``bob`` own a car together:
 
 .. ipython::
 
-    In [0]: car_asset = {'data': {'car': {'vin': '5YJRE11B781000196'}}}
+    In [0]: car_asset = {
+       ...:     'data': {
+       ...:         'car': {
+       ...:             'vin': '5YJRE11B781000196'
+       ...:         }
+       ...:     }
+       ...: }
 
 and they agree that ``alice`` will be the one issuing the asset. To create a
 new digital asset with `multiple` owners, one can simply provide a
-list of ``owners_after``:
+list or tuple of ``recipients``:
 
 .. ipython::
 
     In [0]: car_creation_tx = bdb.transactions.prepare(
        ...:     operation='CREATE',
-       ...:     owners_before=alice.public_key,
-       ...:     owners_after=(alice.public_key, bob.public_key),
+       ...:     signers=alice.public_key,
+       ...:     recipients=(alice.public_key, bob.public_key),
        ...:     asset=car_asset,
        ...: )
 
@@ -333,7 +346,11 @@ list of ``owners_after``:
 
 .. code-block:: python
 
-    sent_car_tx = bdb.transactions.send(signed_car_creation_tx
+    >>> sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
+
+    >>> sent_car_tx == signed_car_creation_tx
+    True
+
 
 One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
 and realizing they no longer need their car, wish to transfer the ownership of
@@ -348,17 +365,17 @@ input:
 
 .. ipython::
 
-    In [0]: cid = 0
+    In [0]: output_index = 0
 
-    In [0]: condition = signed_car_creation_tx['conditions'][cid]
+    In [0]: output = signed_car_creation_tx['outputs'][output_index]
 
     In [0]: input_ = {
-       ...:     'fulfillment': condition['condition']['details'],
-       ...:     'input': {
-       ...:         'cid': cid,
+       ...:     'fulfillment': output['condition']['details'],
+       ...:     'fulfills': {
+       ...:         'output': output_index,
        ...:         'txid': signed_car_creation_tx['id'],
        ...:     },
-       ...:     'owners_before': condition['owners_after'],
+       ...:     'owners_before': output['public_keys'],
        ...: }
 
 Let's take a moment to contemplate what this ``input_`` is:
@@ -367,11 +384,13 @@ Let's take a moment to contemplate what this ``input_`` is:
 
     In [0]: input_
 
-and the asset:
+and the asset (because it's a ``CREATE`` transaction):
 
 .. ipython::
 
-    In [0]: asset = signed_car_creation_tx['asset']
+    In [0]: transfer_asset = {
+       ...:     'id': signed_car_creation_tx['id'],
+       ...: }
 
 then ``alice`` can prepare the transfer:
 
@@ -379,13 +398,13 @@ then ``alice`` can prepare the transfer:
 
     In [0]: car_transfer_tx = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
-       ...:     owners_after=carol.public_key,
-       ...:     asset=asset,
+       ...:     recipients=carol.public_key,
+       ...:     asset=transfer_asset,
        ...:     inputs=input_,
        ...: )
 
-The asset can be transfered as soon as each of the ``owners_after`` fulfills
-the transaction, that is ``alice`` and ``bob``.
+The asset can be transfered as soon as each of the original transaction's
+``signers`` fulfills the transaction, that is ``alice`` and ``bob``.
 
 To do so, simply provide a list of all private keys to the fulfill method.
 
@@ -476,13 +495,13 @@ Setting up a generic threshold condition is a bit more elaborate than regular tr
 The basic workflow for creating a more complex cryptocondition is the following:
 
 1. Create a transaction template that includes the public key of all (nested)
-   parties as ``owners_after``
+   parties (``signers``) in the ``output``'s ``public_keys``
 2. Set up the threshold condition using the
    `cryptocondition library <https://github.com/bigchaindb/cryptoconditions>`_
-3. Update the condition and hash in the transaction template
+3. Update the output's condition and hash in the transaction template
 
-We'll illustrate this by a threshold condition where 2 out of 3
-``owners_after`` need to sign the transaction:
+We'll illustrate this with a threshold condition where 2 out of 3 of the
+``signers`` need to sign the transaction:
 
 .. todo:: Stay tuned. Will soon be documented once
 
@@ -545,11 +564,11 @@ The transaction can now be transfered by fulfilling the threshold condition.
 The fulfillment involves:
 
 1. Create a transaction template that includes the public key of all (nested)
-   parties as ``owners_before``
+   parties (``signers``) in the ``inputs``'s ``owners_before``
 2. Parsing the threshold condition into a fulfillment using the
    `cryptocondition library <https://github.com/bigchaindb/cryptoconditions>`_
-3. Signing all necessary subfulfillments and updating the fulfillment field in
-   the transaction
+3. Signing all necessary subfulfillments and updating the ``inputs`` of the
+   transaction
 
 
 .. todo:: Stay tuned. Will soon be documented once
