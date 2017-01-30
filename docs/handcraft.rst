@@ -56,43 +56,37 @@ From the point of view of Python, a transaction is simply a dictionary:
 .. code-block:: python
 
     {
-        'id': '5c89494da317a343e7b99a8928669efe738aef6c1c4f092e436281ca070f4ea2',
+        'id': 'c10671ba9b1d3be3cb68959416bf88a711a4eeff2dbe29f5aca13e8dc39579ff',
         'operation': 'CREATE',
         'asset': {
             'data': {
                 'bicycle': {
                     'manufacturer': 'bkfab',
                     'serial_number': 'abcd1234',
-                }
+                },
             },
-            'divisible': False,
-            'refillable': False,
-            'updatable': False
-            'id': 'f60ce68c-1278-48d4-85dd-8051feca2ba3',
         },
         'metadata': {'planet': 'earth'},
-        'conditions': [{
+        'outputs': [{
             'amount': 1,
-            'cid': 0,
             'condition': {
                 'details': {
                     'bitmask': 32,
-                    'public_key': '8xeMF83SdMCm8r4GTnjCnE3LV6X6RogmqAWijBL2RFMf',
+                    'public_key': '6FCKbDMmCiM37pN9qzNmgJxKqebWzGxZUcAqB8CNg84J',
                     'signature': None,
                     'type': 'fulfillment',
-                    'type_id': 4
+                    'type_id': 4,
                 },
-                'uri': 'cc:4:20:dkL70TkL8ut-X9QqcloujpM10MRgbvIyVPjEer_DztY:96'
+                'uri': 'cc:4:20:Te1duSG0oFpsm-5Sn9uQT1QIngxmhZSOEry8xeCna8M:96',
             },
-            'owners_after': ['8xeMF83SdMCm8r4GTnjCnE3LV6X6RogmqAWijBL2RFMf']
+            'public_keys': ['6FCKbDMmCiM37pN9qzNmgJxKqebWzGxZUcAqB8CNg84J'],
         }],
-        'fulfillments': [{
-            'fid': 0,
-            'fulfillment': 'cf:4:dkL70TkL8ut-X9QqcloujpM10MRgbvIyVPjEer_DztYZ0gTuGPQ2U4u6MpxfRaSMZ0i8gYRgGJ-XuzwLOXZylPLvQM81cZ4W_K6izsLvQuHbUiTgdtV3pzSUHDHdpIYC',
-            'input': None,
-            'owners_before': ['8xeMF83SdMCm8r4GTnjCnE3LV6X6RogmqAWijBL2RFMf'],
+        'inputs': [{
+            'fulfillment': 'cf:4:Te1duSG0oFpsm-5Sn9uQT1QIngxmhZSOEry8xeCna8OJSbCmmVoQddD14yzvLRC0XxC5CsK7KnOORFOe5gOiCkEUh-KqCBgia_38jx4B-KDUkhcMaT-oP2TcjIRZhhkJ',
+            'fulfills': None,
+            'owners_before': ['6FCKbDMmCiM37pN9qzNmgJxKqebWzGxZUcAqB8CNg84J'],
         }],
-        'version': 1
+        'version': '0.9',
     }
 
 Because a transaction must be signed before being sent, the ``id`` and
@@ -141,7 +135,7 @@ to:
 
     In [0]: prepared_creation_tx = prepare_transaction(
        ...:     operation='CREATE',
-       ...:     owners_before=alice.public_key,
+       ...:     signers=alice.public_key,
        ...:     asset=bicycle,
        ...:     metadata=metadata,
        ...: )
@@ -152,22 +146,33 @@ and the payload of the prepared transaction looked similar to:
 
     In [0]: prepared_creation_tx
 
-Note ``alice``'s public key:
+Note ``alice``'s public key is listed in the public keys of ``outputs``:
 
 .. ipython::
 
     In [0]: alice.public_key
 
+    In [0]: prepared_creation_tx['outputs'][0]['public_keys'][0] == alice.public_key
+
 We are now going to craft this payload by hand.
 
-Extract asset id:
+version
+-------
+Until 1.0, each version of BigchainDB can be expected to contain
+backwards-incompatible changes to the transaction model. To facilitate this,
+the ``version`` in a transaction will correspond with the version of BigchainDB
+that was used to create it. For BigchainDB 0.9, this will be:
 
 .. ipython::
 
-    In [0]: asset_id = prepared_creation_tx['asset']['id']
+    In [0]: version = '0.9'
 
 asset
 -----
+Because this is a ``CREATE`` transaction, we provide the data payload for the
+asset to the transaction (see `the transfer example below <#bicycle-asset-transfer-revisited>`_
+for how to construct assets in ``TRANSFER`` transactions):
+
 .. ipython::
 
     In [0]: asset = {
@@ -177,10 +182,6 @@ asset
        ...:             'serial_number': 'abcd1234',
        ...:         },
        ...:     },
-       ...:     'divisible': False,
-       ...:     'refillable': False,
-       ...:     'updatable': False,
-       ...:     'id': asset_id,
        ...: }
 
 metadata
@@ -199,19 +200,19 @@ operation
 
     Case sensitive; all letters must be capitalized.
 
-conditions
-----------
-The purpose of the condition is to lock the transaction, such that a valid
-fulfillment is required to unlock it. In the case of signature-based schemes,
-the lock is basically a public key, such that in order to unlock the
-transaction one needs to have the private key.
+outputs
+-------
+The purpose of the output condition is to lock the transaction, such that a
+valid input fulfillment is required to unlock it. In the case of
+signature-based schemes, the lock is basically a public key, such that in order
+to unlock the transaction one needs to have the private key.
 
-Let's review the condition payload of the prepared transaction, to see what we
-are aiming for:
+Let's review the output payload of the prepared transaction, to see what we are
+aiming for:
 
 .. ipython::
 
-    In [0]: prepared_creation_tx['conditions'][0]
+    In [0]: prepared_creation_tx['outputs'][0]
 
 The difficult parts are the condition details and URI. We''ll now see how to
 generate them using the ``cryptoconditions`` library:
@@ -236,21 +237,20 @@ As for the details:
 
     In [0]: ed25519.to_dict()
 
-We can now easily assemble the ``dict`` for the condition:
+We can now easily assemble the ``dict`` for the output:
 
 .. ipython::
 
-    In [0]: condition = {
+    In [0]: output = {
        ...:     'amount': 1,
-       ...:     'cid': 0,
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
        ...:     },
-       ...:     'owners_after': (alice.public_key,),
+       ...:     'public_keys': (alice.public_key,),
        ...: }
 
-Let's recap and set the ``conditions`` key:
+Let's recap and set the ``outputs`` key with our self-constructed condition:
 
 .. ipython::
 
@@ -258,17 +258,16 @@ Let's recap and set the ``conditions`` key:
 
     In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
-    In [0]: condition = {
+    In [0]: output = {
        ...:     'amount': 1,
-       ...:     'cid': 0,
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
        ...:     },
-       ...:     'owners_after': (alice.public_key,),
+       ...:     'public_keys': (alice.public_key,),
        ...: }
 
-    In [0]: conditions = (condition,)
+    In [0]: outputs = (output,)
 
 The key part is the condition URI:
 
@@ -280,31 +279,31 @@ To know more about its meaning, you may read the `cryptoconditions internet
 draft`_.
 
 
-fulfillments
-------------
-The fulfillment for a ``CREATE`` operation is somewhat special:
+inputs
+------
+The input fulfillment for a ``CREATE`` operation is somewhat special, and
+simplified:
 
 .. ipython::
 
-    In [0]: fulfillment = {
-       ...:     'fid': 0,
+    In [0]: input_ = {
        ...:     'fulfillment': None,
-       ...:     'input': None,
+       ...:     'fulfills': None,
        ...:     'owners_before': (alice.public_key,)
        ...: }
 
-* The input field is empty because it's a ``CREATE`` operation;
-* The ``'fulfillemnt'`` value is ``None`` as it will be set during the
-  fulfillment step; and
+* The ``fulfills`` field is empty because it's a ``CREATE`` operation;
+* The ``'fulfillment'`` value is ``None`` as it will be set during the
+  `fulfillment step <#the-fulfilled-transaction>`_; and
 * The ``'owners_before'`` field identifies the issuer(s) of the asset that is
   being created.
 
 
-The ``fulfillments`` value is simply a list or tuple of all fulfillments:
+The ``inputs`` value is simply a list or tuple of all inputs:
 
 .. ipython::
 
-    In [0]: fulfillments = (fulfillment,)
+    In [0]: inputs = (input_,)
 
 
 .. note:: You may rightfully observe that the input generated in
@@ -312,13 +311,13 @@ The ``fulfillments`` value is simply a list or tuple of all fulfillments:
 
     .. ipython::
 
-        In [0]: prepared_creation_tx['fulfillments'][0]
+        In [0]: prepared_creation_tx['inputs'][0]
 
     More precisely, the value of ``'fulfillment'`` is not ``None``:
 
     .. ipython::
 
-        In [0]: prepared_creation_tx['fulfillments'][0]['fulfillment']
+        In [0]: prepared_creation_tx['inputs'][0]['fulfillment']
 
     The quick answer is that it simply is not needed, and can be set to
     ``None``.
@@ -334,9 +333,9 @@ Putting it all together:
        ...:     'asset': asset,
        ...:     'metadata': metadata,
        ...:     'operation': operation,
-       ...:     'conditions': conditions,
-       ...:     'fulfillments': fulfillments,
-       ...:     'version': 1,
+       ...:     'outputs': outputs,
+       ...:     'inputs': inputs,
+       ...:     'version': version,
        ...: }
 
     In [0]: handcrafted_creation_tx
@@ -357,6 +356,8 @@ above payload:
 
     operation = 'CREATE'
 
+    version = '0.9'
+
     asset = {
         'data': {
             'bicycle': {
@@ -364,42 +365,36 @@ above payload:
                 'serial_number': 'abcd1234',
             },
         },
-        'divisible': False,
-        'refillable': False,
-        'updatable': False,
-        'id': asset_id,
     }
 
     metadata = {'planet': 'earth'}
 
     ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
-    condition = {
+    output = {
         'amount': 1,
-        'cid': 0,
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (alice.public_key,),
+        'public_keys': (alice.public_key,),
     }
-    conditions = (condition,)
+    outputs = (output,)
 
-    fulfillment = {
-        'fid': 0,
+    input_ = {
         'fulfillment': None,
-        'input': None,
+        'fulfills': None,
         'owners_before': (alice.public_key,)
     }
-    fulfillments = (fulfillment,)
+    inputs = (input_,)
 
     handcrafted_creation_tx = {
         'asset': asset,
         'metadata': metadata,
         'operation': operation,
-        'conditions': conditions,
-        'fulfillments': fulfillments,
-        'version': 1,
+        'outputs': outputs,
+        'inputs': inputs,
+        'version': version,
     }
 
 id
@@ -446,9 +441,9 @@ You may observe that
 
     In [0]: prepared_creation_tx_bk = deepcopy(prepared_creation_tx)
 
-    In [0]: # set fulfillment to None
+    In [0]: # set input fulfillment to None
 
-    In [0]: prepared_creation_tx['fulfillments'][0]['fulfillment'] = None
+    In [0]: prepared_creation_tx['inputs'][0]['fulfillment'] = None
 
     In [0]: handcrafted_creation_tx == prepared_creation_tx
 
@@ -506,15 +501,15 @@ The Fulfilled Transaction
 
     In [0]: ed25519.sign(message.encode(), sk)
 
-    In [0]: fulfillment = ed25519.serialize_uri()
+    In [0]: fulfillment_uri = ed25519.serialize_uri()
 
-    In [0]: handcrafted_creation_tx['fulfillments'][0]['fulfillment'] = fulfillment
+    In [0]: handcrafted_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Let's check this:
 
 .. ipython::
 
-    In [0]: fulfilled_creation_tx['fulfillments'][0]['fulfillment'] == fulfillment
+    In [0]: fulfilled_creation_tx['inputs'][0]['fulfillment'] == fulfillment_uri
 
     In [0]: json.dumps(fulfilled_creation_tx, sort_keys=True) == json.dumps(handcrafted_creation_tx, sort_keys=True)
 
@@ -539,7 +534,8 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     operation = 'CREATE'
 
-    asset_id = str(uuid4())
+    version = '0.9'
+
     asset = {
         'data': {
             'bicycle': {
@@ -547,42 +543,36 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
                 'serial_number': 'abcd1234',
             },
         },
-        'divisible': False,
-        'refillable': False,
-        'updatable': False,
-        'id': asset_id,
     }
 
     metadata = {'planet': 'earth'}
 
     ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
 
-    condition = {
+    output = {
         'amount': 1,
-        'cid': 0,
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (alice.public_key,),
+        'public_keys': (alice.public_key,),
     }
-    conditions = (condition,)
+    outputs = (output,)
 
-    fulfillment = {
-        'fid': 0,
+    input_ = {
         'fulfillment': None,
-        'input': None,
+        'fulfills': None,
         'owners_before': (alice.public_key,)
     }
-    fulfillments = (fulfillment,)
+    inputs = (input_,)
 
     handcrafted_creation_tx = {
         'asset': asset,
         'metadata': metadata,
         'operation': operation,
-        'conditions': conditions,
-        'fulfillments': fulfillments,
-        'version': 1,
+        'outputs': outputs,
+        'inputs': inputs,
+        'version': version,
     }
 
     json_str_tx = json.dumps(
@@ -607,9 +597,9 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     ed25519.sign(message.encode(), sk)
 
-    fulfillment = ed25519.serialize_uri()
+    fulfillment_uri = ed25519.serialize_uri()
 
-    handcrafted_creation_tx['fulfillments'][0]['fulfillment'] = fulfillment
+    handcrafted_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Sending it over to a BigchainDB node:
 
@@ -650,24 +640,28 @@ transfer transaction was prepared and fulfilled as follows:
 
     In [0]: bob = generate_keypair()
 
-    In [0]: cid = 0
+    In [0]: output_index = 0
 
-    In [0]: condition = creation_tx['conditions'][cid]
+    In [0]: output = creation_tx['outputs'][output_index]
 
     In [0]: transfer_input = {
-       ...:     'fulfillment': condition['condition']['details'],
-       ...:     'input': {
-       ...:          'cid': cid,
+       ...:     'fulfillment': output['condition']['details'],
+       ...:     'fulfills': {
+       ...:          'output': output_index,
        ...:          'txid': creation_tx['id'],
        ...:      },
-       ...:      'owners_before': condition['owners_after'],
+       ...:      'owners_before': output['public_keys'],
+       ...: }
+
+    In [0]: transfer_asset = {
+       ...:     'id': creation_tx['id'],
        ...: }
 
     In [0]: prepared_transfer_tx = prepare_transaction(
        ...:     operation='TRANSFER',
-       ...:     asset=creation_tx['asset'],
+       ...:     asset=transfer_asset,
        ...:     inputs=transfer_input,
-       ...:     owners_after=bob.public_key,
+       ...:     recipients=bob.public_key,
        ...: )
 
     In [0]: fulfilled_transfer_tx = fulfill_transaction(
@@ -688,12 +682,20 @@ the help of
 The Prepared Transaction
 ========================
 
+version
+-------
+.. ipython::
+
+    In [0]: version = '0.9'
+
 asset
 -----
+The asset payload for ``TRANSFER`` transaction is a ``dict`` with only the
+asset id (i.e. the id of the ``CREATE`` transaction for the asset):
 
 .. ipython::
 
-    In [0]: asset = {'id': asset_id}
+    In [0]: asset = {'id': creation_tx['id']}
 
 metadata
 --------
@@ -707,45 +709,44 @@ operation
 
     In [0]: operation = 'TRANSFER'
 
-conditions
-----------
+outputs
+-------
 .. ipython::
 
     In [0]: from cryptoconditions import Ed25519Fulfillment
 
     In [0]: ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
-    In [0]: condition = {
+    In [0]: output = {
        ...:     'amount': 1,
-       ...:     'cid': 0,
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
        ...:     },
-       ...:     'owners_after': (bob.public_key,),
+       ...:     'public_keys': (bob.public_key,),
        ...: }
 
-    In [0]: conditions = (condition,)
+    In [0]: outputs = (output,)
 
 fulfillments
 ------------
 .. ipython::
 
-    In [0]: fulfillment = {
-       ...:     'fid': 0,
+    In [0]: input_ = {
        ...:     'fulfillment': None,
-       ...:     'input': {
+       ...:     'fulfills': {
        ...:         'txid': creation_tx['id'],
-       ...:         'cid': 0,
+       ...:         'output': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key,)
        ...: }
 
-    In [0]: fulfillments = (fulfillment,)
+    In [0]: inputs = (input_,)
 
 A few notes:
 
-* The ``input`` field points to the condition that needs to be fulfilled;
+* The ``fulfills`` field points to the condition (in a transaction) that needs
+  to be fulfilled;
 * The ``'fulfillment'`` value is ``None`` as it will be set during the
   fulfillment step; and
 * The ``'owners_before'`` field identifies the fulfiller(s).
@@ -758,9 +759,9 @@ Putting it all together:
        ...:     'asset': asset,
        ...:     'metadata': metadata,
        ...:     'operation': operation,
-       ...:     'conditions': conditions,
-       ...:     'fulfillments': fulfillments,
-       ...:     'version': 1,
+       ...:     'outputs': outputs,
+       ...:     'inputs': inputs,
+       ...:     'version': version,
        ...: }
 
     In [0]: handcrafted_transfer_tx
@@ -781,40 +782,39 @@ Before we generate the ``id``, let's recap how we got here:
     )
 
     operation = 'TRANSFER'
-    asset = {'id': asset_id}
+    version = '0.9'
+    asset = {'id': creation_tx['id']}
     metadata = None
 
     ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
-    condition = {
+    output = {
         'amount': 1,
-        'cid': 0,
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (bob.public_key,),
+        'public_keys': (bob.public_key,),
     }
-    conditions = (condition,)
+    outputs = (output,)
 
-    fulfillment = {
-        'fid': 0,
+    input_ = {
         'fulfillment': None,
-        'input': {
+        'fulfills': {
             'txid': creation_tx['id'],
-            'cid': 0,
+            'output': 0,
         },
         'owners_before': (alice.public_key,)
     }
-    fulfillments = (fulfillment,)
+    inputs = (input_,)
 
     handcrafted_transfer_tx = {
         'asset': asset,
         'metadata': metadata,
         'operation': operation,
-        'conditions': conditions,
-        'fulfillments': fulfillments,
-        'version': 1,
+        'outputs': outputs,
+        'inputs': inputs,
+        'version': version,
     }
 
 id
@@ -860,7 +860,7 @@ You may observe that
 
     In [0]: # set fulfillment to None
 
-    In [0]: prepared_transfer_tx['fulfillments'][0]['fulfillment'] = None
+    In [0]: prepared_transfer_tx['inputs'][0]['fulfillment'] = None
 
     In [0]: handcrafted_transfer_tx == prepared_transfer_tx
 
@@ -918,15 +918,15 @@ The Fulfilled Transaction
 
     In [0]: ed25519.sign(message.encode(), sk)
 
-    In [0]: fulfillment = ed25519.serialize_uri()
+    In [0]: fulfillment_uri = ed25519.serialize_uri()
 
-    In [0]: handcrafted_transfer_tx['fulfillments'][0]['fulfillment'] = fulfillment
+    In [0]: handcrafted_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Let's check this:
 
 .. ipython::
 
-    In [0]: fulfilled_transfer_tx['fulfillments'][0]['fulfillment'] == fulfillment
+    In [0]: fulfilled_transfer_tx['inputs'][0]['fulfillment'] == fulfillment_uri
 
     In [0]: json.dumps(fulfilled_transfer_tx, sort_keys=True) == json.dumps(handcrafted_transfer_tx, sort_keys=True)
 
@@ -947,40 +947,39 @@ In a nutshell
     bob = generate_keypair()
 
     operation = 'TRANSFER'
-    asset = {'id': asset_id}
+    version = '0.9'
+    asset = {'id': creation_tx['id']}
     metadata = None
 
     ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
 
-    condition = {
+    output = {
         'amount': 1,
-        'cid': 0,
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
         },
-        'owners_after': (bob.public_key,),
+        'public_keys': (bob.public_key,),
     }
-    conditions = (condition,)
+    outputs = (output,)
 
-    fulfillment = {
-        'fid': 0,
+    input_ = {
         'fulfillment': None,
-        'input': {
+        'fulfills': {
             'txid': creation_txid,
-            'cid': 0,
+            'output': 0,
         },
         'owners_before': (alice.public_key,)
     }
-    fulfillments = (fulfillment,)
+    inputs = (input_,)
 
     handcrafted_transfer_tx = {
         'asset': asset,
         'metadata': metadata,
         'operation': operation,
-        'conditions': conditions,
-        'fulfillments': fulfillments,
-        'version': 1,
+        'outputs': outputs,
+        'inputs': inputs,
+        'version': version,
     }
 
     json_str_tx = json.dumps(
@@ -1005,9 +1004,9 @@ In a nutshell
 
     ed25519.sign(message.encode(), sk)
 
-    fulfillment = ed25519.serialize_uri()
+    fulfillment_uri = ed25519.serialize_uri()
 
-    handcrafted_transfer_tx['fulfillments'][0]['fulfillment'] = fulfillment
+    handcrafted_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Sending it over to a BigchainDB node:
 
@@ -1053,10 +1052,9 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 
 
     bob, carly = generate_keypair(), generate_keypair()
+    version = '0.9'
 
-    asset_id = str(uuid4())
     asset = {
-        'divisible': True,
         'data': {
             'token_for': {
                 'bicycle': {
@@ -1066,9 +1064,6 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
                 'description': 'time share token. each token equals 1 hour of riding.'
             },
         },
-        'refillable': False,
-        'updatable': False,
-        'id': asset_id,
     }
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for carly
@@ -1080,29 +1075,28 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
     unsigned_fulfillment_dict = ed25519.to_dict()
 
-    condition = {
+    output = {
         'amount': 10,
-        'cid': 0,
         'condition': {
             'details': unsigned_fulfillment_dict,
             'uri': condition_uri,
         },
-        'owners_after': (carly.public_key,),
+        'public_keys': (carly.public_key,),
     }
 
-    fulfillment = {
-        'fid': 0,
+    input_ = {
         'fulfillment': None,
-        'input': None,
+        'fulfills': None,
         'owners_before': (bob.public_key,)
     }
 
     token_creation_tx = {
-        'asset': metadata': None,
         'operation': 'CREATE',
-        'conditions': (condition,),
-        'fulfillments': (fulfillment,),
-        'version': 1,
+        'asset': asset,
+        'metadata': None,
+        'outputs': (output,),
+        'inputs': (input_,),
+        'version': version,
     }
 
     # JSON: serialize the id-less transaction to a json formatted string
@@ -1135,7 +1129,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     fulfillment_uri = ed25519.serialize_uri()
 
     # add the fulfillment uri (signature)
-    token_creation_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
+    token_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Sending it over to a BigchainDB node:
 
@@ -1153,13 +1147,13 @@ A few checks:
     >>> json.dumps(returned_creation_tx, sort_keys=True) == json.dumps(token_creation_tx, sort_keys=True)
     True
 
-    >>> token_creation_tx['fulfillments'][0]['owners_before'][0] == bob.public_key
+    >>> token_creation_tx['inputs'][0]['owners_before'][0] == bob.public_key
     True
 
-    >>> token_creation_tx['conditions'][0]['owners_after'][0] == carly.public_key
+    >>> token_creation_tx['outputs'][0]['public_keys'][0] == carly.public_key
     True
 
-    >>> token_creation_tx['conditions'][0]['amount'] == 10
+    >>> token_creation_tx['outputs'][0]['amount'] == 10
     True
 
 
@@ -1191,42 +1185,39 @@ to Bob:
     bob_unsigned_fulfillment_dict = bob_ed25519.to_dict()
     carly_unsigned_fulfillment_dict = carly_ed25519.to_dict()
 
-    bob_condition = {
+    bob_output = {
         'amount': 2,
-        'cid': 0,
         'condition': {
             'details': bob_unsigned_fulfillment_dict,
             'uri': bob_condition_uri,
         },
-        'owners_after': (bob.public_key,),
+        'public_keys': (bob.public_key,),
     }
-    carly_condition = {
+    carly_output = {
         'amount': 8,
-        'cid': 1,
         'condition': {
             'details': carly_unsigned_fulfillment_dict,
             'uri': carly_condition_uri,
         },
-        'owners_after': (carly.public_key,),
+        'public_keys': (carly.public_key,),
     }
 
-    fulfillment = {
-        'fid': 0,
+    input_ = {
         'fulfillment': None,
-        'input': {
+        'fulfills': {
             'txid': token_creation_tx['id'],
-            'cid': 0,
+            'output': 0,
         },
         'owners_before': (carly.public_key,)
     }
 
     token_transfer_tx = {
-        'asset': {'id': asset_id},
-        'metadata': None,
         'operation': 'TRANSFER',
-        'conditions': (bob_condition, carly_condition),
-        'fulfillments': (fulfillment,),
-        'version': 1,
+        'asset': {'id': token_creation_tx['id']},
+        'metadata': None,
+        'outputs': (bob_output, carly_output),
+        'inputs': (input_,),
+        'version': version,
     }
 
     # JSON: serialize the id-less transaction to a json formatted string
@@ -1259,7 +1250,7 @@ to Bob:
     fulfillment_uri = carly_ed25519.serialize_uri()
 
     # add bob's fulfillment uri (signature)
-    token_transfer_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
+    token_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Sending it over to a BigchainDB node:
 
@@ -1275,7 +1266,7 @@ A few checks:
     >>> json.dumps(returned_transfer_tx, sort_keys=True) == json.dumps(token_transfer_tx, sort_keys=True)
     True
 
-    >>> token_transfer_tx['fulfillments'][0]['owners_before'][0] == carly.public_key
+    >>> token_transfer_tx['inputs'][0]['owners_before'][0] == carly.public_key
     True
 
 
@@ -1311,8 +1302,8 @@ Say ``alice`` and ``bob`` own a car together:
 
     In [0]: car_creation_tx = offchain.prepare_transaction(
        ...:     operation='CREATE',
-       ...:     owners_before=alice.public_key,
-       ...:     owners_after=(alice.public_key, bob.public_key),
+       ...:     signers=alice.public_key,
+       ...:     recipients=(alice.public_key, bob.public_key),
        ...:     asset=car_asset,
        ...: )
 
@@ -1336,25 +1327,25 @@ their car over to ``carol``:
 
     In [0]: carol = generate_keypair()
 
-    In [0]: cid = 0
+    In [0]: output_index = 0
 
-    In [0]: condition = signed_car_creation_tx['conditions'][cid]
+    In [0]: output = signed_car_creation_tx['outputs'][output_index]
 
     In [0]: input_ = {
-       ...:     'fulfillment': condition['condition']['details'],
-       ...:     'input': {
-       ...:         'cid': cid,
+       ...:     'fulfillment': output['condition']['details'],
+       ...:     'fulfills': {
+       ...:         'output': output_index,
        ...:         'txid': signed_car_creation_tx['id'],
        ...:     },
-       ...:     'owners_before': condition['owners_after'],
+       ...:     'owners_before': output['public_keys'],
        ...: }
 
-    In [0]: asset = signed_car_creation_tx['asset']
+    In [0]: asset = signed_car_creation_tx['id']
 
     In [0]: car_transfer_tx = offchain.prepare_transaction(
        ...:     operation='TRANSFER',
-       ...:     owners_after=carol.public_key,
-       ...:     asset=asset,
+       ...:     recipients=carol.public_key,
+       ...:     asset={'id': car_creation_tx['id']},
        ...:     inputs=input_,
        ...: )
 
@@ -1390,17 +1381,15 @@ Create the asset, setting all values:
 
 .. ipython::
 
-    In [0]: car_asset_id = signed_car_creation_tx['asset']['id']
-
     In [0]: car_asset = {
-       ...:     'data': {'car': {'vin': '5YJRE11B781000196'}},
-       ...:     'divisible': False,
-       ...:     'refillable': False,
-       ...:     'updatable': False,
-       ...:     'id': car_asset_id,
+       ...:     'data': {
+       ...:         'car': {
+       ...:             'vin': '5YJRE11B781000196',
+       ...:         },
+       ...:     },
        ...: }
 
-Generate the condition:
+Generate the output condition:
 
 .. ipython::
 
@@ -1418,14 +1407,13 @@ Generate the condition:
 
     In [0]: condition_uri = threshold_sha256.condition.serialize_uri()
 
-    In [0]: condition = {
+    In [0]: output = {
        ...:     'amount': 1,
-       ...:     'cid': 0,
        ...:     'condition': {
        ...:         'details': unsigned_subfulfillments_dict,
        ...:         'uri': condition_uri,
        ...:     },
-       ...:     'owners_after': (alice.public_key, bob.public_key),
+       ...:     'public_keys': (alice.public_key, bob.public_key),
        ...: }
 
 .. tip:: The condition ``uri`` could have been generated in a slightly
@@ -1445,14 +1433,13 @@ Generate the condition:
     The ``details`` on the other hand holds the associated fulfillments not yet
     fulfilled.
 
-The yet to be fulfilled fulfillment:
+The yet to be fulfilled input:
 
 .. ipython::
 
-    In [0]: fulfillment = {
-       ...:     'fid': 0,
+    In [0]: input_ = {
        ...:     'fulfillment': None,
-       ...:     'input': None,
+       ...:     'fulfills': None,
        ...:     'owners_before': (alice.public_key,),
        ...: }
 
@@ -1460,13 +1447,15 @@ Craft the payload:
 
 .. ipython::
 
+    In [0]: version = '0.9'
+
     In [0]: handcrafted_car_creation_tx = {
+       ...:     'operation': 'CREATE',
        ...:     'asset': car_asset,
        ...:     'metadata': None,
-       ...:     'operation': 'CREATE',
-       ...:     'conditions': (condition,),
-       ...:     'fulfillments': (fulfillment,),
-       ...:     'version': 1,
+       ...:     'outputs': (output,),
+       ...:     'inputs': (input_,),
+       ...:     'version': version,
        ...: }
 
 Generate the id, by hashing the encoded json formatted string representation of
@@ -1506,7 +1495,7 @@ Sign the transaction:
 
     In [0]: fulfillment_uri = alice_ed25519.serialize_uri()
 
-    In [0]: handcrafted_car_creation_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
+    In [0]: handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Compare our signed ``CREATE`` transaction with the driver's:
 
@@ -1529,26 +1518,24 @@ The transfer to Carol:
 
     In [0]: condition_uri = carol_ed25519.condition.serialize_uri()
 
-    In [0]: condition = {
+    In [0]: output = {
        ...:     'amount': 1,
-       ...:     'cid': 0,
        ...:     'condition': {
        ...:         'details': unsigned_fulfillments_dict,
        ...:         'uri': condition_uri,
        ...:     },
-       ...:     'owners_after': (carol.public_key,),
+       ...:     'public_keys': (carol.public_key,),
        ...: }
 
-The yet to be fulfilled fulfillments:
+The yet to be fulfilled input:
 
 .. ipython::
 
-    In [0]: fulfillment = {
-       ...:     'fid': 0,
+    In [0]: input_ = {
        ...:     'fulfillment': None,
-       ...:     'input': {
+       ...:     'fulfills': {
        ...:         'txid': handcrafted_car_creation_tx['id'],
-       ...:         'cid': 0,
+       ...:         'output': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key, bob.public_key),
        ...: }
@@ -1558,12 +1545,12 @@ Craft the payload:
 .. ipython::
 
     In [0]: handcrafted_car_transfer_tx = {
-       ...:     'asset': {'id': car_asset_id},
-       ...:     'metadata': None,
        ...:     'operation': 'TRANSFER',
-       ...:     'conditions': (condition,),
-       ...:     'fulfillments': (fulfillment,),
-       ...:     'version': 1,
+       ...:     'asset': {'id': handcrafted_car_creation_tx['id']},
+       ...:     'metadata': None,
+       ...:     'outputs': (output,),
+       ...:     'inputs': (input_,),
+       ...:     'version': version,
        ...: }
 
 Generate the id, by hashing the encoded json formatted string representation of
@@ -1619,7 +1606,7 @@ Sign the transaction:
 
     In [0]: fulfillment_uri = threshold_sha256.serialize_uri()
 
-    In [0]: handcrafted_car_transfer_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
+    In [0]: handcrafted_car_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Compare our signed ``TRANSFER`` transaction with the driver's:
 
@@ -1644,16 +1631,14 @@ Handcrafting the ``'CREATE'`` transaction
     from bigchaindb_driver.crypto import generate_keypair
 
 
+    version = 0.9
+
     car_asset = {
         'data': {
             'car': {
                 'vin': '5YJRE11B781000196',
             },
         },
-        'divisible': False,
-         'refillable': False,
-         'updatable': False,
-         'id': '5YJRE11B781000196',
     }
 
     alice, bob = generate_keypair(), generate_keypair()
@@ -1679,32 +1664,30 @@ Handcrafting the ``'CREATE'`` transaction
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = threshold_sha256.condition.serialize_uri()
 
-    condition = {
+    output = {
         'amount': 1,
-        'cid': 0,
         'condition': {
             'details': unsigned_subfulfillments_dict,
             'uri': threshold_sha256.condition_uri,
         },
-        'owners_after': (alice.public_key, bob.public_key),
+        'public_keys': (alice.public_key, bob.public_key),
     }
 
-    # The yet to be fulfilled fulfillment:
-    fulfillment = {
-        'fid': 0,
+    # The yet to be fulfilled input:
+    input_ = {
         'fulfillment': None,
-        'input': None,
+        'fulfills': None,
         'owners_before': (alice.public_key,),
     }
 
     # Craft the payload:
     handcrafted_car_creation_tx = {
+        'operation': 'CREATE',
         'asset': car_asset,
         'metadata': None,
-        'operation': 'CREATE',
-        'conditions': (condition,),
-        'fulfillments': (fulfillment,),
-        'version': 1,
+        'outputs': (output,),
+        'inputs': (input_,),
+        'version': version,
     }
 
     # JSON: serialize the id-less transaction to a json formatted string
@@ -1739,7 +1722,7 @@ Handcrafting the ``'CREATE'`` transaction
     fulfillment_uri = alice_ed25519.serialize_uri()
 
     # add the fulfillment uri (signature)
-    handcrafted_car_creation_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
+    handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 
 Sending it over to a BigchainDB node:
@@ -1763,6 +1746,8 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
+    version = 0.9
+
     carol = generate_keypair()
 
     alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
@@ -1775,35 +1760,33 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     condition_uri = carol_ed25519.condition.serialize_uri()
 
-    condition = {
+    output = {
         'amount': 1,
-        'cid': 0,
         'condition': {
             'details': unsigned_fulfillments_dict,
             'uri': condition_uri,
         },
-        'owners_after': (carol.public_key,),
+        'public_keys': (carol.public_key,),
     }
 
-    # The yet to be fulfilled fulfillments:
-    fulfillment = {
-        'fid': 0,
+    # The yet to be fulfilled input:
+    input_ = {
         'fulfillment': None,
-        'input': {
+        'fulfills': {
             'txid': handcrafted_car_creation_tx['id'],
-            'cid': 0,
+            'output': 0,
         },
         'owners_before': (alice.public_key, bob.public_key),
     }
 
     # Craft the payload:
     handcrafted_car_transfer_tx = {
+        'operation': 'TRANSFER',
         'asset': {'id': car_asset['id']},
         'metadata': None,
-        'operation': 'TRANSFER',
-        'conditions': (condition,),
-        'fulfillments': (fulfillment,),
-        'version': 1,
+        'outputs': (output,),
+        'inputs': (input_,),
+        'version': version,
     }
 
     # Generate the id, by hashing the encoded json formatted string
@@ -1847,7 +1830,7 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     fulfillment_uri = threshold_sha256.serialize_uri()
 
-    handcrafted_car_transfer_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
+    handcrafted_car_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Sending it over to a BigchainDB node:
 
