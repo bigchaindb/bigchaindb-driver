@@ -95,8 +95,8 @@ From the point of view of Python, a transaction is simply a dictionary:
         'version': 1
     }
 
-Because a transaction must be signed before being sent, the ``id``, must be
-provided by the client.
+Because a transaction must be signed before being sent, the ``id`` and
+``fulfillment`` must be provided by the client.
 
 .. important:: **Implications of Signed Payloads**
 
@@ -222,7 +222,7 @@ generate them using the ``cryptoconditions`` library:
 
     In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
-generate the condition uri:
+generate the condition URI:
 
 .. ipython::
 
@@ -307,14 +307,14 @@ The ``fulfillments`` value is simply a list or tuple of all fulfillments:
     In [0]: fulfillments = (fulfillment,)
 
 
-.. note:: You may rightfully observe that the ``prepared_creation_tx``
-    fulfillment generated via the ``prepare_transaction`` function  differs:
+.. note:: You may rightfully observe that the input generated in
+    ``prepared_creation_tx`` via ``prepare_transaction()`` differs:
 
     .. ipython::
 
         In [0]: prepared_creation_tx['fulfillments'][0]
 
-    More precisely, the value of ``'fulfillment'``:
+    More precisely, the value of ``'fulfillment'`` is not ``None``:
 
     .. ipython::
 
@@ -322,6 +322,9 @@ The ``fulfillments`` value is simply a list or tuple of all fulfillments:
 
     The quick answer is that it simply is not needed, and can be set to
     ``None``.
+
+Up to now
+---------
 
 Putting it all together:
 
@@ -338,8 +341,9 @@ Putting it all together:
 
     In [0]: handcrafted_creation_tx
 
-We're missing the ``id``, and we'll generate it soon, but before that, let's
-recap how we've put all the code together to generate the above payload:
+The only thing we're missing now is the ``id``. We'll generate it soon, but
+before that, let's recap how we've put all the code together to generate the
+above payload:
 
 .. code-block:: python
 
@@ -401,6 +405,9 @@ recap how we've put all the code together to generate the above payload:
 id
 --
 
+The transaction's id is essentially a SHA3-256 hash of the entire transaction
+(up to now), with a few additional tweaks:
+
 .. ipython::
 
     In [0]: import json
@@ -461,7 +468,7 @@ Are still not equal because we used tuples instead of lists.
 
     In [0]: prepared_creation_tx = prepared_creation_tx_bk
 
-The full handcrafted yet-to-be-fulfilled transaction payload:
+The fully handcrafted, yet-to-be-fulfilled ``CREATE`` transaction payload:
 
 .. ipython::
 
@@ -475,12 +482,18 @@ The Fulfilled Transaction
 
     In [0]: from cryptoconditions.crypto import Ed25519SigningKey
 
+    In [0]: # fulfill prepared transaction
+
     In [0]: from bigchaindb_driver.offchain import fulfill_transaction
 
     In [0]: fulfilled_creation_tx = fulfill_transaction(
        ...:     prepared_creation_tx,
        ...:     private_keys=alice.private_key,
        ...: )
+
+    In [0]: # fulfill handcrafted transaction (with our previously built ED25519 fulfillment)
+
+    In [0]: ed25519.to_dict()
 
     In [0]: sk = Ed25519SigningKey(alice.private_key)
 
@@ -509,7 +522,7 @@ Let's check this:
 In a nutshell
 =============
 
-Handcrafting a ``'CREATE'`` transaction can be done as follows:
+Handcrafting a ``CREATE`` transaction can be done as follows:
 
 .. code-block:: python
 
@@ -752,8 +765,10 @@ Putting it all together:
 
     In [0]: handcrafted_transfer_tx
 
-We're missing the ``id``, and we'll generate it, but before, let's recap how
-we've put all the code together to generate the above payload:
+Up to now
+---------
+
+Before we generate the ``id``, let's recap how we got here:
 
 .. code-block:: python
 
@@ -865,7 +880,7 @@ Are still not equal because we used tuples instead of lists.
 
     In [0]: prepared_transfer_tx = prepared_transfer_tx_bk
 
-The full handcrafted yet-to-be-fulfilled transaction payload:
+The fully handcrafted, yet-to-be-fulfilled ``TRANSFER`` transaction payload:
 
 .. ipython::
 
@@ -881,10 +896,16 @@ The Fulfilled Transaction
 
     In [0]: from bigchaindb_driver.offchain import fulfill_transaction
 
+    In [0]: # fulfill prepared transaction
+
     In [0]: fulfilled_transfer_tx = fulfill_transaction(
        ...:     prepared_transfer_tx,
        ...:     private_keys=alice.private_key,
        ...: )
+
+    In [0]: # fulfill handcrafted transaction (with our previously built ED25519 fulfillment)
+
+    In [0]: ed25519.to_dict()
 
     In [0]: sk = Ed25519SigningKey(alice.private_key)
 
@@ -1017,7 +1038,8 @@ A few checks:
 Bicycle Sharing Revisited
 *************************
 
-Handcrafting the ``'CREATE'`` transaction:
+Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
+<bicycle-divisible-assets>`:
 
 .. code-block:: python
 
@@ -1231,7 +1253,7 @@ to Bob:
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id for bob
     carly_ed25519.sign(message.encode(),
-                     cryptoconditions.crypto.Ed25519SigningKey(carly.private_key))
+                       cryptoconditions.crypto.Ed25519SigningKey(carly.private_key))
 
     # CRYPTO-CONDITIONS: generate bob's fulfillment uri
     fulfillment_uri = carly_ed25519.serialize_uri()
@@ -1272,7 +1294,8 @@ Multiple Owners Revisited
 Walkthrough
 ===========
 
-We'll re-use the example, to compare our work.
+We'll re-use the :ref:`example of Alice and Bob owning a car together
+<car-multiple-owners>` to handcraft transactions with multiple owners.
 
 Say ``alice`` and ``bob`` own a car together:
 
@@ -1346,6 +1369,9 @@ Sending the transaction to a BigchainDB node:
 .. code-block:: python
 
     sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx)
+
+Doing this manually
+-------------------
 
 In order to do this manually, let's first import the necessary tools (json,
 sha3, and cryptoconditions):
@@ -1482,14 +1508,14 @@ Sign the transaction:
 
     In [0]: handcrafted_car_creation_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
 
-Compare our signed CREATE transaction with the driver's:
+Compare our signed ``CREATE`` transaction with the driver's:
 
 .. ipython::
 
     In [0]: (json.dumps(handcrafted_car_creation_tx, sort_keys=True) ==
        ...:  json.dumps(signed_car_creation_tx, sort_keys=True))
 
-The transfer:
+The transfer to Carol:
 
 .. ipython::
 
@@ -1595,7 +1621,7 @@ Sign the transaction:
 
     In [0]: handcrafted_car_transfer_tx['fulfillments'][0]['fulfillment'] = fulfillment_uri
 
-Compare our signed TRANSFER transaction with the driver's:
+Compare our signed ``TRANSFER`` transaction with the driver's:
 
 .. ipython::
 

@@ -333,6 +333,7 @@ Running the above code should give something similar to:
 
 .. _bigchaindb_driver: https://github.com/bigchaindb/bigchaindb-driver
 
+.. _bicycle-divisible-assets:
 
 Divisible Assets
 ----------------
