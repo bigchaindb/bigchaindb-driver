@@ -38,7 +38,7 @@ class BigchainDB:
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
         self._transport = transport_class(*self._nodes, headers=headers)
         self._transactions = TransactionsEndpoint(self)
-        self._unspents = UnspentsEndpoint(self)
+        self._outputs = OutputsEndpoint(self)
 
     @property
     def nodes(self):
@@ -61,11 +61,11 @@ class BigchainDB:
         return self._transactions
 
     @property
-    def unspents(self):
-        """:class:`~bigchaindb_driver.driver.UnspentsEndpoint`:
-            Exposes functionalities of the ``'/unspents'`` endpoint.
+    def outputs(self):
+        """:class:`~bigchaindb_driver.driver.OutputsEndpoint`:
+            Exposes functionalities of the ``'/outputs'`` endpoint.
         """
-        return self._unspents
+        return self._outputs
 
 
 class NamespacedDriver:
@@ -243,21 +243,24 @@ class TransactionsEndpoint(NamespacedDriver):
             method='GET', path=path, headers=headers)
 
 
-class UnspentsEndpoint(NamespacedDriver):
+class OutputsEndpoint(NamespacedDriver):
     """Endpoint for unspents.
 
     Attributes:
         path (str): The path of the endpoint: ``'/unspents'``
 
     """
-    path = '/unspents/'
+    path = '/outputs/'
 
-    def get(self, public_key, headers=None):
+    def get(self, public_key, unspent=False, headers=None):
         """
 
         Args:
             public_key (str): Public key for which unfulfilled
                 conditions are sought.
+            unspent (bool): Whether to get the unconsumed outputs
+                only. Defaults to ``False``, meaning that both consumed,
+                and unconsumed outputs will be returned.
             headers (dict): Optional headers to pass to the request.
 
         Returns:
@@ -276,6 +279,6 @@ class UnspentsEndpoint(NamespacedDriver):
         return self.transport.forward_request(
             method='GET',
             path=self.path,
-            params={'public_key': public_key},
+            params={'public_key': public_key, 'unspent': unspent},
             headers=headers,
         )

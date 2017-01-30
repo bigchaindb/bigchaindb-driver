@@ -2,6 +2,7 @@ import json
 from base64 import b64encode
 from collections import namedtuple
 from os import environ, urandom
+from time import sleep
 
 import requests
 from cryptoconditions import Ed25519Fulfillment
@@ -105,8 +106,29 @@ def carol_keypair():
 
 
 @fixture
+def carol_privkey(carol_keypair):
+    return carol_keypair.private_key
+
+
+@fixture
 def carol_pubkey(carol_keypair):
     return carol_keypair.public_key
+
+
+@fixture
+def dimi_keypair():
+    from bigchaindb_driver.crypto import generate_keypair
+    return generate_keypair()
+
+
+@fixture
+def dimi_privkey(dimi_keypair):
+    return dimi_keypair.private_key
+
+
+@fixture
+def dimi_pubkey(dimi_keypair):
+    return dimi_keypair.public_key
 
 
 @fixture
@@ -268,6 +290,58 @@ def persisted_carol_car_transaction(driver, signed_carol_car_transaction):
         driver.nodes[0] + '/transactions/',
         json=signed_carol_car_transaction,
     )
+    return response.json()
+
+
+@fixture
+def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey, bdb_node,
+                                         persisted_carol_car_transaction):
+    # FIXME The sleep, or some other approach is required to wait for the
+    # transaction to be available as some processing is being done by the
+    # server.
+    sleep(1.5)
+    output_txid = persisted_carol_car_transaction['id']
+    ed25519_dimi = Ed25519Fulfillment(public_key=dimi_pubkey)
+    transaction = {
+        'asset': {'id': output_txid},
+        'metadata': None,
+        'operation': 'TRANSFER',
+        'outputs': ({
+            'amount': 1,
+            'condition': {
+                'details': ed25519_dimi.to_dict(),
+                'uri': ed25519_dimi.condition_uri,
+            },
+            'public_keys': (dimi_pubkey,),
+        },),
+        'inputs': ({
+            'fulfillment': None,
+            'fulfills': {
+                'output': 0,
+                'txid': output_txid,
+            },
+            'owners_before': (carol_keypair.public_key,),
+        },),
+        'version': '0.9',
+    }
+    serialized_transaction_without_id = json.dumps(
+        transaction,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    ).encode()
+    transaction['id'] = sha3_256(serialized_transaction_without_id).hexdigest()
+    serialized_transaction_with_id = json.dumps(
+        transaction,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    ).encode()
+    ed25519_carol = Ed25519Fulfillment(public_key=carol_keypair.public_key)
+    ed25519_carol.sign(serialized_transaction_with_id,
+                       Ed25519SigningKey(carol_keypair.private_key))
+    transaction['inputs'][0]['fulfillment'] = ed25519_carol.serialize_uri()
+    response = requests.post(bdb_node + '/transactions/', json=transaction)
     return response.json()
 
 

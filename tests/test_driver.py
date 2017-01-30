@@ -30,7 +30,7 @@ class TestBigchainDB:
         for conn in driver.transport.pool.connections:
             conn.session.headers == expected_headers
         assert driver.transactions
-        assert driver.unspents
+        assert driver.outputs
 
 
 class TestTransactionsEndpoint:
@@ -110,20 +110,37 @@ class TestTransactionsEndpoint:
         assert sent_tx == fulfilled_tx
 
 
-class TestUnspentsEndpoint:
+class TestOutputsEndpoint:
 
-    @mark.skip
-    def test_get_unspents(self, carol_pubkey, driver,
-                          persisted_alice_transaction,
-                          persisted_carol_bicycle_transaction,
-                          persisted_carol_car_transaction):
+    def test_get_outputs(self, driver, carol_pubkey,
+                         persisted_carol_bicycle_transaction,
+                         persisted_carol_car_transaction):
         # FIXME The sleep, or some other approach is required to wait for the
         # transaction to be available as some processing is being done by the
         # server.
         sleep(1.5)
-        unspents = driver.unspents.get(carol_pubkey)
-        assert len(unspents) == 2
-        assert '../transactions/{id}/conditions/0'.format_map(
-            persisted_carol_bicycle_transaction) in unspents
-        assert '../transactions/{id}/conditions/0'.format_map(
-            persisted_carol_car_transaction) in unspents
+        outputs = driver.outputs.get(carol_pubkey)
+        assert len(outputs) == 2
+        assert '../transactions/{id}/outputs/0'.format_map(
+            persisted_carol_bicycle_transaction) in outputs
+        assert '../transactions/{id}/outputs/0'.format_map(
+            persisted_carol_car_transaction) in outputs
+
+    @mark.parametrize('unspent,outputs_qty', ((True, 1), (False, 2)))
+    def test_get_outputs_with_unspent_query_param(
+            self, unspent, outputs_qty, driver, carol_pubkey,
+            persisted_carol_bicycle_transaction,
+            persisted_carol_car_transaction,
+            persisted_transfer_carol_car_to_dimi):
+        # FIXME The sleep, or some other approach is required to wait for the
+        # transaction to be available as some processing is being done by the
+        # server.
+        sleep(1.5)
+        outputs = driver.outputs.get(carol_pubkey, unspent=unspent)
+        assert len(outputs) == outputs_qty
+        output_link = '../transactions/{id}/outputs/0'
+        assert output_link.format_map(
+            persisted_carol_bicycle_transaction) in outputs
+        if not unspent:
+            assert output_link.format_map(
+                persisted_carol_car_transaction) in outputs
