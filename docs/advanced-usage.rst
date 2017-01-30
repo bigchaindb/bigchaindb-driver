@@ -303,6 +303,7 @@ Send the transaction over to the node
 .. todo:: Update the above output once
     https://github.com/bigchaindb/bigchaindb/issues/664 is taken care of.
 
+.. _car-multiple-owners:
 
 Multiple Owners
 ===============
