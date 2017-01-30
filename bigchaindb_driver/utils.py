@@ -1,8 +1,5 @@
 """Set of utilities to support various functionalities of the driver.
 
-.. danger:: This module is meant for specific internal usage only and its
-    behaviour is subject to change.
-
 Attributes:
     ops_map (dict): Mapping between operation strings and classes.
         E.g.: The string ``'CREATE'`` is mapped to
