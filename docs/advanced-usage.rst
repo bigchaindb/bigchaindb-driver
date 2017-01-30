@@ -7,10 +7,8 @@ Advanced Usage Examples
 This section has examples of using the Python Driver for more advanced use
 cases such as escrow.
 
-.. todo:: Work in progress. Will gradually appear as
+.. todo:: Work in progress. More examples will gradually appear as issues like
 
-    * https://github.com/bigchaindb/bigchaindb/issues/664
-    * https://github.com/bigchaindb/bigchaindb-driver/issues/108
     * https://github.com/bigchaindb/bigchaindb-driver/issues/110
 
     are taken care of.
@@ -19,12 +17,13 @@ cases such as escrow.
 Getting Started
 ===============
 
-First, make sure you have RethinkDB and BigchainDB `installed and running`,
-i.e. you `installed them <https://docs.bigchaindb.com/projects/server/en/latest/dev-and-test/setup-run-node.html>`_ and you ran:
+First, make sure you have RethinkDB and BigchainDB
+`installed and running <https://docs.bigchaindb.com/projects/server/en/latest/dev-and-test/setup-run-node.html>`_,
+e.g.:
 
 .. code-block:: bash
 
-    $ rethinkdb
+    $ rethinkdb --daemon
     $ bigchaindb configure
     $ bigchaindb start
 
@@ -105,18 +104,16 @@ to the signed transaction payload.
 
 Read the Creation Transaction from the DB
 =========================================
-After a couple of seconds, we can check if the transactions was included in the
-bigchain:
+After a couple of seconds, we can check if the transaction was validated in a
+block:
 
 .. code-block:: python
 
-    # Retrieve a transaction from the bigchain
+    # Retrieve a validated transaction
     >>> tx_retrieved = bdb.transactions.retrieve(tx['id'])
 
-
-
-The new owner of the digital asset is now alice which is the public key, aka
-verifying key of ``alice``.
+The new owner of the digital asset is now Alice (or more correctly, her *public
+key*):
 
 .. ipython::
 
@@ -142,18 +139,18 @@ referred to as a ``condition`` (put inside an "output") and a corresponding
 
 Since a transaction can have multiple outputs each with their own
 (crypto)condition, each transaction input is required to refer to the output
-condition that they fulfill via ``fulfills.output``.
+condition that they fulfill via ``fulfills['output']``.
 
 .. image:: _static/tx_single_condition_single_fulfillment_v1.png
     :scale: 70%
     :align: center
 
-In order to prepare a transfer transaction, alice needs to provide at least
+In order to prepare a transfer transaction, Alice needs to provide at least
 three things:
 
 1. ``inputs`` -- one or more fulfillments that fulfill a prior transaction's
    output conditions.
-2. ``asset.id`` -- the id of the asset being transferred.
+2. ``asset['id']`` -- the id of the asset being transferred.
 3. Recipient ``public_keys`` -- one or more public keys representing the new
    recipients(s).
 
@@ -175,9 +172,10 @@ To construct the input:
        ...: }
 
 The asset in a ``TRANSFER`` transaction must be a dictionary with an ``id`` key
-denoting the asset to transfer. This asset id can either be the id of the
-``CREATE`` transaction of the asset (as it is in this case), or found inside
-the ``asset`` of a ``TRANSFER`` transaction:
+denoting the asset to transfer. This asset id is either the id of the
+``CREATE`` transaction of the asset (as it is in this case), or is the
+``asset['id']`` property in a ``TRANSFER`` transaction (note that this value
+simply points to the id of the asset's ``CREATE`` transaction):
 
 .. ipython::
 
@@ -212,9 +210,11 @@ The ``tx_transfer`` dictionary should look something like:
 
     In [0]: tx_transfer
 
-Notice, ``bob``'s verifying key (public key), appearing in the above ``dict``.
+Notice, ``bob``'s public key, appearing in the above ``dict``.
 
 .. ipython::
+
+    In [0]: tx_transfer['outputs'][0]['public_keys'][0]
 
     In [0]: bob.public_key
 
@@ -238,12 +238,11 @@ More precisely:
 
 .. ipython::
 
-    In [0]: signed_tx_transfer['fulfillments'][0]['fulfillment']
-    'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg4S_S7Obu7E-HtL2ZjM3tcKKfoaspMhyx17Eg2KBijylZMxv1NvAD0j8uJP1WOb2AP6ezJorcw6TA5n-cmuwkE'
+    In [0]: signed_tx_transfer['inputs'][0]['fulfillment']
 
 We have yet to send the transaction over to a BigchainDB node, as both
-preparing and fulfilling a transaction are done "offchain", that is without the
-need to have a conenction to a BigchainDB federation.
+preparing and fulfilling a transaction are done "offchain," that is, without
+the need to have a connection to a BigchainDB federation.
 
 .. code-block:: python
 
@@ -481,16 +480,17 @@ specification can be found
 `here <https://interledger.org/five-bells-condition/spec.html>`_.
 
 Implementations of the crypto-conditions are available in
-`Python <https://github.com/bigchaindb/cryptoconditions>`_ and
-`JavaScript <https://github.com/interledger/five-bells-condition>`_.
+`Python <https://github.com/bigchaindb/cryptoconditions>`_,
+`JavaScript <https://github.com/interledger/five-bells-condition>`_, and
+`Java <https://github.com/interledger/java-crypto-conditions>`_.
 
 
 Threshold Conditions
 --------------------
 
-Threshold conditions introduce multi-signatures, m-of-n signatures or even more complex binary Merkle trees to BigchainDB.
+Threshold conditions introduce multi-signatures, m-of-n signatures, or even more complex binary Merkle trees to BigchainDB.
 
-Setting up a generic threshold condition is a bit more elaborate than regular transaction signing but allow for flexible signing between multiple parties or groups.
+Setting up a generic threshold condition is a bit more elaborate than regular transaction signing but allows for flexible signing between multiple parties or groups.
 
 The basic workflow for creating a more complex cryptocondition is the following:
 
@@ -643,7 +643,7 @@ Hash-locked Conditions
 ----------------------
 
 A hash-lock condition on an asset is like a password condition: anyone with the
-secret preimage (like a password) can fulfill the hash-lock condition and
+secret preimage (i.e. a password) can fulfill the hash-lock condition and
 transfer the asset to themselves.
 
 Under the hood, fulfilling a hash-lock condition amounts to finding a string
