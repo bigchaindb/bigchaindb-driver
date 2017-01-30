@@ -21,13 +21,13 @@ class BigchainDB:
         Args:
             *nodes (str): BigchainDB nodes to connect to. Currently, the full
                 URL must be given. In the absence of any node, the default
-                will be used, e.g.: ``'http://localhost:9984/api/v1'``.
+                (``'http://localhost:9984/api/v1'``) will be used.
             transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
             headers (dict): Optional headers that will be passed with
                 each request. To pass headers only on a per-request
                 basis, you can pass the headers to the method of choice
-                (e.g. :meth:`.TransactionsEndpoint.send`).
+                (e.g. :meth:`~.TransactionsEndpoint.send`).
 
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
