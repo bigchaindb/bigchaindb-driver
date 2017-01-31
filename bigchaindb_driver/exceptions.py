@@ -49,10 +49,15 @@ class ConnectionError(TransportError):
     """
 
 
+class BadRequest(TransportError):
+    """Exception for HTTP 400 errors."""
+
+
 class NotFoundError(TransportError):
     """Exception for HTTP 404 errors."""
 
 
 HTTP_EXCEPTIONS = {
+    400: BadRequest,
     404: NotFoundError,
 }
