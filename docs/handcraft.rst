@@ -1631,7 +1631,7 @@ Handcrafting the ``'CREATE'`` transaction
     from bigchaindb_driver.crypto import generate_keypair
 
 
-    version = 0.9
+    version = '0.9'
 
     car_asset = {
         'data': {
@@ -1746,7 +1746,7 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
-    version = 0.9
+    version = '0.9'
 
     carol = generate_keypair()
 
