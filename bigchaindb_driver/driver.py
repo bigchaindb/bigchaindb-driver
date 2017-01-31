@@ -193,6 +193,48 @@ class TransactionsEndpoint(NamespacedDriver):
         """
         return fulfill_transaction(transaction, private_keys=private_keys)
 
+    def get(self, *, asset_id, operation=None, headers=None):
+        """Given an asset id, get its list of transactions (and
+        optionally filter for only ``'CREATE'`` or ``'TRANSFER'``
+        transactions).
+
+        Args:
+            asset_id (str): Id of the asset.
+            operation (str): The type of operation the transaction
+                should be. Either ``'CREATE'`` or ``'TRANSFER'``.
+                Defaults to ``None``.
+            headers (dict): Optional headers to pass to the request.
+
+        Note:
+            Please note that the id of an asset in BigchainDB is
+            actually the id of the transaction which created the asset.
+            In other words, when querying for an asset id with the
+            operation set to ``'CREATE'``, only one transaction should
+            be expected. This transaction will be the transaction in
+            which the asset was created, and the transaction id will be
+            equal to the given asset id. Hence, the following calls to
+            :meth:`.retrieve` and :meth:`.get` should return the same
+            transaction.
+
+                >>> bdb = BigchainDB()
+                >>> bdb.transactions.retrieve('foo')
+                >>> bdb.transactions.get(asset_id='foo', operation='CREATE')
+
+            Since :meth:`.get` returns a list of transactions, it may
+            be more efficient to use :meth:`.retrieve` instead, if one
+            is only interested in the ``'CREATE'`` operation.
+
+        Returns:
+            list: List of transactions.
+
+        """
+        return self.transport.forward_request(
+            method='GET',
+            path=self.path,
+            params={'asset_id': asset_id, 'operation': operation},
+            headers=headers,
+        )
+
     def send(self, transaction, headers=None):
         """Submit a transaction to the Federation.
 
