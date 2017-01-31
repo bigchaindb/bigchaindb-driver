@@ -27,7 +27,8 @@ class BigchainDB:
             headers (dict): Optional headers that will be passed with
                 each request. To pass headers only on a per-request
                 basis, you can pass the headers to the method of choice
-                (e.g. :meth:`~.TransactionsEndpoint.send`).
+                (e.g. :meth:`BigchainDB().transactions.send()
+                <.TransactionsEndpoint.send>`).
 
         """
         self._nodes = nodes if nodes else (DEFAULT_NODE,)
