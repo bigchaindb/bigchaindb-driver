@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 from time import sleep
 
 import rapidjson
@@ -108,6 +109,44 @@ class TestTransactionsEndpoint:
                                                    private_keys=alice_privkey)
         sent_tx = driver.transactions.send(fulfilled_tx)
         assert sent_tx == fulfilled_tx
+
+    def test_get_raises_type_error(self, driver):
+        """This test is somewhat important as it ensures that the
+        signature of the method requires the ``asset_id`` argument.
+        The http api would return a 400 if no ``asset_id`` is provided.
+
+        """
+        with raises(TypeError) as exc:
+            driver.transactions.get()
+        assert exc.value.args == (
+            "get() missing 1 required keyword-only argument: 'asset_id'",)
+
+    @mark.parametrize('query_params', (
+        {}, {'operation': 'CREATE'}, {'operation': 'TRANSFER'}
+    ))
+    def test_get_empty(self, driver, query_params):
+        response = driver.transactions.get(asset_id='a' * 64)
+        assert response == []
+
+    @mark.parametrize('operation,tx_qty', (
+        (None, 3), ('CREATE', 1), ('TRANSFER', 2)
+    ))
+    @mark.usefixtures('persisted_transfer_dimi_car_to_ewy')
+    def test_get(self, driver,
+                 signed_carol_car_transaction, operation, tx_qty):
+        # FIXME The sleep, or some other approach is required to wait for the
+        # transaction to be available as some processing is being done by the
+        # server.
+        sleep(1.5)
+        response = driver.transactions.get(
+            asset_id=signed_carol_car_transaction['id'], operation=operation)
+        assert len(response) == tx_qty
+        if operation in (None, 'CREATE'):
+            assert any(tx['id'] == signed_carol_car_transaction['id']
+                       for tx in response)
+        if operation in (None, 'TRANSFER'):
+            assert all(tx['asset']['id'] == signed_carol_car_transaction['id']
+                       for tx in response if 'id' in tx['asset'])
 
 
 class TestOutputsEndpoint:
