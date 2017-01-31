@@ -27,6 +27,7 @@ extensions = [
     'IPython.sphinxext.ipython_directive',
 ]
 
+autodoc_default_flags = ['show-inheritance']
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
