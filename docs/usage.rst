@@ -169,16 +169,26 @@ To check the status of the transaction:
 
 .. code-block:: python
 
-    >>> trials = 0
-
-    >>> while bdb.transactions.status(txid).get('status') != 'valid' and trials < 100:
-    ...     trials += 1
-
     >>> bdb.transactions.status(txid)
-    {'status': 'valid'}
 
 .. note:: It may take a small amount of time before a BigchainDB cluster
     confirms a transaction as being valid.
+
+Here's some code that keeps checking the status of the transaction until it is valid:
+
+.. code-block:: python
+
+    >>> trials = 0
+
+    >>> while trials < 100:
+    ...     try:
+    ...         if bdb.transactions.status(txid).get('status') == 'valid':
+    ...             break
+    ...     except bigchaindb_driver.exceptions.NotFoundError:
+    ...         trials += 1
+    
+    >>> bdb.transactions.status(txid)
+    {'status': 'valid'}
 
 .. _bicycle-transfer:
 
