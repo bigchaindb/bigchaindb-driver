@@ -45,13 +45,11 @@ class TestTransactionsEndpoint:
         with raises(NotFoundError):
             driver.transactions.retrieve(txid)
 
-    @mark.skip(reason='bigchaindb/bigchaindb-driver/issues/229')
     def test_status(self, driver, persisted_alice_transaction):
         txid = persisted_alice_transaction['id']
         status = driver.transactions.status(txid)
         assert status['status'] == 'valid'
 
-    @mark.skip(reason='bigchaindb/bigchaindb-driver/issues/229')
     def test_status_not_found(self, driver):
         from bigchaindb_driver.exceptions import NotFoundError
         txid = 'dummy_id'
