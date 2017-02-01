@@ -419,8 +419,8 @@ To do so, simply provide a list of all private keys to the fulfill method.
        ...:     car_transfer_tx, private_keys=[alice.private_key, bob.private_key]
        ...: )
 
-Note, that if one the signing keys is missing, the fulfillment will fail. If we
-omit ``bob``:
+Note, that if one of the private keys is missing, the fulfillment will fail. If
+we omit ``bob``:
 
 .. ipython::
 
