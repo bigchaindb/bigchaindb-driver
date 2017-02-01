@@ -2,7 +2,6 @@
 
 import json
 
-import rapidjson
 from pytest import mark, raises
 from requests.utils import default_headers
 
@@ -84,11 +83,11 @@ class TestTransactionsEndpoint:
         signed_transaction = driver.transactions.fulfill(
             unsigned_transaction, private_keys=alice_keypair.sk)
         unsigned_transaction['inputs'][0]['fulfillment'] = None
-        message = rapidjson.dumps(
+        message = json.dumps(
             unsigned_transaction,
-            skipkeys=False,
-            ensure_ascii=False,
             sort_keys=True,
+            separators=(',', ':'),
+            ensure_ascii=False,
         ).encode()
         ed25519 = Ed25519Fulfillment(public_key=alice_keypair.vk)
         ed25519.sign(message, Ed25519SigningKey(alice_keypair.sk))
