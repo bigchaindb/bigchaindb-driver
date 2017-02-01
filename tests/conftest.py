@@ -1,6 +1,7 @@
 import json
 from base64 import b64encode
 from collections import namedtuple
+from functools import wraps
 from os import environ, urandom
 from time import sleep
 
@@ -11,6 +12,18 @@ from pytest import fixture
 from sha3 import sha3_256
 
 from bigchaindb.common.transaction import Transaction
+
+
+# FIXME The sleep, or some other approach is required to wait for the
+# transaction to be available as some processing is being done by the
+# server.
+def await_transaction(fixture_func, waiting_time=1.5):
+    @wraps(fixture_func)
+    def wrapper(*args, **kwargs):
+        transaction = fixture_func(*args, **kwargs)
+        sleep(waiting_time)
+        return transaction
+    return wrapper
 
 
 def make_ed25519_condition(public_key, *, amount=1):
@@ -199,6 +212,7 @@ def alice_transaction(alice_transaction_obj):
 
 
 @fixture
+@await_transaction
 def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
     signed_transaction = alice_transaction_obj.sign([alice_privkey])
     json = signed_transaction.to_dict()
@@ -259,6 +273,7 @@ def signed_carol_bicycle_transaction(request, carol_keypair,
 
 
 @fixture
+@await_transaction
 def persisted_carol_bicycle_transaction(driver,
                                         signed_carol_bicycle_transaction):
     response = requests.post(
@@ -301,6 +316,7 @@ def signed_carol_car_transaction(request, carol_keypair,
 
 
 @fixture
+@await_transaction
 def persisted_carol_car_transaction(driver, signed_carol_car_transaction):
     response = requests.post(
         driver.nodes[0] + '/transactions/',
@@ -310,12 +326,9 @@ def persisted_carol_car_transaction(driver, signed_carol_car_transaction):
 
 
 @fixture
+@await_transaction
 def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey, bdb_node,
                                          persisted_carol_car_transaction):
-    # FIXME The sleep, or some other approach is required to wait for the
-    # transaction to be available as some processing is being done by the
-    # server.
-    sleep(1.5)
     output_txid = persisted_carol_car_transaction['id']
     ed25519_dimi = Ed25519Fulfillment(public_key=dimi_pubkey)
     transaction = {
@@ -362,12 +375,9 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey, bdb_node,
 
 
 @fixture
+@await_transaction
 def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey, bdb_node,
                                        persisted_transfer_carol_car_to_dimi):
-    # FIXME The sleep, or some other approach is required to wait for the
-    # transaction to be available as some processing is being done by the
-    # server.
-    sleep(1.5)
     output_txid = persisted_transfer_carol_car_to_dimi['id']
     ed25519_ewy = Ed25519Fulfillment(public_key=ewy_pubkey)
     transaction = {

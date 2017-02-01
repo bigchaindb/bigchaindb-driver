@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import json
-from time import sleep
 
 import rapidjson
 from pytest import mark, raises
@@ -38,10 +37,6 @@ class TestTransactionsEndpoint:
 
     def test_retrieve(self, driver, persisted_alice_transaction):
         txid = persisted_alice_transaction['id']
-        # FIXME The sleep, or some other approach is required to wait for the
-        # transaction to be available as some processing is being done by the
-        # server.
-        sleep(1.5)
         tx = driver.transactions.retrieve(txid)
         assert tx['id'] == txid
 
@@ -54,10 +49,6 @@ class TestTransactionsEndpoint:
     @mark.skip(reason='bigchaindb/bigchaindb-driver/issues/229')
     def test_status(self, driver, persisted_alice_transaction):
         txid = persisted_alice_transaction['id']
-        # FIXME The sleep, or some other approach is required to wait for the
-        # transaction to be available as some processing is being done by the
-        # server.
-        sleep(1.5)
         status = driver.transactions.status(txid)
         assert status['status'] == 'valid'
 
@@ -134,10 +125,6 @@ class TestTransactionsEndpoint:
     @mark.usefixtures('persisted_transfer_dimi_car_to_ewy')
     def test_get(self, driver,
                  signed_carol_car_transaction, operation, tx_qty):
-        # FIXME The sleep, or some other approach is required to wait for the
-        # transaction to be available as some processing is being done by the
-        # server.
-        sleep(1.5)
         response = driver.transactions.get(
             asset_id=signed_carol_car_transaction['id'], operation=operation)
         assert len(response) == tx_qty
@@ -154,10 +141,6 @@ class TestOutputsEndpoint:
     def test_get_outputs(self, driver, carol_pubkey,
                          persisted_carol_bicycle_transaction,
                          persisted_carol_car_transaction):
-        # FIXME The sleep, or some other approach is required to wait for the
-        # transaction to be available as some processing is being done by the
-        # server.
-        sleep(1.5)
         outputs = driver.outputs.get(carol_pubkey)
         assert len(outputs) == 2
         assert '../transactions/{id}/outputs/0'.format_map(
@@ -171,10 +154,6 @@ class TestOutputsEndpoint:
             persisted_carol_bicycle_transaction,
             persisted_carol_car_transaction,
             persisted_transfer_carol_car_to_dimi):
-        # FIXME The sleep, or some other approach is required to wait for the
-        # transaction to be available as some processing is being done by the
-        # server.
-        sleep(1.5)
         outputs = driver.outputs.get(carol_pubkey, unspent=unspent)
         assert len(outputs) == outputs_qty
         output_link = '../transactions/{id}/outputs/0'
