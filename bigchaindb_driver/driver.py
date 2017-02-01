@@ -276,9 +276,9 @@ class TransactionsEndpoint(NamespacedDriver):
             dict: A dict containing a 'status' item for the transaction.
 
         """
-        path = self.path + txid + '/status'
+        path = '/statuses'
         return self.transport.forward_request(
-            method='GET', path=path, headers=headers)
+            method='GET', path=path, params={'tx_id': txid}, headers=headers)
 
 
 class OutputsEndpoint(NamespacedDriver):
