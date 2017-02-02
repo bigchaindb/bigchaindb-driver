@@ -64,6 +64,49 @@ class BigchainDB:
         """
         return self._outputs
 
+    def info(self, headers=None):
+        """Retrieves information of the node being connected to via the
+        root endpoint ``'/'``.
+
+        Args:
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            dict: Details of the node that this instance is connected
+            to. Some information that may be interesting:
+
+                * the server version,
+                * the public key of the node, and
+                * its key ring (list of public keys of the nodes this
+                  node is connected to).
+
+        Note:
+            Currently limited to one node, and will be expanded to
+            return information for each node that this instance is
+            connected to.
+
+        """
+        return self.transport.forward_request(
+            method='GET', path='/', headers=headers)
+
+    def api_info(self, headers=None):
+        """Retrieves information provided by the API root endpoint
+        ``'/api/v1'``.
+
+        Args:
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            dict: Details of the HTTP API provided by the BigchainDB
+            server.
+
+        """
+        return self.transport.forward_request(
+            method='GET',
+            path=self.api_prefix,
+            headers=headers,
+        )
+
 
 class NamespacedDriver:
     """Base class for creating endpoints (namespaced objects) that can be added
