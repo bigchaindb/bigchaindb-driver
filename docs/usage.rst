@@ -348,14 +348,18 @@ Recap: Asset Creation & Transfer
 	txid = fulfilled_creation_tx['id']
 	
 	trials = 0
-	while bdb.transactions.status(txid).get('status') != 'valid' and trials < 60:
-		trials += 1
-		sleep(1)
+	while trials < 60:
+		try:
+			if bdb.transactions.status(txid).get('status') == 'valid':
+				print('Tx valid in:', trials, 'secs')
+				break
+		except bigchaindb_driver.exceptions.NotFoundError:
+			trials += 1
+			sleep(1)
 	
 	if trials == 60:
 		print('Tx is still being processed... Bye!')
 		exit(0)
-	print('Tx valid in:', trials, 'secs')
 	
 	asset_id = txid
 	
