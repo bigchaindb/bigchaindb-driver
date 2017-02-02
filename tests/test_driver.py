@@ -31,6 +31,24 @@ class TestBigchainDB:
         assert driver.transactions
         assert driver.outputs
 
+    def test_info(self, driver, bdb_node_pubkey):
+        response = driver.info()
+        assert '_links' in response
+        assert 'docs' in response['_links']
+        assert response['keyring'] == []
+        assert response['public_key'] == bdb_node_pubkey
+        assert response['software'] == 'BigchainDB'
+        assert 'version' in response
+
+    def test_api_info(self, driver):
+        response = driver.api_info()
+        assert '_links' in response
+        assert 'docs' in response['_links']
+        api_root = driver.nodes[0] + driver.api_prefix + '/'
+        assert response['_links']['self'] == api_root
+        assert response['_links']['transactions'] == api_root + 'transactions/'
+        assert response['_links']['statuses'] == api_root + 'statuses/'
+
 
 class TestTransactionsEndpoint:
 
