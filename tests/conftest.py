@@ -172,13 +172,23 @@ def bdb_port():
 
 @fixture
 def bdb_node(bdb_host, bdb_port):
-    return 'http://{host}:{port}/api/v1'.format(host=bdb_host, port=bdb_port)
+    return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
 
 
 @fixture
 def driver(bdb_node):
     from bigchaindb_driver import BigchainDB
     return BigchainDB(bdb_node)
+
+
+@fixture
+def api_root(bdb_node):
+    return bdb_node + '/api/v1'
+
+
+@fixture
+def transactions_api_full_url(api_root):
+    return api_root + '/transactions'
 
 
 @fixture
@@ -213,10 +223,12 @@ def alice_transaction(alice_transaction_obj):
 
 @fixture
 @await_transaction
-def persisted_alice_transaction(alice_privkey, driver, alice_transaction_obj):
+def persisted_alice_transaction(alice_privkey,
+                                alice_transaction_obj,
+                                transactions_api_full_url):
     signed_transaction = alice_transaction_obj.sign([alice_privkey])
     json = signed_transaction.to_dict()
-    response = requests.post(driver.nodes[0] + '/transactions/', json=json)
+    response = requests.post(transactions_api_full_url, json=json)
     return response.json()
 
 
@@ -274,12 +286,10 @@ def signed_carol_bicycle_transaction(request, carol_keypair,
 
 @fixture
 @await_transaction
-def persisted_carol_bicycle_transaction(driver,
+def persisted_carol_bicycle_transaction(transactions_api_full_url,
                                         signed_carol_bicycle_transaction):
     response = requests.post(
-        driver.nodes[0] + '/transactions/',
-        json=signed_carol_bicycle_transaction,
-    )
+        transactions_api_full_url, json=signed_carol_bicycle_transaction)
     return response.json()
 
 
@@ -317,17 +327,17 @@ def signed_carol_car_transaction(request, carol_keypair,
 
 @fixture
 @await_transaction
-def persisted_carol_car_transaction(driver, signed_carol_car_transaction):
+def persisted_carol_car_transaction(transactions_api_full_url,
+                                    signed_carol_car_transaction):
     response = requests.post(
-        driver.nodes[0] + '/transactions/',
-        json=signed_carol_car_transaction,
-    )
+        transactions_api_full_url, json=signed_carol_car_transaction)
     return response.json()
 
 
 @fixture
 @await_transaction
-def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey, bdb_node,
+def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
+                                         transactions_api_full_url,
                                          persisted_carol_car_transaction):
     output_txid = persisted_carol_car_transaction['id']
     ed25519_dimi = Ed25519Fulfillment(public_key=dimi_pubkey)
@@ -370,13 +380,14 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey, bdb_node,
     ed25519_carol.sign(serialized_transaction_with_id,
                        Ed25519SigningKey(carol_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_carol.serialize_uri()
-    response = requests.post(bdb_node + '/transactions/', json=transaction)
+    response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
 
 
 @fixture
 @await_transaction
-def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey, bdb_node,
+def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
+                                       transactions_api_full_url,
                                        persisted_transfer_carol_car_to_dimi):
     output_txid = persisted_transfer_carol_car_to_dimi['id']
     ed25519_ewy = Ed25519Fulfillment(public_key=ewy_pubkey)
@@ -419,7 +430,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey, bdb_node,
     ed25519_dimi.sign(serialized_transaction_with_id,
                       Ed25519SigningKey(dimi_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_dimi.serialize_uri()
-    response = requests.post(bdb_node + '/transactions/', json=transaction)
+    response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
 
 
