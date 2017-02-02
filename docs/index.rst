@@ -14,6 +14,7 @@ BigchainDB Python Driver
    ← Back to All BigchainDB Docs <https://bigchaindb.readthedocs.io/en/latest/index.html>
    readme
    quickstart
+   connect
    usage
    advanced-usage
    handcraft
