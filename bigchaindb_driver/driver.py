@@ -2,7 +2,7 @@ from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
 
 
-DEFAULT_NODE = 'http://localhost:9984/api/v1'
+DEFAULT_NODE = 'http://localhost:9984'
 
 
 class BigchainDB:
@@ -21,7 +21,7 @@ class BigchainDB:
         Args:
             *nodes (str): BigchainDB nodes to connect to. Currently, the full
                 URL must be given. In the absence of any node, the default
-                (``'http://localhost:9984/api/v1'``) will be used.
+                (``'http://localhost:9984'``) will be used.
             transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
             headers (dict): Optional headers that will be passed with
@@ -35,6 +35,7 @@ class BigchainDB:
         self._transport = transport_class(*self._nodes, headers=headers)
         self._transactions = TransactionsEndpoint(self)
         self._outputs = OutputsEndpoint(self)
+        self.api_prefix = '/api/v1'
 
     @property
     def nodes(self):
@@ -68,6 +69,8 @@ class NamespacedDriver:
     """Base class for creating endpoints (namespaced objects) that can be added
     under the :class:`~bigchaindb_driver.driver.BigchainDB` driver.
     """
+    PATH = '/'
+
     def __init__(self, driver):
         """Initializes an instance of
         :class:`~bigchaindb_driver.driver.NamespacedDriver` with the given
@@ -83,6 +86,14 @@ class NamespacedDriver:
     def transport(self):
         return self.driver.transport
 
+    @property
+    def api_prefix(self):
+        return self.driver.api_prefix
+
+    @property
+    def path(self):
+        return self.api_prefix + self.PATH
+
 
 class TransactionsEndpoint(NamespacedDriver):
     """Exposes functionality of the ``'/transactions/'`` endpoint.
@@ -91,7 +102,7 @@ class TransactionsEndpoint(NamespacedDriver):
         path (str): The path of the endpoint.
 
     """
-    path = '/transactions/'
+    PATH = '/transactions/'
 
     @staticmethod
     def prepare(*, operation='CREATE', signers=None,
@@ -276,7 +287,10 @@ class TransactionsEndpoint(NamespacedDriver):
             dict: A dict containing a 'status' item for the transaction.
 
         """
-        path = '/statuses'
+        # TODO Once the HTTP API has stabilized, especially with matters
+        # relating to the transaction status, this can be updated to match the
+        # HTTP API more thoroughly.
+        path = self.api_prefix + '/statuses'
         return self.transport.forward_request(
             method='GET', path=path, params={'tx_id': txid}, headers=headers)
 
@@ -288,7 +302,7 @@ class OutputsEndpoint(NamespacedDriver):
         path (str): The path of the endpoint.
 
     """
-    path = '/outputs/'
+    PATH = '/outputs/'
 
     def get(self, public_key, unspent=False, headers=None):
         """
