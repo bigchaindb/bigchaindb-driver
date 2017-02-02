@@ -1,13 +1,13 @@
 .. _advanced-usage:
 
-***********************
+=======================
 Advanced Usage Examples
-***********************
+=======================
 
 This section has examples of using the Python Driver for more advanced use
 cases such as escrow.
 
-.. todo:: Work in progress. More examples will gradually appear as issues like
+.. todo:: This is work in progress. More examples will gradually appear as issues like
 
     * https://github.com/bigchaindb/bigchaindb-driver/issues/110
 
@@ -15,9 +15,9 @@ cases such as escrow.
 
 
 Getting Started
-===============
+---------------
 
-First, make sure you have RethinkDB and BigchainDB
+First, make sure you have RethinkDB and BigchainDB Server
 `installed and running <https://docs.bigchaindb.com/projects/server/en/latest/dev-and-test/setup-run-node.html>`_,
 e.g.:
 
@@ -27,12 +27,16 @@ e.g.:
     $ bigchaindb configure
     $ bigchaindb start
 
-Don't shut them down! In a new terminal, open a Python shell:
+Don't shut them down!
+
+Next, make sure you've :doc:`installed the bigchaindb_driver Python package <quickstart>`.
+Then, in a new terminal, run an IPython shell:
 
 .. code-block:: bash
 
-    $ python
+    $ ipython
 
+Make sure it's Python 3.
 Now we can import the :class:`~bigchaindb_driver.BigchainDB` class and create
 an instance:
 
@@ -45,11 +49,15 @@ an instance:
 This instantiates an object ``bdb`` of class
 :class:`~bigchaindb_driver.BigchainDB`. When instantiating a
 :class:`~bigchaindb_driver.BigchainDB` object without arguments (as above), it
-sets the server node URL to ``http://localhost:9984/api/v1``.
+uses the default BigchainDB API Root Endpoint ``http://localhost:9984/api/v1``.
+
+If you want to connect to something other than a BigchainDB node on localhost,
+see :doc:`the page about other connection options <connect>`.
 
 
 Create a Digital Asset
-======================
+----------------------
+
 At a high level, a "digital asset" is something which can be represented
 digitally and can be assigned to a user. In BigchainDB, users are identified by
 their public key, and the data payload in a digital asset is represented using
@@ -103,7 +111,8 @@ to the signed transaction payload.
 
 
 Read the Creation Transaction from the DB
-=========================================
+-----------------------------------------
+
 After a couple of seconds, we can check if the transaction was validated in a
 block:
 
@@ -121,7 +130,8 @@ key*):
 
 
 Transfer the Digital Asset
-==========================
+--------------------------
+
 Now that ``alice`` has a digital asset assigned to her, she can transfer it to
 another person. Transfer transactions require an input. The input will be the
 transaction id of a digital asset that was assigned to ``alice``, which in our
@@ -258,7 +268,7 @@ by the server is equal to the signed one.
 
 
 Double Spends
-=============
+-------------
 
 BigchainDB makes sure that a user can't transfer the same digital asset two or
 more times (i.e. it prevents double spends).
@@ -312,7 +322,7 @@ Send the transaction over to the node
 .. _car-multiple-owners:
 
 Multiple Owners
-===============
+---------------
 
 Say ``alice`` and ``bob`` own a car together:
 
@@ -463,10 +473,10 @@ their car to ``carol``, and can go on exploring the countless galaxies of the
 universe using their new teleportation skills.
 
 Crypto-Conditions (Advanced)
-============================
+----------------------------
 
 Introduction
-------------
+~~~~~~~~~~~~
 Crypto-conditions provide a mechanism to describe a signed message such that
 multiple actors in a distributed system can all verify the same signed message
 and agree on whether it matches the description.
@@ -487,7 +497,7 @@ Implementations of the crypto-conditions are available in
 
 
 Threshold Conditions
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 Threshold conditions introduce multi-signatures, m-of-n signatures, or even more complex binary Merkle trees to BigchainDB.
 
@@ -641,7 +651,7 @@ The fulfillment involves:
 
 
 Hash-locked Conditions
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 A hash-lock condition on an asset is like a password condition: anyone with the
 secret preimage (i.e. a password) can fulfill the hash-lock condition and
@@ -743,7 +753,7 @@ correct secret:
 ..     { ... }
 
 Timeout Conditions
-------------------
+~~~~~~~~~~~~~~~~~~
 
 Timeout conditions allow assets to expire after a certain time.
 The primary use case of timeout conditions is to enable :ref:`Escrow`.
@@ -852,7 +862,7 @@ If you were fast enough, you should see the following output:
 .. _escrow:
 
 Escrow
-======
+~~~~~~
 
 Escrow is a mechanism for conditional release of assets.
 

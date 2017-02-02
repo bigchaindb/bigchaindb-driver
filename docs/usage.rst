@@ -4,66 +4,9 @@
 Basic Usage Examples
 ====================
 
-.. note::
-
-   You must :doc:`install the bigchaindb_driver Python package <quickstart>` first.
-
-   You should use Python 3 for these examples.
-
-
-The BigchainDB driver's main purpose is to connect to one or more BigchainDB
-server nodes, in order to perform supported API calls (see the server's
-`HTTP API docs <https://docs.bigchaindb.com/projects/server/en/latest/drivers-clients/http-client-server-api.html>`_
-for the full list of API endpoints).
-
-Connecting to a BigchainDB node is done via the
-:class:`BigchainDB <bigchaindb_driver.BigchainDB>` class:
-
-.. code-block:: python
-
-    from bigchaindb_driver import BigchainDB
-
-    bdb = BigchainDB('<api_endpoint>')
-
-where ``<api_endpoint>`` is the root URL of the BigchainDB server API you wish
-to connect to.
-
-For the simplest case in which a BigchainDB node would be running locally, (and
-the ``BIGCHAINDB_SERVER_BIND`` setting wouldn't have been changed), you would
-connect to the local BigchainDB server this way:
-
-.. code-block:: python
-
-    bdb = BigchainDB('http://localhost:9984/api/v1')
-
-If you are running the docker-based dev setup that comes along with the
-`bigchaindb_driver`_ repository (see :ref:`devenv-docker` for more
-information), and wish to connect to it from the ``bdb-driver`` linked
-(container) service:
-
-.. code-block:: python
-
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
-
-Alternatively, you may connect to the containerized BigchainDB node from
-"outside", in which case you need to know the port binding:
-
-.. code-block:: bash
-
-    $ docker-compose port bdb-server 9984
-    0.0.0.0:32780
-
-.. code-block:: python
-
-    bdb = BigchainDB('http://0.0.0.0:32780/api/v1')
-
-For the sake of this example, we'll assume:
-
-.. ipython::
-
-    In [0]: from bigchaindb_driver import BigchainDB
-
-    In [0]: bdb = BigchainDB('http://bdb-server:9984/api/v1')
+First, make sure you're using Python 3,
+you've :doc:`installed the bigchaindb_driver Python package <quickstart>`,
+and you've :doc:`connected to a BigchainDB node or cluster <connect>`.
 
 Digital Asset Definition
 ------------------------
@@ -340,8 +283,6 @@ Running the above code should give something similar to:
 
     2016-09-29 15:06:30,606 404 Transaction "12345" was not found.
 
-
-.. _bigchaindb_driver: https://github.com/bigchaindb/bigchaindb-driver
 
 .. _bicycle-divisible-assets:
 
