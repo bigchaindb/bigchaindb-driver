@@ -171,6 +171,11 @@ def bdb_port():
 
 
 @fixture
+def bdb_node_pubkey():
+    return environ['BIGCHAINDB_KEYPAIR_PUBLIC']
+
+
+@fixture
 def bdb_node(bdb_host, bdb_port):
     return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
 
