@@ -16,6 +16,12 @@ For the sake of these examples, we'll assume:
 
     In [0]: bdb = BigchainDB('http://bdb-server:9984/api/v1')
 
+.. important::
+
+    You will want to change the instances of ``'http://bdb-server:9984/api/v1'``
+    to be the URL of the node you want to connect to. See the :doc:`docs on
+    connecting <connect>` for more information.
+
 Digital Asset Definition
 ------------------------
 As an example, let's consider the creation and transfer of a digital asset that
@@ -372,8 +378,6 @@ Handling cases for which the transaction ``id`` may not be found:
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='%(asctime)-15s %(status)-3s %(message)s')
 
-    # NOTE: You may need to change the URL.
-    # E.g.: 'http://localhost:9984/api/v1'
     bdb = BigchainDB('http://bdb-server:9984/api/v1')
     txid = '12345'
     try:
