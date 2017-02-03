@@ -8,6 +8,14 @@ First, make sure you're using Python 3,
 you've :doc:`installed the bigchaindb_driver Python package <quickstart>`,
 and you've :doc:`connected to a BigchainDB node or cluster <connect>`.
 
+For the sake of these examples, we'll assume:
+
+.. ipython::
+
+    In [0]: from bigchaindb_driver import BigchainDB
+
+    In [0]: bdb = BigchainDB('http://bdb-server:9984/api/v1')
+
 Digital Asset Definition
 ------------------------
 As an example, let's consider the creation and transfer of a digital asset that
@@ -259,7 +267,7 @@ Recap: Asset Creation & Transfer
 
     alice, bob = generate_keypair(), generate_keypair()
 
-    bdb = BigchainDB('http://localhost:59984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984/api/v1')
 
     bicycle_asset = {
         'data': {
