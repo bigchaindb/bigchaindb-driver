@@ -14,13 +14,13 @@ To build the docs, simply run
 
 .. code-block:: bash
 
-    $ docker-compose -d docs.yml up bdocs
+    $ docker-compose --file docs.yml up -d bdocs
 
 Or if you prefer, start a ``bash`` session,
 
 .. code-block:: bash
 
-    $ docker-compose -f docs.yml run --rm bdocs bash
+    $ docker-compose --file docs.yml run --rm bdocs bash
 
 and build the docs:
 
@@ -35,7 +35,7 @@ You can start a little web server to view the docs at http://localhost:55555/
 
 .. code-block:: bash
 
-    $ docker-compose up -d vdocs
+    $ docker-compose --file docs.yml up -d vdocs
 
 .. note:: If you are using ``docker-machine`` you need to replace ``localhost``
     with the ``ip`` of the machine (e.g.: ``docker-machine ip tm`` if your
