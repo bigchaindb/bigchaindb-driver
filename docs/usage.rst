@@ -14,11 +14,11 @@ For the sake of these examples, we'll assume:
 
     In [0]: from bigchaindb_driver import BigchainDB
 
-    In [0]: bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    In [0]: bdb = BigchainDB('http://bdb-server:9984')
 
 .. important::
 
-    You will want to change the instances of ``'http://bdb-server:9984/api/v1'``
+    You will want to change the instances of ``'http://bdb-server:9984'``
     to be the URL of the node you want to connect to. See the :doc:`docs on
     connecting <connect>` for more information.
 
@@ -273,7 +273,7 @@ Recap: Asset Creation & Transfer
 
     alice, bob = generate_keypair(), generate_keypair()
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
 
     bicycle_asset = {
         'data': {
@@ -378,7 +378,7 @@ Handling cases for which the transaction ``id`` may not be found:
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='%(asctime)-15s %(status)-3s %(message)s')
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
     txid = '12345'
     try:
         status = bdb.transactions.status(txid)

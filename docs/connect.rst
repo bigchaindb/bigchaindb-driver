@@ -18,10 +18,9 @@ class so we can use it to connect:
 
     from bigchaindb_driver import BigchainDB
 
-Finally, to make the connection, you need to know
-the BigchainDB "API Root Endpoint"
-of a BigchainDB node or cluster.
-There are several possible cases, listed below.
+Finally, to make the connection, you need to know the BigchainDB Root URL of
+the BigchainDB node or cluster where HTTP requests can be sent. There are
+several possible cases, listed below.
 
 Case 1: BigchainDB on localhost
 -------------------------------
@@ -33,10 +32,8 @@ you would connect to the local BigchainDB server using:
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://localhost:9984/api/v1')
+    bdb = BigchainDB('http://localhost:9984')
 
-(This assumes the API version is v1. You may have to change that if
-the node is running a different-version HTTP API.)
 
 Case 2: A Known BigchainDB API Root Endpoint
 --------------------------------------------
@@ -52,13 +49,13 @@ Here are some examples:
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://example.com:9984/api/v1')
-    bdb = BigchaindB('http://api.example.com:9984/api/v1')
-    bdb = BigchaindB('http://example.com:1234/api/v1')
-    bdb = BigchaindB('http://example.com/api/v1')  # http is port 80 by default
-    bdb = BigchaindB('https://example.com/api/v1')  # https is port 443 by default
-    bdb = BigchaindB('http://12.34.56.123:9984/api/v1')
-    bdb = BigchaindB('http://12.34.56.123:5000/api/v1')
+    bdb = BigchainDB('http://example.com:9984')
+    bdb = BigchaindB('http://api.example.com:9984')
+    bdb = BigchaindB('http://example.com:1234')
+    bdb = BigchaindB('http://example.com')  # http is port 80 by default
+    bdb = BigchaindB('https://example.com')  # https is port 443 by default
+    bdb = BigchaindB('http://12.34.56.123:9984')
+    bdb = BigchaindB('http://12.34.56.123:5000')
 
 Case 3: Docker Container on localhost
 -------------------------------------
@@ -70,7 +67,7 @@ information), and wish to connect to it from the ``bdb-driver`` linked
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
 
 Alternatively, you may connect to the containerized BigchainDB node from
 "outside", in which case you need to know the port binding:
@@ -82,7 +79,7 @@ Alternatively, you may connect to the containerized BigchainDB node from
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://0.0.0.0:32780/api/v1')
+    bdb = BigchainDB('http://0.0.0.0:32780')
 
 
 

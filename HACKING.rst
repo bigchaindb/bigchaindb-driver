@@ -12,4 +12,4 @@ Point to some BigchainDB node, which is running BigchainDB server ``master``:
 
     from bigchaindb_driver import BigchainDB 
     
-    bdb = BigchainDB('http://here.be.dragons:9984/api/v1') 
+    bdb = BigchainDB('http://here.be.dragons:9984') 

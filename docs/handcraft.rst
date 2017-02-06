@@ -607,7 +607,7 @@ Sending it over to a BigchainDB node:
 
     from bigchaindb_driver import BigchainDB
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
     returned_creation_tx = bdb.transactions.send(handcrafted_creation_tx)
 
 A few checks:
@@ -1014,7 +1014,7 @@ Sending it over to a BigchainDB node:
 
     from bigchaindb_driver import BigchainDB
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
     returned_transfer_tx = bdb.transactions.send(handcrafted_transfer_tx)
 
 A few checks:
@@ -1137,7 +1137,7 @@ Sending it over to a BigchainDB node:
 
     from bigchaindb_driver import BigchainDB
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
     returned_creation_tx = bdb.transactions.send(token_creation_tx)
 
 A few checks:
@@ -1256,7 +1256,7 @@ Sending it over to a BigchainDB node:
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
     returned_transfer_tx = bdb.transactions.send(token_transfer_tx)
 
 A few checks:
@@ -1731,7 +1731,7 @@ Sending it over to a BigchainDB node:
 
     from bigchaindb_driver import BigchainDB
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
     returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx)
 
 Wait for some nano seconds, and check the status:
@@ -1836,7 +1836,7 @@ Sending it over to a BigchainDB node:
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://bdb-server:9984/api/v1')
+    bdb = BigchainDB('http://bdb-server:9984')
     returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx)
 
 Wait for some nano seconds, and check the status:
