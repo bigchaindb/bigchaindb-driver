@@ -510,9 +510,13 @@ To do so, she needs to send two tokens to Bob:
        ...:     'owners_before': output['public_keys'],
        ...: }
 
+    In [0]: transfer_asset = {
+       ...:     'id': prepared_token_tx['id'],
+       ...: }
+
     In [0]: prepared_transfer_tx = bdb.transactions.prepare(
        ...:     operation='TRANSFER',
-       ...:     asset=prepared_token_tx['asset'],
+       ...:     asset=transfer_asset,
        ...:     inputs=transfer_input,
        ...:     recipients=[([bob.public_key], 2), ([carly.public_key], 8)]
        ...: )
