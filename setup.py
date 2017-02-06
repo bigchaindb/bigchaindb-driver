@@ -47,7 +47,7 @@ setup(
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
     author_email='dev@bigchaindb.com',
-    url='https://github.com/bigchaindb/bigchaindb_driver',
+    url='https://github.com/bigchaindb/bigchaindb-driver',
     packages=[
         'bigchaindb_driver',
     ],
