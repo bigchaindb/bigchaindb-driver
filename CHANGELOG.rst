@@ -1,6 +1,21 @@
 Changelog
 =========
 
+0.2.0 (2017-02-06)
+------------------
+Added
+^^^^^
+* Support for BigchainDB server 0.9.0.
+* Methods for `GET /` and `GET /api/v1`
+
+Changed
+^^^^^^^
+* Node URLs, passed to `BigchainDB()` MUST not include the api prefix
+  `'/api/v1'`, e.g.: 
+    
+    * BEFORE: `http://localhost:9984/api/v1`
+    * NOW: `http://localhost:9984`
+
 0.1.0 (2016-11-29)
 ------------------
 Added
