@@ -49,7 +49,7 @@ an instance:
 This instantiates an object ``bdb`` of class
 :class:`~bigchaindb_driver.BigchainDB`. When instantiating a
 :class:`~bigchaindb_driver.BigchainDB` object without arguments (as above), it
-uses the default BigchainDB API Root Endpoint ``http://localhost:9984/api/v1``.
+uses the default BigchainDB Root URL Endpoint ``http://localhost:9984``.
 
 If you want to connect to something other than a BigchainDB node on localhost,
 see :doc:`the page about other connection options <connect>`.
