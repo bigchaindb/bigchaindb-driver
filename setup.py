@@ -11,7 +11,7 @@ with open('CHANGELOG.rst') as changelog_file:
 
 install_requires = [
     'requests>=2.11.0',
-    'bigchaindb~=0.9.dev',
+    'bigchaindb~=0.9',
 ]
 
 tests_require = [
@@ -39,10 +39,6 @@ docs_require = [
     'sphinxcontrib-httpdomain',
     'matplotlib',
 ]
-
-dependency_links = (
-    'git+https://github.com/bigchaindb/bigchaindb.git#egg=bigchaindb-0.9.dev',
-)
 
 setup(
     name='bigchaindb_driver',
@@ -76,5 +72,4 @@ setup(
         'dev': dev_require + tests_require + docs_require,
         'docs': docs_require,
     },
-    dependency_links=dependency_links,
 )
