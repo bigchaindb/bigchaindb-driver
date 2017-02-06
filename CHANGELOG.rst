@@ -5,7 +5,7 @@ Changelog
 ------------------
 Added
 ^^^^^
-* Support for BigchainDB server 0.9.0.
+* Support for BigchainDB server 0.9.
 * Methods for ``GET /`` and ``GET /api/v1``
 
 Changed
