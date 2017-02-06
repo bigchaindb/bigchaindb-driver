@@ -11,7 +11,7 @@ with open('CHANGELOG.rst') as changelog_file:
 
 install_requires = [
     'requests>=2.11.0',
-    'bigchaindb~=0.8',
+    'bigchaindb~=0.8.2',
 ]
 
 tests_require = [
