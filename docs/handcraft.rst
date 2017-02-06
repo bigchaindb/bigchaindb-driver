@@ -513,6 +513,12 @@ Let's check this:
 
     In [0]: json.dumps(fulfilled_creation_tx, sort_keys=True) == json.dumps(handcrafted_creation_tx, sort_keys=True)
 
+The fulfilled transaction, ready to be sent over to a BigchainDB node:
+
+.. ipython::
+    
+    In [0]: fulfilled_creation_tx
+
 
 In a nutshell
 =============
