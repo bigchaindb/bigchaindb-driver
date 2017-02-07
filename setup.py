@@ -11,7 +11,7 @@ with open('CHANGELOG.rst') as changelog_file:
 
 install_requires = [
     'requests>=2.11.0',
-    'bigchaindb~=0.8',
+    'bigchaindb~=0.8.2',
 ]
 
 tests_require = [
@@ -41,7 +41,7 @@ docs_require = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.1.3',
+    version='0.1.4',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
