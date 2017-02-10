@@ -1,8 +1,6 @@
 from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
-
-
-DEFAULT_NODE = 'http://localhost:9984'
+from .utils import _normalize_nodes
 
 
 class BigchainDB:
@@ -31,7 +29,7 @@ class BigchainDB:
                 <.TransactionsEndpoint.send>`).
 
         """
-        self._nodes = nodes if nodes else (DEFAULT_NODE,)
+        self._nodes = _normalize_nodes(*nodes)
         self._transport = transport_class(*self._nodes, headers=headers)
         self._transactions = TransactionsEndpoint(self)
         self._outputs = OutputsEndpoint(self)
