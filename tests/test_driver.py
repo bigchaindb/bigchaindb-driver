@@ -11,19 +11,21 @@ from cryptoconditions.crypto import Ed25519SigningKey
 
 class TestBigchainDB:
 
-    @mark.parametrize('nodes,headers', (
-        ((), None),
-        (('node-1',), None),
-        (('node-1', 'node-2'), None),
-        (('node-1', 'node-2'), {'app_id': 'id'}),
+    @mark.parametrize('nodes,headers, normalized_nodes', (
+        ((), None, ('http://localhost:9984',)),
+        (('node-1',), None, ('http://node-1:9984',)),
+        (('node-1', 'node-2'), None, ('http://node-1:9984',
+                                      'http://node-2:9984')),
+        (('node-1', 'node-2'), {'app_id': 'id'}, ('http://node-1:9984',
+                                                  'http://node-2:9984')),
     ))
-    def test_driver_init(self, nodes, headers):
-        from bigchaindb_driver.driver import BigchainDB, DEFAULT_NODE
+    def test_driver_init(self, nodes, headers, normalized_nodes):
+        from bigchaindb_driver.driver import BigchainDB
         driver = BigchainDB(*nodes, headers=headers)
-        nodes = (DEFAULT_NODE,) if not nodes else nodes
+        nodes = normalized_nodes
         headers = {} if not headers else headers
-        assert driver.nodes == nodes
-        assert driver.transport.nodes == nodes
+        assert driver.nodes == normalized_nodes
+        assert driver.transport.nodes == normalized_nodes
         expected_headers = default_headers()
         expected_headers.update(headers)
         for conn in driver.transport.pool.connections:
