@@ -4,23 +4,22 @@
 Basic Usage Examples
 ====================
 
-First, make sure you're using Python 3,
+For the examples on this page,
+we assume you're using a Python 3 version of IPython (or similar),
 you've :doc:`installed the bigchaindb_driver Python package <quickstart>`,
-and you've :doc:`connected to a BigchainDB node or cluster <connect>`.
+and :doc:`you have determined the BigchainDB Root URL <connect>`
+of the node or cluster you want to connect to.
 
-For the sake of these examples, we'll assume:
+We begin by creating an object of class BigchainDB:
 
 .. ipython::
 
     In [0]: from bigchaindb_driver import BigchainDB
 
-    In [0]: bdb = BigchainDB('http://bdb-server:9984')
+    In [0]: bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
 
-.. important::
+    In [0]: bdb = BigchainDB(bdb_root_url)
 
-    You will want to change the instances of ``'http://bdb-server:9984'``
-    to be the URL of the node you want to connect to. See the :doc:`docs on
-    connecting <connect>` for more information.
 
 Digital Asset Definition
 ------------------------
@@ -273,7 +272,9 @@ Recap: Asset Creation & Transfer
 
     alice, bob = generate_keypair(), generate_keypair()
 
-    bdb = BigchainDB('http://bdb-server:9984')
+    bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
+
+    bdb = BigchainDB(bdb_root_url)
 
     bicycle_asset = {
         'data': {
@@ -378,7 +379,8 @@ Handling cases for which the transaction ``id`` may not be found:
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='%(asctime)-15s %(status)-3s %(message)s')
 
-    bdb = BigchainDB('http://bdb-server:9984')
+    bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
+    bdb = BigchainDB(bdb_root_url)
     txid = '12345'
     try:
         status = bdb.transactions.status(txid)

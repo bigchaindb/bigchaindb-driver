@@ -15,7 +15,7 @@ If you're missing one of those, then see below. Otherwise, you can install the B
 
     pip install bigchaindb_driver
 
-and then you can try the :doc:`Basic Usage Examples <usage>`.
+Next: :doc:`determine the BigchainDB Root URL of the BigchainDB node or cluster you want to connect to <connect>`.
 
 
 How to Install the Dependencies
