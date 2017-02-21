@@ -1,26 +1,14 @@
 .. _connect:
 
-===============
-Step 2: Connect
-===============
+=================================
+Determine the BigchainDB Root URL
+=================================
 
-If you want to use the BigchainDB Python driver to communicate
-with a BigchainDB node or cluster, the first step is to connect to one.
-This page explains how to do that.
+If you want to use the BigchainDB Python Driver
+to communicate with a BigchainDB node or cluster,
+then you will need its BigchainDB Root URL.
+This page is to help you determine it.
 
-First, make sure you're using Python 3 and you've
-:doc:`installed the bigchaindb_driver Python package <quickstart>`.
-
-Next, in Python, import the :class:`BigchainDB <bigchaindb_driver.BigchainDB>`
-class so we can use it to connect:
-
-.. code-block:: python
-
-    from bigchaindb_driver import BigchainDB
-
-Finally, to make the connection, you need to know the BigchainDB Root URL of
-the BigchainDB node or cluster where HTTP requests can be sent. There are
-several possible cases, listed below.
 
 Case 1: BigchainDB on localhost
 -------------------------------
@@ -28,20 +16,20 @@ Case 1: BigchainDB on localhost
 If a BigchainDB node is running locally
 (and the ``BIGCHAINDB_SERVER_BIND`` setting wasn't changed
 from the default ``localhost:9984``),
-you would connect to the local BigchainDB server using:
+then the BigchainDB Root URL is:
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://localhost:9984')
+   bdb_root_url = 'http://localhost:9984'
 
 
-Case 2: A Known BigchainDB API Root Endpoint
---------------------------------------------
+Case 2: A Cluster Hosted by Someone Else
+----------------------------------------
 
 If you're connecting to a BigchainDB cluster hosted
 by someone else, then they'll tell you their
-API Root Endpoint.
-A BigchainDB API Root endpoint can take many forms.
+BigchaindB Root URL.
+It can take many forms.
 It can use HTTP or HTTPS.
 It can use a hostname or an IP address.
 The port might not be 9984.
@@ -49,13 +37,13 @@ Here are some examples:
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://example.com:9984')
-    bdb = BigchaindB('http://api.example.com:9984')
-    bdb = BigchaindB('http://example.com:1234')
-    bdb = BigchaindB('http://example.com')  # http is port 80 by default
-    bdb = BigchaindB('https://example.com')  # https is port 443 by default
-    bdb = BigchaindB('http://12.34.56.123:9984')
-    bdb = BigchaindB('http://12.34.56.123:5000')
+    bdb_root_url = 'http://example.com:9984'
+    bdb_root_url = 'http://api.example.com:9984'
+    bdb_root_url = 'http://example.com:1234'
+    bdb_root_url = 'http://example.com'  # http is port 80 by default
+    bdb_root_url = 'https://example.com'  # https is port 443 by default
+    bdb_root_url = 'http://12.34.56.123:9984'
+    bdb_root_url = 'http://12.34.56.123:5000'
 
 Case 3: Docker Container on localhost
 -------------------------------------
@@ -67,7 +55,7 @@ information), and wish to connect to it from the ``bdb-driver`` linked
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://bdb-server:9984')
+    bdb_root_url = 'http://bdb-server:9984'
 
 Alternatively, you may connect to the containerized BigchainDB node from
 "outside", in which case you need to know the port binding:
@@ -79,8 +67,10 @@ Alternatively, you may connect to the containerized BigchainDB node from
 
 .. code-block:: python
 
-    bdb = BigchainDB('http://0.0.0.0:32780')
+    bdb_root_url = 'http://0.0.0.0:32780'
 
+
+Next, try some of the :doc:`basic usage examples <usage>`.
 
 
 .. _bigchaindb_driver: https://github.com/bigchaindb/bigchaindb-driver
