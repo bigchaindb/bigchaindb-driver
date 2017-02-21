@@ -10,6 +10,10 @@ you've :doc:`installed the bigchaindb_driver Python package <quickstart>`,
 and :doc:`you have determined the BigchainDB Root URL <connect>`
 of the node or cluster you want to connect to.
 
+
+Getting Started
+---------------
+
 We begin by creating an object of class BigchainDB:
 
 .. ipython::

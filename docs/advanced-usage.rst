@@ -4,7 +4,7 @@
 Advanced Usage Examples
 =======================
 
-This section has examples of using the Python Driver for more advanced use
+This page has examples of using the Python Driver for more advanced use
 cases such as escrow.
 
 .. todo:: This is work in progress. More examples will gradually appear as issues like
@@ -13,46 +13,30 @@ cases such as escrow.
 
     are taken care of.
 
+For the examples on this page,
+we assume you're using a Python 3 version of IPython (or similar),
+you've :doc:`installed the bigchaindb_driver Python package <quickstart>`,
+and :doc:`you have determined the BigchainDB Root URL <connect>`
+of the node or cluster you want to connect to.
+
 
 Getting Started
 ---------------
 
-First, make sure you have RethinkDB and BigchainDB Server
-`installed and running <https://docs.bigchaindb.com/projects/server/en/latest/dev-and-test/setup-run-node.html>`_,
-e.g.:
-
-.. code-block:: bash
-
-    $ rethinkdb --daemon
-    $ bigchaindb configure
-    $ bigchaindb start
-
-Don't shut them down!
-
-Next, make sure you've :doc:`installed the bigchaindb_driver Python package <quickstart>`.
-Then, in a new terminal, run an IPython shell:
-
-.. code-block:: bash
-
-    $ ipython
-
-Make sure it's Python 3.
-Now we can import the :class:`~bigchaindb_driver.BigchainDB` class and create
-an instance:
+We begin by creating an object of class BigchainDB:
 
 .. ipython::
 
     In [0]: from bigchaindb_driver import BigchainDB
 
-    In [0]: bdb = BigchainDB()
+    In [0]: bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
 
-This instantiates an object ``bdb`` of class
+    In [0]: bdb = BigchainDB(bdb_root_url)
+
+That last command instantiates an object ``bdb`` of class
 :class:`~bigchaindb_driver.BigchainDB`. When instantiating a
-:class:`~bigchaindb_driver.BigchainDB` object without arguments (as above), it
-uses the default BigchainDB Root URL Endpoint ``http://localhost:9984``.
-
-If you want to connect to something other than a BigchainDB node on localhost,
-see :doc:`the page about other connection options <connect>`.
+:class:`~bigchaindb_driver.BigchainDB` object without arguments, it
+uses the default BigchainDB Root URL ``http://localhost:9984``.
 
 
 Create a Digital Asset
