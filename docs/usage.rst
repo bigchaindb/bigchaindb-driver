@@ -22,7 +22,20 @@ We begin by creating an object of class BigchainDB:
 
     In [0]: bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
 
+If the BigchainDB node or cluster doesn't require authentication tokens, you can do: 
+
+.. ipython::
+
     In [0]: bdb = BigchainDB(bdb_root_url)
+
+If it *does* require authentication tokens, you can do put them in a dict like so:
+
+.. ipython::
+
+    In [0]: tokens = {'app_id': 'your_app_id', 'app_key': 'your_app_key'}
+
+    In [0]: bdb = BigchainDB(bdb_root_url, headers=tokens)
+
 
 
 Digital Asset Definition
