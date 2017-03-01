@@ -365,7 +365,7 @@ class OutputsEndpoint(NamespacedDriver):
             key::
 
                 >>> bdb = BigchainDB()
-                >>> bdb.unspents.get(alice_pubkey)
+                >>> bdb.outputs.get(alice_pubkey)
                 ... ['../transactions/da1b64a907ba54/conditions/0']
 
         """
