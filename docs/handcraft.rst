@@ -2064,25 +2064,13 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     alice_sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
 
-    bob_sk = cryptoconditions.crypto.Ed25519SigningKey(bob.private_key)
-
     threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=1)
 
+    alice_ed25519.sign(message.encode(), private_key=alice_sk)
+    
     threshold_sha256.add_subfulfillment(alice_ed25519)
 
-    threshold_sha256.add_subfulfillment(bob_ed25519)
-
-    alice_condition = threshold_sha256.get_subcondition_from_vk(alice.public_key)[0]
-
-    bob_condition = threshold_sha256.get_subcondition_from_vk(bob.public_key)[0]
-
-    threshold_sha256.subconditions = []
-
-    alice_condition.sign(message.encode(), private_key=alice_sk)
-    
-    threshold_sha256.add_subfulfillment(alice_condition)
-
-    threshold_sha256.add_subcondition(bob_condition.condition)
+    threshold_sha256.add_subcondition(bob_ed25519.condition)
 
     fulfillment_uri = threshold_sha256.serialize_uri()
 
