@@ -1853,6 +1853,256 @@ Wait for some nano seconds, and check the status:
     {'status': 'valid'}
 
 
+**************************************
+Multiple Owners with m-of-n Signatures
+**************************************
+In this example, ``alice`` and ``bob`` co-own a car asset such that only one
+of them is required to sign the transfer transaction. The example is very
+similar to the one where both owners are required to sign, but with minor
+differences that are very important, in order to make the fulfillment URI
+valid.
+
+We only show the "nutshell" version for now. The example is self-contained.
+
+In a nutshell
+=============
+
+Handcrafting the ``'CREATE'`` transaction
+-----------------------------------------
+
+.. code-block:: python
+
+    import json
+
+    import sha3
+    import cryptoconditions
+
+    from bigchaindb_driver.crypto import generate_keypair
+
+
+    version = '0.9'
+
+    car_asset = {
+        'data': {
+            'car': {
+                'vin': '5YJRE11B781000196',
+            },
+        },
+    }
+
+    alice, bob = generate_keypair(), generate_keypair()
+
+    # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for alice
+    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
+
+    # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for bob
+    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+
+    # CRYPTO-CONDITIONS: instantiate a threshold SHA 256 crypto-condition
+    # NOTICE that the threshold is set to 1, not 2
+    threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=1)
+
+    # CRYPTO-CONDITIONS: add alice ed25519 to the threshold SHA 256 condition
+    threshold_sha256.add_subfulfillment(alice_ed25519)
+
+    # CRYPTO-CONDITIONS: add bob ed25519 to the threshold SHA 256 condition
+    threshold_sha256.add_subfulfillment(bob_ed25519)
+
+    # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
+    unsigned_subfulfillments_dict = threshold_sha256.to_dict()
+
+    # CRYPTO-CONDITIONS: generate the condition uri
+    condition_uri = threshold_sha256.condition.serialize_uri()
+
+    output = {
+        'amount': 1,
+        'condition': {
+            'details': unsigned_subfulfillments_dict,
+            'uri': threshold_sha256.condition_uri,
+        },
+        'public_keys': (alice.public_key, bob.public_key),
+    }
+
+    # The yet to be fulfilled input:
+    input_ = {
+        'fulfillment': None,
+        'fulfills': None,
+        'owners_before': (alice.public_key,),
+    }
+
+    # Craft the payload:
+    handcrafted_car_creation_tx = {
+        'operation': 'CREATE',
+        'asset': car_asset,
+        'metadata': None,
+        'outputs': (output,),
+        'inputs': (input_,),
+        'version': version,
+    }
+
+    # JSON: serialize the id-less transaction to a json formatted string
+    # Generate the id, by hashing the encoded json formatted string representation of
+    # the transaction:
+    json_str_tx = json.dumps(
+        handcrafted_car_creation_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    # SHA3: hash the serialized id-less transaction to generate the id
+    car_creation_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+
+    # add the id
+    handcrafted_car_creation_tx['id'] = car_creation_txid
+
+    # JSON: serialize the transaction-with-id to a json formatted string
+    message = json.dumps(
+        handcrafted_car_creation_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
+    alice_ed25519.sign(message.encode(),
+                       cryptoconditions.crypto.Ed25519SigningKey(alice.private_key))
+
+    # CRYPTO-CONDITIONS: generate the fulfillment uri
+    fulfillment_uri = alice_ed25519.serialize_uri()
+
+    # add the fulfillment uri (signature)
+    handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+
+
+Sending it over to a BigchainDB node:
+
+.. code-block:: python
+
+    from bigchaindb_driver import BigchainDB
+
+    bdb = BigchainDB('http://bdb-server:9984')
+    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx)
+
+Wait for some nano seconds, and check the status:
+
+.. code-block:: python
+
+    >>> bdb.transactions.status(returned_car_creation_tx['id'])
+    {'_links': {'tx': '/transactions/8548f3e0f58a258f2db13dd33480b6f3322eeed9c49416d3b96b55163fd66019'},
+     'status': 'valid'}
+
+
+Handcrafting the ``'TRANSFER'`` transaction
+-------------------------------------------
+
+.. code-block:: python
+
+    version = '0.9'
+
+    carol = generate_keypair()
+
+    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
+
+    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+
+    carol_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carol.public_key)
+
+    unsigned_fulfillments_dict = carol_ed25519.to_dict()
+
+    condition_uri = carol_ed25519.condition.serialize_uri()
+
+    output = {
+        'amount': 1,
+        'condition': {
+            'details': unsigned_fulfillments_dict,
+            'uri': condition_uri,
+        },
+        'public_keys': (carol.public_key,),
+    }
+
+    # The yet to be fulfilled input:
+    input_ = {
+        'fulfillment': None,
+        'fulfills': {
+            'txid': handcrafted_car_creation_tx['id'],
+            'output': 0,
+        },
+        'owners_before': (alice.public_key, bob.public_key),
+    }
+
+    # Craft the payload:
+    handcrafted_car_transfer_tx = {
+        'operation': 'TRANSFER',
+        'asset': {'id': handcrafted_car_creation_tx['id']},
+        'metadata': None,
+        'outputs': (output,),
+        'inputs': (input_,),
+        'version': version,
+    }
+
+    # Generate the id, by hashing the encoded json formatted string
+    # representation of the transaction:
+    json_str_tx = json.dumps(
+        handcrafted_car_transfer_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    car_transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+
+    handcrafted_car_transfer_tx['id'] = car_transfer_txid
+
+    # Sign the transaction:
+    message = json.dumps(
+        handcrafted_car_transfer_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    alice_sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
+
+    bob_sk = cryptoconditions.crypto.Ed25519SigningKey(bob.private_key)
+
+    threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=1)
+
+    threshold_sha256.add_subfulfillment(alice_ed25519)
+
+    threshold_sha256.add_subfulfillment(bob_ed25519)
+
+    alice_condition = threshold_sha256.get_subcondition_from_vk(alice.public_key)[0]
+
+    bob_condition = threshold_sha256.get_subcondition_from_vk(bob.public_key)[0]
+
+    threshold_sha256.subconditions = []
+
+    alice_condition.sign(message.encode(), private_key=alice_sk)
+    
+    threshold_sha256.add_subfulfillment(alice_condition)
+
+    threshold_sha256.add_subcondition(bob_condition.condition)
+
+    fulfillment_uri = threshold_sha256.serialize_uri()
+
+    handcrafted_car_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+
+Sending it over to a BigchainDB node:
+
+.. code-block:: python
+
+    bdb = BigchainDB('http://bdb-server:9984')
+    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx)
+
+Wait for some nano seconds, and check the status:
+
+.. code-block:: python
+
+    >>> bdb.transactions.status(returned_car_transfer_tx['id'])
+    {'_links': {'tx': '/transactions/da344aa9ddec0a332c55242888bc12c80df5839dd3f7e441b6b98e99854ceb09'},
+     'status': 'valid'}
+
 
 .. _sha3: https://github.com/tiran/pysha3
 .. _cryptoconditions: https://github.com/bigchaindb/cryptoconditions
