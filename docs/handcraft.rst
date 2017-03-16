@@ -96,7 +96,7 @@ Because a transaction must be signed before being sent, the ``id`` and
 
     Because BigchainDB relies on cryptographic signatures, the payloads need to
     be fully prepared and signed on the client side. This prevents the
-    server(s) from tempering with the provided data.
+    server(s) from tampering with the provided data.
 
     This enhanced security puts more work on the clients, as various values
     that could traditionally be generated on the server side need to be
