@@ -26,7 +26,7 @@ def await_transaction(fixture_func, waiting_time=1.5):
     return wrapper
 
 
-def make_ed25519_condition(public_key, *, amount=1):
+def make_ed25519_condition(public_key, *, amount='1'):
     ed25519 = Ed25519Fulfillment(public_key=public_key)
     return {
         'amount': str(amount),
