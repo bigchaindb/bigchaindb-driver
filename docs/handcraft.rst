@@ -68,7 +68,7 @@ From the point of view of Python, a transaction is simply a dictionary:
         },
         'metadata': {'planet': 'earth'},
         'outputs': [{
-            'amount': 1,
+            'amount': '1',
             'condition': {
                 'details': {
                     'bitmask': 32,
@@ -242,7 +242,7 @@ We can now easily assemble the ``dict`` for the output:
 .. ipython::
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
@@ -259,7 +259,7 @@ Let's recap and set the ``outputs`` key with our self-constructed condition:
     In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
@@ -372,7 +372,7 @@ above payload:
     ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -556,7 +556,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
     ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -724,7 +724,7 @@ outputs
     In [0]: ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
@@ -795,7 +795,7 @@ Before we generate the ``id``, let's recap how we got here:
     ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -960,7 +960,7 @@ In a nutshell
     ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -1082,7 +1082,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     unsigned_fulfillment_dict = ed25519.to_dict()
 
     output = {
-        'amount': 10,
+        'amount': '10',
         'condition': {
             'details': unsigned_fulfillment_dict,
             'uri': condition_uri,
@@ -1159,7 +1159,7 @@ A few checks:
     >>> token_creation_tx['outputs'][0]['public_keys'][0] == carly.public_key
     True
 
-    >>> token_creation_tx['outputs'][0]['amount'] == 10
+    >>> token_creation_tx['outputs'][0]['amount'] == '10'
     True
 
 
@@ -1192,7 +1192,7 @@ to Bob:
     carly_unsigned_fulfillment_dict = carly_ed25519.to_dict()
 
     bob_output = {
-        'amount': 2,
+        'amount': '2',
         'condition': {
             'details': bob_unsigned_fulfillment_dict,
             'uri': bob_condition_uri,
@@ -1200,7 +1200,7 @@ to Bob:
         'public_keys': (bob.public_key,),
     }
     carly_output = {
-        'amount': 8,
+        'amount': '8',
         'condition': {
             'details': carly_unsigned_fulfillment_dict,
             'uri': carly_condition_uri,
@@ -1414,7 +1414,7 @@ Generate the output condition:
     In [0]: condition_uri = threshold_sha256.condition.serialize_uri()
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': unsigned_subfulfillments_dict,
        ...:         'uri': condition_uri,
@@ -1525,7 +1525,7 @@ The transfer to Carol:
     In [0]: condition_uri = carol_ed25519.condition.serialize_uri()
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': unsigned_fulfillments_dict,
        ...:         'uri': condition_uri,
@@ -1671,7 +1671,7 @@ Handcrafting the ``'CREATE'`` transaction
     condition_uri = threshold_sha256.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_subfulfillments_dict,
             'uri': threshold_sha256.condition_uri,
@@ -1767,7 +1767,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     condition_uri = carol_ed25519.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_fulfillments_dict,
             'uri': condition_uri,
@@ -1915,7 +1915,7 @@ Handcrafting the ``'CREATE'`` transaction
     condition_uri = threshold_sha256.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_subfulfillments_dict,
             'uri': threshold_sha256.condition_uri,
@@ -2013,7 +2013,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     condition_uri = carol_ed25519.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_fulfillments_dict,
             'uri': condition_uri,
