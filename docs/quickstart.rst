@@ -90,35 +90,24 @@ Once you have a recent Python 3 version of ``pip``, you should be able to upgrad
     pip install --upgrade setuptools
 
 
+Installing the Driver
+---------------------
 
-Installing from the Source Code
--------------------------------
-
-The source code for the BigchainDB Python Driver can be downloaded from the `Github repo`_.
-You can either clone the public repository:
+Now you can install the BigchainDB Python Driver (``bigchaindb_driver``) using:
 
 .. code-block:: bash
 
-    git clone git://github.com/bigchaindb/bigchaindb-driver
+    pip install bigchaindb_driver
 
-Or download the `tarball`_:
-
-.. code-block:: bash
-
-    curl  -OL https://github.com/bigchaindb/bigchaindb-driver/tarball/master
-
-Once you have a copy of the source code, you can install it by going to the directory containing ``setup.py`` and doing:
-
-.. code-block:: bash
-
-    python setup.py install
+Next: :doc:`determine the BigchainDB Root URL of the BigchainDB node or cluster you want to connect to <connect>`.
 
 
-.. include:: ../HACKING.rst
+Advanced Installation Options
+-----------------------------
+
+See the :doc:`Advanced Installation Options <advanced-installation>` page.
 
 
-.. _Github repo: https://github.com/bigchaindb/bigchaindb-driver
-.. _tarball: https://github.com/bigchaindb/bigchaindb-driver/tarball/master
 .. _pynacl: https://github.com/pyca/pynacl/
 .. _Networking and Cryptography library: https://nacl.cr.yp.to/
 .. _cryptoconditions: https://github.com/bigchaindb/cryptoconditions

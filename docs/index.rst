@@ -18,6 +18,7 @@ BigchainDB Python Driver
    usage
    advanced-usage
    handcraft
+   advanced-installation
    upgrading
    libref
    aboutthedocs
