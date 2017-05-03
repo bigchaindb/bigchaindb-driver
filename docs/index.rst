@@ -5,8 +5,6 @@
 
 BigchainDB Python Driver
 ========================
-
-.. important:: **Development Status: Alpha**
     
 .. toctree::
    :maxdepth: 1

@@ -59,7 +59,7 @@ setup(
     zip_safe=False,
     keywords='bigchaindb_driver',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
