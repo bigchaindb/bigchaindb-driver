@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  bdb-driver:
+  bdb:
     build:
       context: .
       dockerfile: ./compose/driver/Dockerfile
@@ -12,7 +12,7 @@ services:
       - ./setup.py:/usr/src/app/setup.py
       - ./tox.ini:/usr/src/app/tox.ini
     environment:
-      BDB_HOST: bdb-server
+      BDB_HOST: bdb-mdb
       BIGCHAINDB_KEYPAIR_PUBLIC: GW1nrdZm4mbVC8ePeiGWz6DqHexqewqy5teURVHi3RG4
     command: pytest -v
   rdb:
@@ -20,13 +20,34 @@ services:
     ports:
       - "58585:8080"
       - "28015"
-  bdb-server:
+  mdb:
+    image: mongo:3.4.3
+    ports:
+      - "27017"
+    command: mongod --replSet=bigchain-rs
+  bdb-rdb:
     build: ./compose/server
     environment:
+      BIGCHAINDB_DATABASE_BACKEND: rethinkdb
       BIGCHAINDB_DATABASE_HOST: rdb
       BIGCHAINDB_SERVER_BIND: 0.0.0.0:9984
+      BIGCHAINDB_WSSERVER_HOST: 0.0.0.0
       BIGCHAINDB_KEYPAIR_PUBLIC: GW1nrdZm4mbVC8ePeiGWz6DqHexqewqy5teURVHi3RG4
       BIGCHAINDB_KEYPAIR_PRIVATE: 2kQgBtQnHoauw8QchKM7xYvEBW1QDoHzhBsCL9Vi1AzB 
     ports:
       - "9984"
+    command: bigchaindb start
+  bdb-mdb:
+    build: ./compose/server
+    environment:
+      BIGCHAINDB_DATABASE_BACKEND: mongodb
+      BIGCHAINDB_DATABASE_HOST: mdb
+      BIGCHAINDB_DATABASE_PORT: 27017
+      BIGCHAINDB_SERVER_BIND: 0.0.0.0:9984
+      BIGCHAINDB_WSSERVER_HOST: 0.0.0.0
+      BIGCHAINDB_KEYPAIR_PUBLIC: GW1nrdZm4mbVC8ePeiGWz6DqHexqewqy5teURVHi3RG4
+      BIGCHAINDB_KEYPAIR_PRIVATE: 2kQgBtQnHoauw8QchKM7xYvEBW1QDoHzhBsCL9Vi1AzB 
+    ports:
+      - "9984"
+      - "9985"
     command: bigchaindb start
