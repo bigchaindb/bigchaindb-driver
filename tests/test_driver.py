@@ -179,3 +179,15 @@ class TestOutputsEndpoint:
         if not unspent:
             assert output_link.format_map(
                 persisted_carol_car_transaction) in outputs
+
+
+class TestBlocksEndppoint:
+
+    def test_get(self, driver, persisted_alice_transaction):
+        blocks = driver.blocks.get(txid=persisted_alice_transaction['id'])
+        assert isinstance(blocks, list)
+        assert len(blocks) == 1
+
+    def test_retrieve(self, driver, block_with_alice_transaction):
+        block = driver.blocks.retrieve(block_id=block_with_alice_transaction)
+        assert block

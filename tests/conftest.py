@@ -197,6 +197,11 @@ def transactions_api_full_url(api_root):
 
 
 @fixture
+def blocks_api_full_url(api_root):
+    return api_root + '/blocks'
+
+
+@fixture
 def mock_requests_post(monkeypatch):
     class MockResponse:
         def __init__(self, json):
@@ -235,6 +240,15 @@ def persisted_alice_transaction(alice_privkey,
     json = signed_transaction.to_dict()
     response = requests.post(transactions_api_full_url, json=json)
     return response.json()
+
+
+@fixture
+def block_with_alice_transaction(persisted_alice_transaction,
+                                 blocks_api_full_url):
+    return requests.get(
+        blocks_api_full_url,
+        params={'tx_id': persisted_alice_transaction['id']}
+    ).json()[0]
 
 
 @fixture
