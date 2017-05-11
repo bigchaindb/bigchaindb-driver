@@ -33,6 +33,7 @@ class BigchainDB:
         self._transport = transport_class(*self._nodes, headers=headers)
         self._transactions = TransactionsEndpoint(self)
         self._outputs = OutputsEndpoint(self)
+        self._blocks = BlocksEndpoint(self)
         self.api_prefix = '/api/v1'
 
     @property
@@ -61,6 +62,13 @@ class BigchainDB:
             Exposes functionalities of the ``'/outputs'`` endpoint.
         """
         return self._outputs
+
+    @property
+    def blocks(self):
+        """:class:`~bigchaindb_driver.driver.BlocksEndpoint`:
+            Exposes functionalities of the ``'/blocks'`` endpoint.
+        """
+        return self._blocks
 
     def info(self, headers=None):
         """Retrieves information of the node being connected to via the
@@ -375,3 +383,49 @@ class OutputsEndpoint(NamespacedDriver):
             params={'public_key': public_key, 'unspent': unspent},
             headers=headers,
         )
+
+
+class BlocksEndpoint(NamespacedDriver):
+    """Exposes functionality of the ``'/blocks'`` endpoint.
+
+    Attributes:
+        path (str): The path of the endpoint.
+
+    """
+    PATH = '/blocks/'
+
+    def get(self, *, txid, status=None, headers=None):
+        """Get the block(s) that contain the given transaction id
+        (``txid``), and optionally that have the given ``status``.
+
+        Args:
+            txid (str): Transaction id.
+            status (str): Status the block should have. Accepted values
+                are ``VALID``, ``UNDECIDED`` or ``INVALID``.
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            :obj:`list` of :obj:`str`: List of block ids.
+
+        """
+        return self.transport.forward_request(
+            method='GET',
+            path=self.path,
+            params={'tx_id': txid, 'status': status},
+            headers=headers,
+        )
+
+    def retrieve(self, block_id, headers=None):
+        """Retrieves the transaction with the given id.
+
+        Args:
+            block_id (str): Id of the block to retrieve.
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            dict: The block with the given id.
+
+        """
+        path = self.path + block_id
+        return self.transport.forward_request(
+            method='GET', path=path, headers=None)
