@@ -29,7 +29,7 @@ def await_transaction(fixture_func, waiting_time=1.5):
 def make_ed25519_condition(public_key, *, amount=1):
     ed25519 = Ed25519Fulfillment(public_key=public_key)
     return {
-        'amount': amount,
+        'amount': str(amount),
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -247,7 +247,7 @@ def block_with_alice_transaction(persisted_alice_transaction,
                                  blocks_api_full_url):
     return requests.get(
         blocks_api_full_url,
-        params={'tx_id': persisted_alice_transaction['id']}
+        params={'transaction_id': persisted_alice_transaction['id']}
     ).json()[0]
 
 
@@ -365,7 +365,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
         'metadata': None,
         'operation': 'TRANSFER',
         'outputs': ({
-            'amount': 1,
+            'amount': '1',
             'condition': {
                 'details': ed25519_dimi.to_dict(),
                 'uri': ed25519_dimi.condition_uri,
@@ -376,7 +376,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
             'fulfillment': None,
             'fulfills': {
                 'output': 0,
-                'txid': output_txid,
+                'transaction_id': output_txid,
             },
             'owners_before': (carol_keypair.public_key,),
         },),
@@ -415,7 +415,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
         'metadata': None,
         'operation': 'TRANSFER',
         'outputs': ({
-            'amount': 1,
+            'amount': '1',
             'condition': {
                 'details': ed25519_ewy.to_dict(),
                 'uri': ed25519_ewy.condition_uri,
@@ -426,7 +426,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
             'fulfillment': None,
             'fulfills': {
                 'output': 0,
-                'txid': output_txid,
+                'transaction_id': output_txid,
             },
             'owners_before': (dimi_keypair.public_key,),
         },),
@@ -462,7 +462,7 @@ def unsigned_transaction():
             },
         },
         'outputs': [{
-            'amount': 1,
+            'amount': '1',
             'condition': {
                 'details': {
                     'bitmask': 32,
@@ -486,7 +486,7 @@ def unsigned_transaction():
             'fulfills': None,
             'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
         }],
-        'id': 'e0efa8f985f91871cd7547f3b06a81a0237f4a21dcffd081ac0a282c28f79c43',   # noqa E501
+        'id': '86c27f9d501dc1ef8955fe25576d021c0750730729d97d4d6ed92603ce453ce6',   # noqa E501
         'metadata': None,
         'operation': 'CREATE',
         'version': '0.9',

@@ -341,7 +341,8 @@ class TransactionsEndpoint(NamespacedDriver):
         # HTTP API more thoroughly.
         path = self.api_prefix + '/statuses'
         return self.transport.forward_request(
-            method='GET', path=path, params={'tx_id': txid}, headers=headers)
+            method='GET', path=path, params={'transaction_id': txid},
+            headers=headers)
 
 
 class OutputsEndpoint(NamespacedDriver):
@@ -353,15 +354,16 @@ class OutputsEndpoint(NamespacedDriver):
     """
     PATH = '/outputs/'
 
-    def get(self, public_key, unspent=False, headers=None):
+    def get(self, public_key, spent=None, headers=None):
         """
 
         Args:
             public_key (str): Public key for which unfulfilled
                 conditions are sought.
-            unspent (bool): Whether to get the unconsumed outputs
-                only. Defaults to ``False``, meaning that both consumed,
-                and unconsumed outputs will be returned.
+            spent (bool): Indicate if the result set should include only spent
+                or only unspent outputs. If not specified (``None``) the
+                result includes all the outputs (both spent and unspent)
+                associated with the public_key
             headers (dict): Optional headers to pass to the request.
 
         Returns:
@@ -380,7 +382,7 @@ class OutputsEndpoint(NamespacedDriver):
         return self.transport.forward_request(
             method='GET',
             path=self.path,
-            params={'public_key': public_key, 'unspent': unspent},
+            params={'public_key': public_key, 'spent': spent},
             headers=headers,
         )
 
@@ -411,7 +413,7 @@ class BlocksEndpoint(NamespacedDriver):
         return self.transport.forward_request(
             method='GET',
             path=self.path,
-            params={'tx_id': txid, 'status': status},
+            params={'transaction_id': txid, 'status': status},
             headers=headers,
         )
 
