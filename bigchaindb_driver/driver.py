@@ -363,7 +363,7 @@ class OutputsEndpoint(NamespacedDriver):
             spent (bool): Indicate if the result set should include only spent
                 or only unspent outputs. If not specified (``None``) the
                 result includes all the outputs (both spent and unspent)
-                associated with the public_key
+                associated with the public key.
             headers (dict): Optional headers to pass to the request.
 
         Returns:
