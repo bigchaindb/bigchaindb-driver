@@ -508,7 +508,7 @@ Carly is the owner of 10 tokens:
 
     In [0]: fulfilled_token_tx['outputs'][0]['public_keys'][0] == carly.public_key
 
-    In [0]: fulfilled_token_tx['outputs'][0]['amount'] == 10
+    In [0]: fulfilled_token_tx['outputs'][0]['amount'] == '10'
 
 
 Now in possession of the tokens, Carly wants to ride the bicycle for two hours.
@@ -561,7 +561,7 @@ able to directly use the ``TRANSFER`` transaction's ``asset`` as the new
 transaction's ``asset`` because it already contained the asset's id.
 
 The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
-``amount=2`` and the other with ``amount=8``:
+``amount='2'`` and the other with ``amount='8'``:
 
 .. ipython::
 
