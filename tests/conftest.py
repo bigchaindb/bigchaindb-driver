@@ -504,9 +504,9 @@ def unsigned_transaction():
 def text_search_assets(transactions_api_full_url, alice_pubkey, alice_privkey):
     # define the assets that will be used by text_search tests
     assets = [
-        {'data': {'msg': 'Hello BigchainDB 1!'}},
-        {'data': {'msg': 'Hello BigchainDB 2!'}},
-        {'data': {'msg': 'Hello BigchainDB 3!'}}
+        {'msg': 'Hello BigchainDB 1!'},
+        {'msg': 'Hello BigchainDB 2!'},
+        {'msg': 'Hello BigchainDB 3!'}
     ]
 
     # write the assets to BigchainDB

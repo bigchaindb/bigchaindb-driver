@@ -19,6 +19,9 @@ Library Reference
 .. autoclass:: OutputsEndpoint
     :members:
 
+.. autoclass:: AssetsEndpoint
+    :members:
+
 .. autoclass:: NamespacedDriver
     :members:
 
