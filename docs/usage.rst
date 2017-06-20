@@ -608,8 +608,10 @@ Lets perform a text search for all assets that contain the word ``bigchaindb``:
     ]
 
 This call returns all the assets that match the string ``bigchaindb``, sorted
-by text score, as well as the asset ``id``. This is the same ``id`` of the
-transaction that created the asset.
+by `text score
+<https://docs.mongodb.com/manual/reference/operator/query/text/#text-operator-text-score>`_,
+as well as the asset ``id``. This is the same ``id`` of the transaction that
+created the asset.
 
 Its also possible to limit the amount of returned results using the ``limit``
 argument:
