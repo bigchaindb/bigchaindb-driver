@@ -273,7 +273,7 @@ def prepare_transfer_transaction(*,
                 'fulfillment': condition['condition']['details'],
                 'input': {
                     'cid': cid,
-                    'txid': tx['id'],
+                    'transaction_id': tx['id'],
                 },
                 'owners_before': condition['owners_after'],
             }
@@ -313,7 +313,9 @@ def prepare_transfer_transaction(*,
     fulfillments = [
         Input(Fulfillment.from_dict(input_['fulfillment']),
               input_['owners_before'],
-              fulfills=TransactionLink(**input_['fulfills']))
+              fulfills=TransactionLink(
+                  txid=input_['fulfills']['transaction_id'],
+                  output=input_['fulfills']['output']))
         for input_ in inputs
     ]
 

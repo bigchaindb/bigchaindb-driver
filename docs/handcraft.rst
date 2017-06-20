@@ -664,7 +664,7 @@ transfer transaction was prepared and fulfilled as follows:
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:          'output': output_index,
-       ...:          'txid': creation_tx['id'],
+       ...:          'transaction_id': creation_tx['id'],
        ...:      },
        ...:      'owners_before': output['public_keys'],
        ...: }
@@ -1351,7 +1351,7 @@ their car over to ``carol``:
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output': output_index,
-       ...:         'txid': signed_car_creation_tx['id'],
+       ...:         'transaction_id': signed_car_creation_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }

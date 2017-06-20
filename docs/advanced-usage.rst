@@ -160,7 +160,7 @@ To construct the input:
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output': output_index,
-       ...:         'txid': tx['id'],
+       ...:         'transaction_id': tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }
@@ -367,7 +367,7 @@ input:
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output': output_index,
-       ...:         'txid': signed_car_creation_tx['id'],
+       ...:         'transaction_id': signed_car_creation_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }
