@@ -35,8 +35,8 @@ class TestBigchainDB:
 
     def test_info(self, driver, bdb_node_pubkey):
         response = driver.info()
-        assert '_links' in response
-        assert 'docs' in response['_links']
+        assert 'api' in response
+        assert 'docs' in response
         assert response['keyring'] == []
         assert response['public_key'] == bdb_node_pubkey
         assert response['software'] == 'BigchainDB'
@@ -44,12 +44,11 @@ class TestBigchainDB:
 
     def test_api_info(self, driver):
         response = driver.api_info()
-        assert '_links' in response
-        assert 'docs' in response['_links']
-        api_root = driver.nodes[0] + driver.api_prefix + '/'
-        assert response['_links']['self'] == api_root
-        assert response['_links']['transactions'] == api_root + 'transactions/'
-        assert response['_links']['statuses'] == api_root + 'statuses/'
+        assert 'docs' in response
+        assert response['assets'] == '/assets/'
+        assert response['outputs'] == '/outputs/'
+        assert response['transactions'] == '/transactions/'
+        assert response['statuses'] == '/statuses/'
 
 
 class TestTransactionsEndpoint:
@@ -160,25 +159,46 @@ class TestOutputsEndpoint:
                          persisted_carol_car_transaction):
         outputs = driver.outputs.get(carol_pubkey)
         assert len(outputs) == 2
-        assert '../transactions/{id}/outputs/0'.format_map(
-            persisted_carol_bicycle_transaction) in outputs
-        assert '../transactions/{id}/outputs/0'.format_map(
-            persisted_carol_car_transaction) in outputs
+        assert {
+            'transaction_id': persisted_carol_bicycle_transaction['id'],
+            'output': 0
+        } in outputs
+        assert {
+            'transaction_id': persisted_carol_car_transaction['id'],
+            'output': 0
+        } in outputs
 
-    @mark.parametrize('unspent,outputs_qty', ((True, 1), (False, 2)))
-    def test_get_outputs_with_unspent_query_param(
-            self, unspent, outputs_qty, driver, carol_pubkey,
+    @mark.parametrize('spent,outputs_qty', ((False, 1), (True, 1), (None, 2)))
+    def test_get_outputs_with_spent_query_param(
+            self, spent, outputs_qty, driver, carol_pubkey,
             persisted_carol_bicycle_transaction,
             persisted_carol_car_transaction,
             persisted_transfer_carol_car_to_dimi):
-        outputs = driver.outputs.get(carol_pubkey, unspent=unspent)
+        outputs = driver.outputs.get(carol_pubkey, spent=spent)
         assert len(outputs) == outputs_qty
-        output_link = '../transactions/{id}/outputs/0'
-        assert output_link.format_map(
-            persisted_carol_bicycle_transaction) in outputs
-        if not unspent:
-            assert output_link.format_map(
-                persisted_carol_car_transaction) in outputs
+
+        # Return only unspent outputs
+        if spent is False:
+            assert {
+                'transaction_id': persisted_carol_bicycle_transaction['id'],
+                'output': 0
+            } in outputs
+        # Return only spent outputs
+        elif spent is True:
+            assert {
+                'transaction_id': persisted_carol_car_transaction['id'],
+                'output': 0
+            } in outputs
+        # Return all outputs for carol
+        elif spent is None:
+            assert {
+                'transaction_id': persisted_carol_bicycle_transaction['id'],
+                'output': 0
+            } in outputs
+            assert {
+                'transaction_id': persisted_carol_car_transaction['id'],
+                'output': 0
+            } in outputs
 
 
 class TestBlocksEndppoint:

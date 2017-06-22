@@ -56,37 +56,47 @@ From the point of view of Python, a transaction is simply a dictionary:
 .. code-block:: python
 
     {
-        'id': 'c10671ba9b1d3be3cb68959416bf88a711a4eeff2dbe29f5aca13e8dc39579ff',
-        'operation': 'CREATE',
-        'asset': {
-            'data': {
-                'bicycle': {
-                    'manufacturer': 'bkfab',
-                    'serial_number': 'abcd1234',
-                },
-            },
+        "inputs": [
+            {
+                "fulfills": null,
+                "owners_before": [
+                    "2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW"
+                ],
+                "fulfillment": "cf:4:EugE6KngB5E5QOWO0nrfl8cPmsO_Gu_37aU-ABIOnVtwUz1P1ZPsvUED-EolmcI67ibQUp-c0IBdEptP0NSNJ5oVbtpLNBsWqEO922s5BLjvYk1_AWtErJun0AJW634D"
+            }
+        ],
+        "asset": {
+            "data": {
+                "bicycle": {
+                    "manufacturer": "bkfab",
+                    "serial_number": "abcd1234"
+                }
+            }
         },
-        'metadata': {'planet': 'earth'},
-        'outputs': [{
-            'amount': 1,
-            'condition': {
-                'details': {
-                    'bitmask': 32,
-                    'public_key': '6FCKbDMmCiM37pN9qzNmgJxKqebWzGxZUcAqB8CNg84J',
-                    'signature': None,
-                    'type': 'fulfillment',
-                    'type_id': 4,
+        "metadata": {
+            "planet": "earth"
+        },
+        "id": "0a4404a598b7b927cd1c5678295e245d1d9e06f026a268b674944ca5ca445e36",
+        "outputs": [
+            {
+                "condition": {
+                    "uri": "cc:4:20:EugE6KngB5E5QOWO0nrfl8cPmsO_Gu_37aU-ABIOnVs:96",
+                    "details": {
+                        "signature": null,
+                        "type": "fulfillment",
+                        "public_key": "2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW",
+                        "bitmask": 32,
+                        "type_id": 4
+                    }
                 },
-                'uri': 'cc:4:20:Te1duSG0oFpsm-5Sn9uQT1QIngxmhZSOEry8xeCna8M:96',
-            },
-            'public_keys': ['6FCKbDMmCiM37pN9qzNmgJxKqebWzGxZUcAqB8CNg84J'],
-        }],
-        'inputs': [{
-            'fulfillment': 'cf:4:Te1duSG0oFpsm-5Sn9uQT1QIngxmhZSOEry8xeCna8OJSbCmmVoQddD14yzvLRC0XxC5CsK7KnOORFOe5gOiCkEUh-KqCBgia_38jx4B-KDUkhcMaT-oP2TcjIRZhhkJ',
-            'fulfills': None,
-            'owners_before': ['6FCKbDMmCiM37pN9qzNmgJxKqebWzGxZUcAqB8CNg84J'],
-        }],
-        'version': '0.9',
+                "public_keys": [
+                    "2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW"
+                ],
+                "amount": "1"
+            }
+        ],
+        "operation": "CREATE",
+        "version": "0.11"
     }
 
 Because a transaction must be signed before being sent, the ``id`` and
@@ -165,7 +175,7 @@ that was used to create it. For BigchainDB 0.9, this will be:
 
 .. ipython::
 
-    In [0]: version = '0.9'
+    In [0]: version = '0.11'
 
 asset
 -----
@@ -242,7 +252,7 @@ We can now easily assemble the ``dict`` for the output:
 .. ipython::
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
@@ -259,7 +269,7 @@ Let's recap and set the ``outputs`` key with our self-constructed condition:
     In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
@@ -372,7 +382,7 @@ above payload:
     ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -540,7 +550,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     operation = 'CREATE'
 
-    version = '0.9'
+    version = '0.11'
 
     asset = {
         'data': {
@@ -556,7 +566,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
     ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -654,7 +664,7 @@ transfer transaction was prepared and fulfilled as follows:
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:          'output': output_index,
-       ...:          'txid': creation_tx['id'],
+       ...:          'transaction_id': creation_tx['id'],
        ...:      },
        ...:      'owners_before': output['public_keys'],
        ...: }
@@ -692,7 +702,7 @@ version
 -------
 .. ipython::
 
-    In [0]: version = '0.9'
+    In [0]: version = '0.11'
 
 asset
 -----
@@ -724,7 +734,7 @@ outputs
     In [0]: ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': ed25519.to_dict(),
        ...:         'uri': ed25519.condition_uri,
@@ -741,7 +751,7 @@ fulfillments
     In [0]: input_ = {
        ...:     'fulfillment': None,
        ...:     'fulfills': {
-       ...:         'txid': creation_tx['id'],
+       ...:         'transaction_id': creation_tx['id'],
        ...:         'output': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key,)
@@ -788,14 +798,14 @@ Before we generate the ``id``, let's recap how we got here:
     )
 
     operation = 'TRANSFER'
-    version = '0.9'
+    version = '0.11'
     asset = {'id': creation_tx['id']}
     metadata = None
 
     ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -807,7 +817,7 @@ Before we generate the ``id``, let's recap how we got here:
     input_ = {
         'fulfillment': None,
         'fulfills': {
-            'txid': creation_tx['id'],
+            'transaction_id': creation_tx['id'],
             'output': 0,
         },
         'owners_before': (alice.public_key,)
@@ -953,14 +963,14 @@ In a nutshell
     bob = generate_keypair()
 
     operation = 'TRANSFER'
-    version = '0.9'
+    version = '0.11'
     asset = {'id': creation_tx['id']}
     metadata = None
 
     ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': ed25519.to_dict(),
             'uri': ed25519.condition_uri,
@@ -972,7 +982,7 @@ In a nutshell
     input_ = {
         'fulfillment': None,
         'fulfills': {
-            'txid': creation_txid,
+            'transaction_id': creation_txid,
             'output': 0,
         },
         'owners_before': (alice.public_key,)
@@ -1058,7 +1068,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 
 
     bob, carly = generate_keypair(), generate_keypair()
-    version = '0.9'
+    version = '0.11'
 
     asset = {
         'data': {
@@ -1082,7 +1092,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     unsigned_fulfillment_dict = ed25519.to_dict()
 
     output = {
-        'amount': 10,
+        'amount': '10',
         'condition': {
             'details': unsigned_fulfillment_dict,
             'uri': condition_uri,
@@ -1159,7 +1169,7 @@ A few checks:
     >>> token_creation_tx['outputs'][0]['public_keys'][0] == carly.public_key
     True
 
-    >>> token_creation_tx['outputs'][0]['amount'] == 10
+    >>> token_creation_tx['outputs'][0]['amount'] == '10'
     True
 
 
@@ -1192,7 +1202,7 @@ to Bob:
     carly_unsigned_fulfillment_dict = carly_ed25519.to_dict()
 
     bob_output = {
-        'amount': 2,
+        'amount': '2',
         'condition': {
             'details': bob_unsigned_fulfillment_dict,
             'uri': bob_condition_uri,
@@ -1200,7 +1210,7 @@ to Bob:
         'public_keys': (bob.public_key,),
     }
     carly_output = {
-        'amount': 8,
+        'amount': '8',
         'condition': {
             'details': carly_unsigned_fulfillment_dict,
             'uri': carly_condition_uri,
@@ -1211,7 +1221,7 @@ to Bob:
     input_ = {
         'fulfillment': None,
         'fulfills': {
-            'txid': token_creation_tx['id'],
+            'transaction_id': token_creation_tx['id'],
             'output': 0,
         },
         'owners_before': (carly.public_key,)
@@ -1341,7 +1351,7 @@ their car over to ``carol``:
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output': output_index,
-       ...:         'txid': signed_car_creation_tx['id'],
+       ...:         'transaction_id': signed_car_creation_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }
@@ -1414,7 +1424,7 @@ Generate the output condition:
     In [0]: condition_uri = threshold_sha256.condition.serialize_uri()
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': unsigned_subfulfillments_dict,
        ...:         'uri': condition_uri,
@@ -1453,7 +1463,7 @@ Craft the payload:
 
 .. ipython::
 
-    In [0]: version = '0.9'
+    In [0]: version = '0.11'
 
     In [0]: handcrafted_car_creation_tx = {
        ...:     'operation': 'CREATE',
@@ -1525,7 +1535,7 @@ The transfer to Carol:
     In [0]: condition_uri = carol_ed25519.condition.serialize_uri()
 
     In [0]: output = {
-       ...:     'amount': 1,
+       ...:     'amount': '1',
        ...:     'condition': {
        ...:         'details': unsigned_fulfillments_dict,
        ...:         'uri': condition_uri,
@@ -1540,7 +1550,7 @@ The yet to be fulfilled input:
     In [0]: input_ = {
        ...:     'fulfillment': None,
        ...:     'fulfills': {
-       ...:         'txid': handcrafted_car_creation_tx['id'],
+       ...:         'transaction_id': handcrafted_car_creation_tx['id'],
        ...:         'output': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key, bob.public_key),
@@ -1637,7 +1647,7 @@ Handcrafting the ``'CREATE'`` transaction
     from bigchaindb_driver.crypto import generate_keypair
 
 
-    version = '0.9'
+    version = '0.11'
 
     car_asset = {
         'data': {
@@ -1671,7 +1681,7 @@ Handcrafting the ``'CREATE'`` transaction
     condition_uri = threshold_sha256.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_subfulfillments_dict,
             'uri': threshold_sha256.condition_uri,
@@ -1752,7 +1762,7 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
-    version = '0.9'
+    version = '0.11'
 
     carol = generate_keypair()
 
@@ -1767,7 +1777,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     condition_uri = carol_ed25519.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_fulfillments_dict,
             'uri': condition_uri,
@@ -1779,7 +1789,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     input_ = {
         'fulfillment': None,
         'fulfills': {
-            'txid': handcrafted_car_creation_tx['id'],
+            'transaction_id': handcrafted_car_creation_tx['id'],
             'output': 0,
         },
         'owners_before': (alice.public_key, bob.public_key),
@@ -1880,7 +1890,7 @@ Handcrafting the ``'CREATE'`` transaction
     from bigchaindb_driver.crypto import generate_keypair
 
 
-    version = '0.9'
+    version = '0.11'
 
     car_asset = {
         'data': {
@@ -1915,7 +1925,7 @@ Handcrafting the ``'CREATE'`` transaction
     condition_uri = threshold_sha256.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_subfulfillments_dict,
             'uri': threshold_sha256.condition_uri,
@@ -1989,8 +1999,7 @@ Wait for some nano seconds, and check the status:
 .. code-block:: python
 
     >>> bdb.transactions.status(returned_car_creation_tx['id'])
-    {'_links': {'tx': '/transactions/8548f3e0f58a258f2db13dd33480b6f3322eeed9c49416d3b96b55163fd66019'},
-     'status': 'valid'}
+     {'status': 'valid'}
 
 
 Handcrafting the ``'TRANSFER'`` transaction
@@ -1998,7 +2007,7 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
-    version = '0.9'
+    version = '0.11'
 
     carol = generate_keypair()
 
@@ -2013,7 +2022,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     condition_uri = carol_ed25519.condition.serialize_uri()
 
     output = {
-        'amount': 1,
+        'amount': '1',
         'condition': {
             'details': unsigned_fulfillments_dict,
             'uri': condition_uri,
@@ -2025,7 +2034,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     input_ = {
         'fulfillment': None,
         'fulfills': {
-            'txid': handcrafted_car_creation_tx['id'],
+            'transaction_id': handcrafted_car_creation_tx['id'],
             'output': 0,
         },
         'owners_before': (alice.public_key, bob.public_key),
@@ -2067,7 +2076,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=1)
 
     alice_ed25519.sign(message.encode(), private_key=alice_sk)
-    
+
     threshold_sha256.add_subfulfillment(alice_ed25519)
 
     threshold_sha256.add_subcondition(bob_ed25519.condition)
@@ -2088,8 +2097,7 @@ Wait for some nano seconds, and check the status:
 .. code-block:: python
 
     >>> bdb.transactions.status(returned_car_transfer_tx['id'])
-    {'_links': {'tx': '/transactions/da344aa9ddec0a332c55242888bc12c80df5839dd3f7e441b6b98e99854ceb09'},
-     'status': 'valid'}
+     {'status': 'valid'}
 
 
 .. _sha3: https://github.com/tiran/pysha3
