@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import json
 
 import base58
@@ -213,6 +214,8 @@ class TestBlocksEndppoint:
         assert block
 
 
+@mark.skipif(os.environ['BIGCHAINDB_DATABASE_BACKEND'] != 'mongodb',
+             reason='Requires MongoDB as the backend')
 class TestAssetsEndpoint:
 
     def test_get_search_no_results(self, driver):
