@@ -574,9 +574,9 @@ Querying for Assets
 
 BigchainDB allows you to query for assets using simple text search. This search
 is applied to all the strings inside the asset payload and returns all the
-assets that match a give text search string.
+assets that match a given text search string.
 
-Lets assume that we :ref:`created <asset-creation>` 3 assets that look like
+Let's assume that we :ref:`created <asset-creation>` 3 assets that look like
 this:
 
 .. ipython::
@@ -587,7 +587,7 @@ this:
        ...:    {'data': {'msg': 'Hello BigchainDB 3!'}}
        ...: ]
 
-Lets perform a text search for all assets that contain the word ``bigchaindb``:
+Let's perform a text search for all assets that contain the word ``bigchaindb``:
 
 .. code-block:: python
 
@@ -613,7 +613,7 @@ by `text score
 as well as the asset ``id``. This is the same ``id`` of the transaction that
 created the asset.
 
-Its also possible to limit the amount of returned results using the ``limit``
+It's also possible to limit the amount of returned results using the ``limit``
 argument:
 
 .. code-block:: python
