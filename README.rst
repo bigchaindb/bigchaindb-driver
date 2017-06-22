@@ -5,7 +5,7 @@ BigchainDB Python Driver
 .. image:: https://img.shields.io/pypi/v/bigchaindb-driver.svg
         :target: https://pypi.python.org/pypi/bigchaindb-driver
 
-.. image:: https://img.shields.io/travis/bigchaindb/bigchaindb-driver.svg
+.. image:: https://travis-ci.org/bigchaindb/bigchaindb-driver.svg?branch=master 
         :target: https://travis-ci.org/bigchaindb/bigchaindb-driver
 
 .. image:: https://img.shields.io/codecov/c/github/bigchaindb/bigchaindb-driver/master.svg
