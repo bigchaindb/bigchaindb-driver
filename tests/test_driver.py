@@ -2,11 +2,11 @@
 
 import json
 
+import base58
 from pytest import mark, raises
 from requests.utils import default_headers
 
-from cryptoconditions import Ed25519Fulfillment
-from cryptoconditions.crypto import Ed25519SigningKey
+from cryptoconditions import Ed25519Sha256
 
 
 class TestBigchainDB:
@@ -106,8 +106,8 @@ class TestTransactionsEndpoint:
             separators=(',', ':'),
             ensure_ascii=False,
         ).encode()
-        ed25519 = Ed25519Fulfillment(public_key=alice_keypair.vk)
-        ed25519.sign(message, Ed25519SigningKey(alice_keypair.sk))
+        ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice_keypair.vk))
+        ed25519.sign(message, base58.b58decode(alice_keypair.sk))
         fulfillment_uri = ed25519.serialize_uri()
         assert signed_transaction['inputs'][0]['fulfillment'] == fulfillment_uri   # noqa
 

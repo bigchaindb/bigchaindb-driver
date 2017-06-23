@@ -56,47 +56,49 @@ From the point of view of Python, a transaction is simply a dictionary:
 .. code-block:: python
 
     {
-        "inputs": [
-            {
-                "fulfills": null,
-                "owners_before": [
-                    "2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW"
-                ],
-                "fulfillment": "cf:4:EugE6KngB5E5QOWO0nrfl8cPmsO_Gu_37aU-ABIOnVtwUz1P1ZPsvUED-EolmcI67ibQUp-c0IBdEptP0NSNJ5oVbtpLNBsWqEO922s5BLjvYk1_AWtErJun0AJW634D"
-            }
-        ],
-        "asset": {
-            "data": {
-                "bicycle": {
-                    "manufacturer": "bkfab",
-                    "serial_number": "abcd1234"
+        'operation': 'CREATE',
+        'asset': {
+            'data': {
+                'bicycle': {
+                    'manufacturer': 'bkfab',
+                    'serial_number': 'abcd1234'
                 }
             }
         },
-        "metadata": {
-            "planet": "earth"
-        },
-        "id": "0a4404a598b7b927cd1c5678295e245d1d9e06f026a268b674944ca5ca445e36",
-        "outputs": [
+        'version': '1.0',
+        'outputs': [
             {
-                "condition": {
-                    "uri": "cc:4:20:EugE6KngB5E5QOWO0nrfl8cPmsO_Gu_37aU-ABIOnVs:96",
-                    "details": {
-                        "signature": null,
-                        "type": "fulfillment",
-                        "public_key": "2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW",
-                        "bitmask": 32,
-                        "type_id": 4
-                    }
+                'condition': {
+                    'details': {
+                        'public_key': '2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW',
+                        'signature': None,
+                        'type': 'ed25519-sha-256'
+                    },
+                    'uri': 'ni:///sha-256;1hBHivh6Nxhgi2b1ndUbP55ZlyUFdLC9BipPUBWth7U?fpt=ed25519-sha-256&cost=131072'
                 },
-                "public_keys": [
-                    "2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW"
+                'public_keys': [
+                    '2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW'
                 ],
-                "amount": "1"
+                'amount': '1'
             }
         ],
-        "operation": "CREATE",
-        "version": "0.11"
+        'inputs': [
+            {
+                'fulfills': None,
+                'owners_before': [
+                    '2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW'
+                ],
+                'fulfillment': {
+                    'public_key': '2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW',
+                    'signature': None,
+                    'type': 'ed25519-sha-256'
+                }
+            }
+        ],
+        'id': '52f8ec4d56b4187be256231ef11017038f316d16ef0a0d250e235d39e901f4d1',
+        'metadata': {
+            'planet': 'earth'
+        }
     }
 
 Because a transaction must be signed before being sent, the ``id`` and
@@ -168,14 +170,11 @@ We are now going to craft this payload by hand.
 
 version
 -------
-Until 1.0, each version of BigchainDB can be expected to contain
-backwards-incompatible changes to the transaction model. To facilitate this,
-the ``version`` in a transaction will correspond with the version of BigchainDB
-that was used to create it. For BigchainDB 0.9, this will be:
+As of BigchainDB 1.0, the transaction ``version`` is set to 1.0.
 
 .. ipython::
 
-    In [0]: version = '0.11'
+    In [0]: version = '1.0'
 
 asset
 -----
@@ -227,11 +226,31 @@ aiming for:
 The difficult parts are the condition details and URI. We''ll now see how to
 generate them using the ``cryptoconditions`` library:
 
+.. note:: In BigchainDB keys are encoded in base58 but the cryptoconditions
+    library expects an unencoded byte string so we will have to decode the
+    base58 key before we can use it with cryptoconditions.
+
+    .. ipython::
+
+        In [0]: import base58
+
+    A base58 encoded key:
+
+    .. ipython::
+
+        In [0]: alice.public_key
+
+    Becomes:
+
+    .. ipython::
+
+        In [0]: base58.b58decode(alice.public_key)
+
 .. ipython::
 
-    In [0]: from cryptoconditions import Ed25519Fulfillment
+    In [0]: from cryptoconditions import Ed25519Sha256
 
-    In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
+    In [0]: ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
 generate the condition URI:
 
@@ -264,9 +283,9 @@ Let's recap and set the ``outputs`` key with our self-constructed condition:
 
 .. ipython::
 
-    In [0]: from cryptoconditions import Ed25519Fulfillment
+    In [0]: from cryptoconditions import Ed25519Sha256
 
-    In [0]: ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
+    In [0]: ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
     In [0]: output = {
        ...:     'amount': '1',
@@ -356,7 +375,7 @@ above payload:
 
 .. code-block:: python
 
-    from cryptoconditions import Ed25519Fulfillment
+    from cryptoconditions import Ed25519Sha256
     from bigchaindb_driver.crypto import CryptoKeypair
 
     alice = CryptoKeypair(
@@ -366,7 +385,7 @@ above payload:
 
     operation = 'CREATE'
 
-    version = '0.9'
+    version = '1.0'
 
     asset = {
         'data': {
@@ -379,7 +398,7 @@ above payload:
 
     metadata = {'planet': 'earth'}
 
-    ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
+    ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
     output = {
         'amount': '1',
@@ -500,8 +519,6 @@ The Fulfilled Transaction
 
     In [0]: ed25519.to_dict()
 
-    In [0]: sk = Ed25519SigningKey(alice.private_key)
-
     In [0]: message = json.dumps(
        ...:     handcrafted_creation_tx,
        ...:     sort_keys=True,
@@ -509,7 +526,7 @@ The Fulfilled Transaction
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: ed25519.sign(message.encode(), sk)
+    In [0]: ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
 
     In [0]: fulfillment_uri = ed25519.serialize_uri()
 
@@ -541,7 +558,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
     from uuid import uuid4
 
     import sha3
-    import cryptoconditions
+    from cryptoconditions import Ed25519Sha256
 
     from bigchaindb_driver.crypto import generate_keypair
 
@@ -550,7 +567,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     operation = 'CREATE'
 
-    version = '0.11'
+    version = '1.0'
 
     asset = {
         'data': {
@@ -563,7 +580,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     metadata = {'planet': 'earth'}
 
-    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
+    ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
     output = {
         'amount': '1',
@@ -602,8 +619,6 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     handcrafted_creation_tx['id'] = creation_txid
 
-    sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
-
     message = json.dumps(
         handcrafted_creation_tx,
         sort_keys=True,
@@ -611,7 +626,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
         ensure_ascii=False,
     )
 
-    ed25519.sign(message.encode(), sk)
+    ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
 
     fulfillment_uri = ed25519.serialize_uri()
 
@@ -702,7 +717,7 @@ version
 -------
 .. ipython::
 
-    In [0]: version = '0.11'
+    In [0]: version = '1.0'
 
 asset
 -----
@@ -729,9 +744,9 @@ outputs
 -------
 .. ipython::
 
-    In [0]: from cryptoconditions import Ed25519Fulfillment
+    In [0]: from cryptoconditions import Ed25519Sha256
 
-    In [0]: ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
+    In [0]: ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
     In [0]: output = {
        ...:     'amount': '1',
@@ -789,7 +804,7 @@ Before we generate the ``id``, let's recap how we got here:
 
 .. code-block:: python
 
-    from cryptoconditions import Ed25519Fulfillment
+    from cryptoconditions import Ed25519Sha256
     from bigchaindb_driver.crypto import CryptoKeypair
 
     bob = CryptoKeypair(
@@ -798,11 +813,11 @@ Before we generate the ``id``, let's recap how we got here:
     )
 
     operation = 'TRANSFER'
-    version = '0.11'
+    version = '1.0'
     asset = {'id': creation_tx['id']}
     metadata = None
 
-    ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
+    ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
     output = {
         'amount': '1',
@@ -908,8 +923,6 @@ The Fulfilled Transaction
 
 .. ipython::
 
-    In [0]: from cryptoconditions.crypto import Ed25519SigningKey
-
     In [0]: from bigchaindb_driver.offchain import fulfill_transaction
 
     In [0]: # fulfill prepared transaction
@@ -923,8 +936,6 @@ The Fulfilled Transaction
 
     In [0]: ed25519.to_dict()
 
-    In [0]: sk = Ed25519SigningKey(alice.private_key)
-
     In [0]: message = json.dumps(
        ...:     handcrafted_transfer_tx,
        ...:     sort_keys=True,
@@ -932,7 +943,7 @@ The Fulfilled Transaction
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: ed25519.sign(message.encode(), sk)
+    In [0]: ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
 
     In [0]: fulfillment_uri = ed25519.serialize_uri()
 
@@ -955,7 +966,7 @@ In a nutshell
     import json
 
     import sha3
-    import cryptoconditions
+    from cryptoconditions import Ed25519Sha256
 
     from bigchaindb_driver.crypto import generate_keypair
 
@@ -963,11 +974,11 @@ In a nutshell
     bob = generate_keypair()
 
     operation = 'TRANSFER'
-    version = '0.11'
+    version = '1.0'
     asset = {'id': creation_tx['id']}
     metadata = None
 
-    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+    ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
     output = {
         'amount': '1',
@@ -1009,8 +1020,6 @@ In a nutshell
 
     handcrafted_transfer_tx['id'] = transfer_txid
 
-    sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
-
     message = json.dumps(
         handcrafted_transfer_tx,
         sort_keys=True,
@@ -1018,7 +1027,7 @@ In a nutshell
         ensure_ascii=False,
     )
 
-    ed25519.sign(message.encode(), sk)
+    ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
 
     fulfillment_uri = ed25519.serialize_uri()
 
@@ -1062,13 +1071,13 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     from uuid import uuid4
 
     import sha3
-    import cryptoconditions
+    from cryptoconditions import Ed25519Sha256
 
     from bigchaindb_driver.crypto import generate_keypair
 
 
     bob, carly = generate_keypair(), generate_keypair()
-    version = '0.11'
+    version = '1.0'
 
     asset = {
         'data': {
@@ -1083,7 +1092,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     }
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for carly
-    ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carly.public_key)
+    ed25519 = Ed25519Sha256(public_key=base58.b58decode(carly.public_key))
 
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = ed25519.condition.serialize_uri()
@@ -1138,8 +1147,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     )
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
-    ed25519.sign(message.encode(),
-                 cryptoconditions.crypto.Ed25519SigningKey(bob.private_key))
+    ed25519.sign(message.encode(), base58.b58decode(bob.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = ed25519.serialize_uri()
@@ -1188,10 +1196,10 @@ to Bob:
 .. code-block:: python
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for carly
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+    bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for carly
-    carly_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carly.public_key)
+    carly_ed25519 = Ed25519Sha256(public_key=base58.b58decode(carly.public_key))
 
     # CRYPTO-CONDITIONS: generate the condition uris
     bob_condition_uri = bob_ed25519.condition.serialize_uri()
@@ -1259,8 +1267,7 @@ to Bob:
     )
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id for bob
-    carly_ed25519.sign(message.encode(),
-                       cryptoconditions.crypto.Ed25519SigningKey(carly.private_key))
+    carly_ed25519.sign(message.encode(), base58.b58decode(carly.private_key))
 
     # CRYPTO-CONDITIONS: generate bob's fulfillment uri
     fulfillment_uri = carly_ed25519.serialize_uri()
@@ -1389,9 +1396,7 @@ sha3, and cryptoconditions):
 
     In [0]: from sha3 import sha3_256
 
-    In [0]: from cryptoconditions import Ed25519Fulfillment, ThresholdSha256Fulfillment
-
-    In [0]: from cryptoconditions.crypto import Ed25519SigningKey
+    In [0]: from cryptoconditions import Ed25519Sha256, ThresholdSha256
 
 Create the asset, setting all values:
 
@@ -1409,11 +1414,11 @@ Generate the output condition:
 
 .. ipython::
 
-    In [0]: alice_ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
+    In [0]: alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
-    In [0]: bob_ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
+    In [0]: bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
-    In [0]: threshold_sha256 = ThresholdSha256Fulfillment(threshold=2)
+    In [0]: threshold_sha256 = ThresholdSha256(threshold=2)
 
     In [0]: threshold_sha256.add_subfulfillment(alice_ed25519)
 
@@ -1438,7 +1443,7 @@ Generate the output condition:
 
     .. ipython::
 
-        In [0]: alt_threshold_sha256 = ThresholdSha256Fulfillment(threshold=2)
+        In [0]: alt_threshold_sha256 = ThresholdSha256(threshold=2)
 
         In [0]: alt_threshold_sha256.add_subcondition(alice_ed25519.condition)
 
@@ -1463,7 +1468,7 @@ Craft the payload:
 
 .. ipython::
 
-    In [0]: version = '0.11'
+    In [0]: version = '1.0'
 
     In [0]: handcrafted_car_creation_tx = {
        ...:     'operation': 'CREATE',
@@ -1507,7 +1512,7 @@ Sign the transaction:
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: alice_ed25519.sign(message.encode(), Ed25519SigningKey(alice.private_key))
+    In [0]: alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
 
     In [0]: fulfillment_uri = alice_ed25519.serialize_uri()
 
@@ -1524,11 +1529,11 @@ The transfer to Carol:
 
 .. ipython::
 
-    In [0]: alice_ed25519 = Ed25519Fulfillment(public_key=alice.public_key)
+    In [0]: alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
-    In [0]: bob_ed25519 = Ed25519Fulfillment(public_key=bob.public_key)
+    In [0]: bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
-    In [0]: carol_ed25519 = Ed25519Fulfillment(public_key=carol.public_key)
+    In [0]: carol_ed25519 = Ed25519Sha256(public_key=base58.b58decode(carol.public_key))
 
     In [0]: unsigned_fulfillments_dict = carol_ed25519.to_dict()
 
@@ -1602,23 +1607,19 @@ Sign the transaction:
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: alice_sk = Ed25519SigningKey(alice.private_key)
-
-    In [0]: bob_sk = Ed25519SigningKey(bob.private_key)
-
-    In [0]: threshold_sha256 = ThresholdSha256Fulfillment(threshold=2)
+    In [0]: threshold_sha256 = ThresholdSha256(threshold=2)
 
     In [0]: threshold_sha256.add_subfulfillment(alice_ed25519)
 
     In [0]: threshold_sha256.add_subfulfillment(bob_ed25519)
 
-    In [102]: alice_condition = threshold_sha256.get_subcondition_from_vk(alice.public_key)[0]
+    In [102]: alice_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(alice.public_key))[0]
 
-    In [103]: bob_condition = threshold_sha256.get_subcondition_from_vk(bob.public_key)[0]
+    In [103]: bob_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(bob.public_key))[0]
 
-    In [106]: alice_condition.sign(message.encode(), private_key=alice_sk)
+    In [106]: alice_condition.sign(message.encode(), private_key=base58.b58decode(alice.private_key))
 
-    In [107]: bob_condition.sign(message.encode(), private_key=bob_sk)
+    In [107]: bob_condition.sign(message.encode(), private_key=base58.b58decode(bob.private_key))
 
     In [0]: fulfillment_uri = threshold_sha256.serialize_uri()
 
@@ -1642,12 +1643,12 @@ Handcrafting the ``'CREATE'`` transaction
     import json
 
     import sha3
-    import cryptoconditions
+    from cryptoconditions import Ed25519Sha256, ThresholdSha256
 
     from bigchaindb_driver.crypto import generate_keypair
 
 
-    version = '0.11'
+    version = '1.0'
 
     car_asset = {
         'data': {
@@ -1660,13 +1661,13 @@ Handcrafting the ``'CREATE'`` transaction
     alice, bob = generate_keypair(), generate_keypair()
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for alice
-    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
+    alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for bob
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+    bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
     # CRYPTO-CONDITIONS: instantiate a threshold SHA 256 crypto-condition
-    threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=2)
+    threshold_sha256 = ThresholdSha256(threshold=2)
 
     # CRYPTO-CONDITIONS: add alice ed25519 to the threshold SHA 256 condition
     threshold_sha256.add_subfulfillment(alice_ed25519)
@@ -1731,8 +1732,7 @@ Handcrafting the ``'CREATE'`` transaction
     )
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
-    alice_ed25519.sign(message.encode(),
-                       cryptoconditions.crypto.Ed25519SigningKey(alice.private_key))
+    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = alice_ed25519.serialize_uri()
@@ -1762,15 +1762,15 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
-    version = '0.11'
+    version = '1.0'
 
     carol = generate_keypair()
 
-    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
+    alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+    bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
-    carol_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carol.public_key)
+    carol_ed25519 = Ed25519Sha256(public_key=base58.b58decode(carol.public_key))
 
     unsigned_fulfillments_dict = carol_ed25519.to_dict()
 
@@ -1826,23 +1826,19 @@ Handcrafting the ``'TRANSFER'`` transaction
         ensure_ascii=False,
     )
 
-    alice_sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
-
-    bob_sk = cryptoconditions.crypto.Ed25519SigningKey(bob.private_key)
-
-    threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=2)
+    threshold_sha256 = ThresholdSha256(threshold=2)
 
     threshold_sha256.add_subfulfillment(alice_ed25519)
 
     threshold_sha256.add_subfulfillment(bob_ed25519)
 
-    alice_condition = threshold_sha256.get_subcondition_from_vk(alice.public_key)[0]
+    alice_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(alice.public_key))[0]
 
-    bob_condition = threshold_sha256.get_subcondition_from_vk(bob.public_key)[0]
+    bob_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(bob.public_key))[0]
 
-    alice_condition.sign(message.encode(), private_key=alice_sk)
+    alice_condition.sign(message.encode(), private_key=base58.b58decode(alice.private_key))
 
-    bob_condition.sign(message.encode(), private_key=bob_sk)
+    bob_condition.sign(message.encode(), private_key=base58.b58decode(bob.private_key))
 
     fulfillment_uri = threshold_sha256.serialize_uri()
 
@@ -1885,12 +1881,12 @@ Handcrafting the ``'CREATE'`` transaction
     import json
 
     import sha3
-    import cryptoconditions
+    from cryptoconditions import Ed25519Sha256, ThresholdSha256
 
     from bigchaindb_driver.crypto import generate_keypair
 
 
-    version = '0.11'
+    version = '1.0'
 
     car_asset = {
         'data': {
@@ -1903,14 +1899,14 @@ Handcrafting the ``'CREATE'`` transaction
     alice, bob = generate_keypair(), generate_keypair()
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for alice
-    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
+    alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
     # CRYPTO-CONDITIONS: instantiate an Ed25519 crypto-condition for bob
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+    bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
     # CRYPTO-CONDITIONS: instantiate a threshold SHA 256 crypto-condition
     # NOTICE that the threshold is set to 1, not 2
-    threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=1)
+    threshold_sha256 = ThresholdSha256(threshold=1)
 
     # CRYPTO-CONDITIONS: add alice ed25519 to the threshold SHA 256 condition
     threshold_sha256.add_subfulfillment(alice_ed25519)
@@ -1975,8 +1971,7 @@ Handcrafting the ``'CREATE'`` transaction
     )
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
-    alice_ed25519.sign(message.encode(),
-                       cryptoconditions.crypto.Ed25519SigningKey(alice.private_key))
+    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = alice_ed25519.serialize_uri()
@@ -2007,15 +2002,15 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
-    version = '0.11'
+    version = '1.0'
 
     carol = generate_keypair()
 
-    alice_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=alice.public_key)
+    alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
-    bob_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=bob.public_key)
+    bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
-    carol_ed25519 = cryptoconditions.Ed25519Fulfillment(public_key=carol.public_key)
+    carol_ed25519 = Ed25519Sha256(public_key=base58.b58decode(carol.public_key))
 
     unsigned_fulfillments_dict = carol_ed25519.to_dict()
 
@@ -2071,11 +2066,9 @@ Handcrafting the ``'TRANSFER'`` transaction
         ensure_ascii=False,
     )
 
-    alice_sk = cryptoconditions.crypto.Ed25519SigningKey(alice.private_key)
+    threshold_sha256 = ThresholdSha256(threshold=1)
 
-    threshold_sha256 = cryptoconditions.ThresholdSha256Fulfillment(threshold=1)
-
-    alice_ed25519.sign(message.encode(), private_key=alice_sk)
+    alice_ed25519.sign(message.encode(), private_key=base58.b58decode(alice.private_key))
 
     threshold_sha256.add_subfulfillment(alice_ed25519)
 
@@ -2102,6 +2095,6 @@ Wait for some nano seconds, and check the status:
 
 .. _sha3: https://github.com/tiran/pysha3
 .. _cryptoconditions: https://github.com/bigchaindb/cryptoconditions
-.. _cryptoconditions internet draft: https://tools.ietf.org/html/draft-thomas-crypto-conditions-01
+.. _cryptoconditions internet draft: https://tools.ietf.org/html/draft-thomas-crypto-conditions-02
 .. _The Transaction Model: https://docs.bigchaindb.com/projects/server/en/latest/data-models/transaction-model.html
 .. _The Transaction Schema: https://docs.bigchaindb.com/projects/server/en/latest/schema/transaction.html

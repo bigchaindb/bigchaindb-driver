@@ -6,8 +6,8 @@ from os import environ, urandom
 from time import sleep
 
 import requests
-from cryptoconditions import Ed25519Fulfillment
-from cryptoconditions.crypto import Ed25519SigningKey
+import base58
+from cryptoconditions import Ed25519Sha256
 from pytest import fixture
 from sha3 import sha3_256
 
@@ -27,7 +27,7 @@ def await_transaction(fixture_func, waiting_time=1.5):
 
 
 def make_ed25519_condition(public_key, *, amount=1):
-    ed25519 = Ed25519Fulfillment(public_key=public_key)
+    ed25519 = Ed25519Sha256(public_key=base58.b58decode(public_key))
     return {
         'amount': str(amount),
         'condition': {
@@ -65,14 +65,14 @@ def add_transaction_id(transaction):
 
 
 def sign_transaction(transaction, *, public_key, private_key):
-    ed25519 = Ed25519Fulfillment(public_key=public_key)
+    ed25519 = Ed25519Sha256(public_key=base58.b58decode(public_key))
     message = json.dumps(
         transaction,
         sort_keys=True,
         separators=(',', ':'),
         ensure_ascii=False,
     )
-    ed25519.sign(message.encode(), Ed25519SigningKey(private_key))
+    ed25519.sign(message.encode(), base58.b58decode(private_key))
     return ed25519.serialize_uri()
 
 
@@ -283,7 +283,7 @@ def prepared_carol_bicycle_transaction(carol_keypair, bicycle_data):
         'operation': 'CREATE',
         'outputs': (condition,),
         'inputs': (fulfillment,),
-        'version': '0.9',
+        'version': '1.0',
     }
     add_transaction_id(tx)
     return tx
@@ -324,7 +324,7 @@ def prepared_carol_car_transaction(carol_keypair, car_data):
         'operation': 'CREATE',
         'outputs': (condition,),
         'inputs': (fulfillment,),
-        'version': '0.9',
+        'version': '1.0',
     }
     add_transaction_id(tx)
     return tx
@@ -359,7 +359,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
                                          transactions_api_full_url,
                                          persisted_carol_car_transaction):
     output_txid = persisted_carol_car_transaction['id']
-    ed25519_dimi = Ed25519Fulfillment(public_key=dimi_pubkey)
+    ed25519_dimi = Ed25519Sha256(public_key=base58.b58decode(dimi_pubkey))
     transaction = {
         'asset': {'id': output_txid},
         'metadata': None,
@@ -380,7 +380,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
             },
             'owners_before': (carol_keypair.public_key,),
         },),
-        'version': '0.9',
+        'version': '1.0',
     }
     serialized_transaction_without_id = json.dumps(
         transaction,
@@ -395,9 +395,10 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
         separators=(',', ':'),
         ensure_ascii=False,
     ).encode()
-    ed25519_carol = Ed25519Fulfillment(public_key=carol_keypair.public_key)
+    ed25519_carol = Ed25519Sha256(
+        public_key=base58.b58decode(carol_keypair.public_key))
     ed25519_carol.sign(serialized_transaction_with_id,
-                       Ed25519SigningKey(carol_keypair.private_key))
+                       base58.b58decode(carol_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_carol.serialize_uri()
     response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
@@ -409,7 +410,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
                                        transactions_api_full_url,
                                        persisted_transfer_carol_car_to_dimi):
     output_txid = persisted_transfer_carol_car_to_dimi['id']
-    ed25519_ewy = Ed25519Fulfillment(public_key=ewy_pubkey)
+    ed25519_ewy = Ed25519Sha256(public_key=base58.b58decode(ewy_pubkey))
     transaction = {
         'asset': {'id': persisted_transfer_carol_car_to_dimi['asset']['id']},
         'metadata': None,
@@ -430,7 +431,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
             },
             'owners_before': (dimi_keypair.public_key,),
         },),
-        'version': '0.9',
+        'version': '1.0',
     }
     serialized_transaction_without_id = json.dumps(
         transaction,
@@ -445,9 +446,10 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
         separators=(',', ':'),
         ensure_ascii=False,
     ).encode()
-    ed25519_dimi = Ed25519Fulfillment(public_key=dimi_keypair.public_key)
+    ed25519_dimi = Ed25519Sha256(
+        public_key=base58.b58decode(dimi_keypair.public_key))
     ed25519_dimi.sign(serialized_transaction_with_id,
-                      Ed25519SigningKey(dimi_keypair.private_key))
+                      base58.b58decode(dimi_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_dimi.serialize_uri()
     response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
@@ -456,38 +458,42 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
 @fixture
 def unsigned_transaction():
     return {
+        'operation': 'CREATE',
         'asset': {
             'data': {
-                'serial_number': 'NNP43x-DaYoSWg==',
-            },
+                'serial_number': 'NNP43x-DaYoSWg=='
+            }
         },
-        'outputs': [{
-            'amount': '1',
-            'condition': {
-                'details': {
-                    'bitmask': 32,
+        'version': '1.0',
+        'outputs': [
+            {
+                'condition': {
+                    'details': {
+                        'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa E501
+                        'signature': None,
+                        'type': 'ed25519-sha-256'
+                    },
+                    'uri': 'ni:///sha-256;7U_VA9u_5e4hsgGkaxO_n0W3ZtSlzhCNYWV6iEYU7mo?fpt=ed25519-sha-256&cost=131072'  # noqa E501
+                },
+                'public_keys': [
+                    'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'
+                ],
+                'amount': '1'
+            }
+        ],
+        'inputs': [
+            {
+                'fulfills': None,
+                'owners_before': [
+                    'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'
+                ],
+                'fulfillment': {
                     'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa E501
                     'signature': None,
-                    'type': 'fulfillment',
-                    'type_id': 4,
-                },
-                'uri': 'cc:4:20:4HwjqBgNkDK0fD1ajmFn0OZ75N3Jk-xIV2zlhgPxP2Y:96',   # noqa E501
-            },
-            'public_keys': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
-        }],
-        'inputs': [{
-            'fulfillment': {
-                'bitmask': 32,
-                'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',
-                'signature': None,
-                'type': 'fulfillment',
-                'type_id': 4,
-            },
-            'fulfills': None,
-            'owners_before': ['G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3'],
-        }],
-        'id': '86c27f9d501dc1ef8955fe25576d021c0750730729d97d4d6ed92603ce453ce6',   # noqa E501
-        'metadata': None,
-        'operation': 'CREATE',
-        'version': '0.9',
+                    'type': 'ed25519-sha-256'
+                }
+            }
+        ],
+        'id': '5a33929b5d25af195b1374d1b0c07fd1f0718484dae82139e228fb05bd862769',   # noqa E501
+        'metadata': None
     }
