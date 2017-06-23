@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  bdb:
+    build:
+      context: .
+      dockerfile: ./compose/driver/Dockerfile
+    volumes:
+      - ./docs:/usr/src/app/docs
+      - ./tests:/usr/src/app/tests
+      - ./bigchaindb_driver:/usr/src/app/bigchaindb_driver
+      - ./setup.py:/usr/src/app/setup.py
+      - ./tox.ini:/usr/src/app/tox.ini
+    environment:
+      BDB_HOST: bdb-server
+      BIGCHAINDB_KEYPAIR_PUBLIC: GW1nrdZm4mbVC8ePeiGWz6DqHexqewqy5teURVHi3RG4
+      BIGCHAINDB_DATABASE_BACKEND: rethinkdb
+    command: pytest -v
+  db:
+    image: rethinkdb
+    ports:
+      - "58585:8080"
+      - "28015"
+  bdb-server:
+    build: ./compose/server
+    environment:
+      BIGCHAINDB_DATABASE_BACKEND: rethinkdb
+      BIGCHAINDB_DATABASE_HOST: db
+      BIGCHAINDB_SERVER_BIND: 0.0.0.0:9984
+      BIGCHAINDB_WSSERVER_HOST: 0.0.0.0
+      BIGCHAINDB_KEYPAIR_PUBLIC: GW1nrdZm4mbVC8ePeiGWz6DqHexqewqy5teURVHi3RG4
+      BIGCHAINDB_KEYPAIR_PRIVATE: 2kQgBtQnHoauw8QchKM7xYvEBW1QDoHzhBsCL9Vi1AzB 
+    ports:
+      - "9984"
+    command: bigchaindb start

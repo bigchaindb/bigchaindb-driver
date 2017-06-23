@@ -2,6 +2,6 @@
 
 set -e -x
 
-if [ "${TOXENV}" == "py35" ]; then
+if [ "${TOXENV}" == "py36" ]; then
     codecov
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "${TOXENV}" == "py35" ]; then
+if [[ "${TOXENV}" == "py35" || "${TOXENV}" == "py36" ]]; then
     source /etc/lsb-release
     echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | tee -a /etc/apt/sources.list.d/rethinkdb.list
     wget -qO- https://download.rethinkdb.com/apt/pubkey.gpg | apt-key add -
