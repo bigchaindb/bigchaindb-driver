@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.3.0 (2017-06-23)
+------------------
+Added
+^^^^^
+* Support for BigchainDB server (HTTP API) 1.0.0rc1.
+* Support for crypto-conditions RFC draft version 02.
+* Added support for text search endpoint ``/assets?search=``
+
 0.2.0 (2017-02-06)
 ------------------
 Added
