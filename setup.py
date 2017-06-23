@@ -42,7 +42,7 @@ docs_require = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.3.0',
+    version='0.3.1',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
