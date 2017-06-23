@@ -497,3 +497,29 @@ def unsigned_transaction():
         'id': '5a33929b5d25af195b1374d1b0c07fd1f0718484dae82139e228fb05bd862769',   # noqa E501
         'metadata': None
     }
+
+
+@fixture
+@await_transaction
+def text_search_assets(transactions_api_full_url, alice_pubkey, alice_privkey):
+    # define the assets that will be used by text_search tests
+    assets = [
+        {'msg': 'Hello BigchainDB 1!'},
+        {'msg': 'Hello BigchainDB 2!'},
+        {'msg': 'Hello BigchainDB 3!'}
+    ]
+
+    # write the assets to BigchainDB
+    assets_by_txid = {}
+    for asset in assets:
+        tx = Transaction.create(
+            tx_signers=[alice_pubkey],
+            recipients=[([alice_pubkey], 1)],
+            asset=asset,
+        )
+        tx_signed = tx.sign([alice_privkey])
+        requests.post(transactions_api_full_url, json=tx_signed.to_dict())
+        assets_by_txid[tx_signed.id] = asset
+
+    # return the assets indexed with the txid that created the asset
+    return assets_by_txid

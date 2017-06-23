@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import json
 
 import base58
@@ -211,3 +212,27 @@ class TestBlocksEndppoint:
     def test_retrieve(self, driver, block_with_alice_transaction):
         block = driver.blocks.retrieve(block_id=block_with_alice_transaction)
         assert block
+
+
+@mark.skipif(os.environ['BIGCHAINDB_DATABASE_BACKEND'] != 'mongodb',
+             reason='Requires MongoDB as the backend')
+class TestAssetsEndpoint:
+
+    def test_get_search_no_results(self, driver):
+        # no asset matches the search string
+        response = driver.assets.get(search='abcdef')
+        assert response == []
+
+    def test_get_search(self, driver, text_search_assets):
+        # we have 3 assets that match 'bigchaindb' in text_search_assets
+        response = driver.assets.get(search='bigchaindb')
+        assert len(response) == 3
+
+        for asset in response:
+            assert text_search_assets[asset['id']] == asset['data']
+
+    def test_get_search_limit(self, driver, text_search_assets):
+        # we have 3 assets that match 'bigchaindb' in text_search_assets but
+        # we are limiting the number of returned results to 2
+        response = driver.assets.get(search='bigchaindb', limit=2)
+        assert len(response) == 2

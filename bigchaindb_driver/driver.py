@@ -34,6 +34,7 @@ class BigchainDB:
         self._transactions = TransactionsEndpoint(self)
         self._outputs = OutputsEndpoint(self)
         self._blocks = BlocksEndpoint(self)
+        self._assets = AssetsEndpoint(self)
         self.api_prefix = '/api/v1'
 
     @property
@@ -62,6 +63,13 @@ class BigchainDB:
             Exposes functionalities of the ``'/outputs'`` endpoint.
         """
         return self._outputs
+
+    @property
+    def assets(self):
+        """:class:`~bigchaindb_driver.driver.AssetsEndpoint`:
+            Exposes functionalities of the ``'/assets'`` endpoint.
+        """
+        return self._assets
 
     @property
     def blocks(self):
@@ -431,3 +439,33 @@ class BlocksEndpoint(NamespacedDriver):
         path = self.path + block_id
         return self.transport.forward_request(
             method='GET', path=path, headers=None)
+
+
+class AssetsEndpoint(NamespacedDriver):
+    """Exposes functionality of the ``'/assets'`` endpoint.
+
+    Attributes:
+        path (str): The path of the endpoint.
+
+    """
+    PATH = '/assets/'
+
+    def get(self, *, search, limit=0, headers=None):
+        """Retrieves the assets that match a given text search string.
+
+        Args:
+            search (str): Text search string.
+            limit (int): Limit the number of returned documents. Defaults to
+                zero meaning that it returns all the matching assets.
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            :obj:`list` of :obj:`dict`: List of assets that match the query.
+
+        """
+        return self.transport.forward_request(
+            method='GET',
+            path=self.path,
+            params={'search': search, 'limit': limit},
+            headers=headers
+        )

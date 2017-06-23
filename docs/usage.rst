@@ -84,6 +84,8 @@ signed transaction was indeed signed by the one who claims to be the signee.
     In [0]: alice, bob = generate_keypair(), generate_keypair()
 
 
+.. _asset-creation:
+
 Asset Creation
 --------------
 We're now ready to create the digital asset. First, let's prepare the
@@ -566,3 +568,64 @@ The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
 .. ipython::
 
     In [0]: fulfilled_transfer_tx
+
+Querying for Assets
+-------------------
+
+BigchainDB allows you to query for assets using simple text search. This search
+is applied to all the strings inside the asset payload and returns all the
+assets that match a given text search string.
+
+Let's assume that we :ref:`created <asset-creation>` 3 assets that look like
+this:
+
+.. ipython::
+
+    In [0]: assets = [
+       ...:    {'data': {'msg': 'Hello BigchainDB 1!'}},
+       ...:    {'data': {'msg': 'Hello BigchainDB 2!'}},
+       ...:    {'data': {'msg': 'Hello BigchainDB 3!'}}
+       ...: ]
+
+Let's perform a text search for all assets that contain the word ``bigchaindb``:
+
+.. code-block:: python
+
+    >> bdb.assets.get(search='bigchaindb')
+    [
+        {
+            'data': {'msg': 'Hello BigchainDB 1!'},
+            'id': '7582d7a81652d0230fefb47dafc360ff09b2c2566b68f05c3a004d57e7fe7610'
+        },
+        {
+            'data': {'msg': 'Hello BigchainDB 2!'},
+            'id': 'e40f4b6ac70b9c1b3b237ec13f4174384fd4d54d36dfde25520171577c49caa4'
+        },
+        {
+            'data': {'msg': 'Hello BigchainDB 3!'},
+            'id': '748f6c30daaf771c9020d84db9ad8ac4d1f7c8de7013db55e16f10ba090f7013'
+        }
+    ]
+
+This call returns all the assets that match the string ``bigchaindb``, sorted
+by `text score
+<https://docs.mongodb.com/manual/reference/operator/query/text/#text-operator-text-score>`_,
+as well as the asset ``id``. This is the same ``id`` of the transaction that
+created the asset.
+
+It's also possible to limit the amount of returned results using the ``limit``
+argument:
+
+.. code-block:: python
+
+    >> bdb.assets.get(search='bigchaindb', limit=2)
+    [
+        {
+            'data': {'msg': 'Hello BigchainDB 1!'},
+            'id': '7582d7a81652d0230fefb47dafc360ff09b2c2566b68f05c3a004d57e7fe7610'
+        },
+        {
+            'data': {'msg': 'Hello BigchainDB 2!'},
+            'id': 'e40f4b6ac70b9c1b3b237ec13f4174384fd4d54d36dfde25520171577c49caa4'
+        }
+    ]
