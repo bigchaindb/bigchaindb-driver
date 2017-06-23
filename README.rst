@@ -43,6 +43,8 @@ Compatibility Matrix
 +-----------------------+---------------------------+
 | ``>= 0.9.1``          | ``0.2.x``                 |
 +-----------------------+---------------------------+
+| ``>= 1.0.0rc1``       | ``0.3.x``                 |
++-----------------------+---------------------------+
 
 `Although we do our best to keep the master branches in sync, there may be
 occasional delays.`
