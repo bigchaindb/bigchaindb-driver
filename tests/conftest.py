@@ -470,7 +470,6 @@ def unsigned_transaction():
                 'condition': {
                     'details': {
                         'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa E501
-                        'signature': None,
                         'type': 'ed25519-sha-256'
                     },
                     'uri': 'ni:///sha-256;7U_VA9u_5e4hsgGkaxO_n0W3ZtSlzhCNYWV6iEYU7mo?fpt=ed25519-sha-256&cost=131072'  # noqa E501
@@ -489,7 +488,6 @@ def unsigned_transaction():
                 ],
                 'fulfillment': {
                     'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa E501
-                    'signature': None,
                     'type': 'ed25519-sha-256'
                 }
             }
