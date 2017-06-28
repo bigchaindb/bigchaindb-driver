@@ -71,7 +71,6 @@ From the point of view of Python, a transaction is simply a dictionary:
                 'condition': {
                     'details': {
                         'public_key': '2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW',
-                        'signature': None,
                         'type': 'ed25519-sha-256'
                     },
                     'uri': 'ni:///sha-256;1hBHivh6Nxhgi2b1ndUbP55ZlyUFdLC9BipPUBWth7U?fpt=ed25519-sha-256&cost=131072'
@@ -90,7 +89,6 @@ From the point of view of Python, a transaction is simply a dictionary:
                 ],
                 'fulfillment': {
                     'public_key': '2GoYB8cMZQrUBZzx9BH9Bq92eGWXBy3oanDXbRK3YRpW',
-                    'signature': None,
                     'type': 'ed25519-sha-256'
                 }
             }
