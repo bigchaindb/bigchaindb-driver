@@ -73,19 +73,19 @@ development.
    Now you can make your changes locally.
 
 4. When you're done making changes, check that your changes pass flake8
-   and the tests. For the tests, you'll need to  start the RethinkDB and
+   and the tests. For the tests, you'll need to  start the MongoDB and
    BigchainDB servers::
 
-    $ docker-compose up -d rdb
+    $ docker-compose up -d db
     $ docker-compose up -d bdb-server
 
 5. flake8 check::
 
-    $ docker-compose run --rm bdb-driver flake8 bigchaindb_driver tests
+    $ docker-compose run --rm bdb flake8 bigchaindb_driver tests
 
 6. To run the tests::
 
-    $ docker-compose run --rm bdb-driver pytest -v
+    $ docker-compose run --rm bdb pytest -v
 
 7. Commit your changes and push your branch to GitHub::
 
@@ -119,10 +119,10 @@ Development Environment with Docker
 Depending on what you are doing, you may need to run at least one BigchainDB
 node. You can use the `docker-compose.yml`_ file to run a node, and perform
 other tasks that depend on the running node. To run a BigchainDB node, (for
-development), you start a RethinkDB node, followed by the linked BigchainDB
+development), you start a MongoDB node, followed by the linked BigchainDB
 node::
 
-    $ docker-compose up -d rdb
+    $ docker-compose up -d db
     $ docker-compose up -d bdb-server
 
 You can monitor the logs::
@@ -135,14 +135,34 @@ Tests
 
 To run a subset of tests::
 
-    $ docker-compose run --rm bdb-driver pytest -v tests/test_driver.py
+    $ docker-compose run --rm bdb pytest -v tests/test_driver.py
 
 .. important:: When running tests, unless you are targeting a test that does
     not require a connection with the BigchainDB server, you need to run the
-    BigchainDB and RethinkDB servers::
+    BigchainDB and MongoDB servers::
 
-    $ docker-compose up -d rdb 
+    $ docker-compose up -d db 
     $ docker-compose up -d bdb-server
+
+
+Using RethinkDB as the backend
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The default docker-compose file runs MongoDB as a backend. In order to work
+with RethinkDB, one has to use the ``docker-compose.rdb.yml`` file, which
+implies working with `multiple compose files`_. The workflow is the same as
+with MongoDB.
+
+First start RethinkDB::
+
+    $ docker-compose -f docker-compose.rdb.yml up -d db
+
+then one BigchainDB server node::
+
+    $ docker-compose -f docker-compose.rdb.yml up -d bdb-server
+
+and run the tests::
+
+    $ docker-compose -f docker-compose.rdb.yml run --rm bdb pytest -v
 
 
 Dependency on Bigchaindb
@@ -156,3 +176,4 @@ against BigchainDB's API.
 
 .. _bigchaindb-driver: https://github.com/bigchaindb/bigchaindb-driver
 .. _docker-compose.yml: https://github.com/bigchaindb/bigchaindb-driver/blob/master/docker-compose.yml
+.. _multiple compose files: https://docs.docker.com/compose/extends/#multiple-compose-files
