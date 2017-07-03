@@ -10,6 +10,7 @@ from bigchaindb.common.transaction import (
     Input,
     Transaction,
     TransactionLink,
+    _fulfillment_from_details
 )
 from bigchaindb.common.exceptions import KeypairMismatchException
 from cryptoconditions import Fulfillment
@@ -250,7 +251,6 @@ def prepare_transfer_transaction(*,
                 'cid': 0,
                 'condition': {'details': {'bitmask': 32,
                   'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-                  'signature': None,
                   'type': 'fulfillment',
                   'type_id': 4},
                  'uri': 'cc:4:20:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg:96'},
@@ -283,7 +283,6 @@ def prepare_transfer_transaction(*,
             >>> input_
             {'fulfillment': {'bitmask': 32,
               'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-              'signature': None,
               'type': 'fulfillment',
               'type_id': 4},
              'input': {'cid': 0,
@@ -311,7 +310,7 @@ def prepare_transfer_transaction(*,
         recipients = [(list(recipients), 1)]
 
     fulfillments = [
-        Input(Fulfillment.from_dict(input_['fulfillment']),
+        Input(_fulfillment_from_details(input_['fulfillment']),
               input_['owners_before'],
               fulfills=TransactionLink(
                   txid=input_['fulfills']['transaction_id'],
