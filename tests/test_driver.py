@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-import os
 import json
 
 import base58
 from pytest import mark, raises
 from requests.utils import default_headers
 
+import bigchaindb
 from cryptoconditions import Ed25519Sha256
 
 
@@ -214,7 +214,7 @@ class TestBlocksEndppoint:
         assert block
 
 
-@mark.skipif(os.environ['BIGCHAINDB_DATABASE_BACKEND'] != 'mongodb',
+@mark.skipif(bigchaindb.config['database']['backend'] != 'mongodb',
              reason='Requires MongoDB as the backend')
 class TestAssetsEndpoint:
 
