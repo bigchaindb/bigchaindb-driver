@@ -34,6 +34,6 @@ install: .ci/travis-install.sh
 
 before_script: .ci/travis-before-script.sh
 
-script: .ci/travis_script.sh
+script: .ci/travis-script.sh
 
 after_success: .ci/travis-after-success.sh
