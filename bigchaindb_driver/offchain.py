@@ -244,49 +244,42 @@ def prepare_transfer_transaction(*,
 
             # noqa E501
             >>> tx
-            {'id': '57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39',
-             'transaction': {'asset': {'data': {'msg': 'Hello BigchainDB!'},
-               'id': '57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39'},
-              'conditions': [{'amount': 1,
-                'cid': 0,
-                'condition': {'details': {'bitmask': 32,
-                  'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-                  'type': 'fulfillment',
-                  'type_id': 4},
-                 'uri': 'cc:4:20:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ugg:96'},
-                'owners_after': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-              'fulfillments': [{'fid': 0,
-                'fulfillment': 'cf:4:IMe7QSL5xRAYIlXon76ZonWktR0NI02M8rAG1bN-ughA8-9lUJYc_LGAB_NtyTPCCV58LfMcNZ9-0PUB6m1y_6pgTbCOQFBEeDtm_nC293CbpZjziwq7j3skrzS-OiAI',
-                'input': None,
-                'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-              'metadata': None,
-              'operation': 'CREATE',
-              'timestamp': '1479393278'},
-             'version': 1}
-
+                {'asset': {'data': {'msg': 'Hello BigchainDB!'}},
+                 'id': '9650055df2539223586d33d273cb8fd05bd6d485b1fef1caf7c8901a49464c87',
+                 'inputs': [{'fulfillment': {'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
+                                             'type': 'ed25519-sha-256'},
+                             'fulfills': None,
+                             'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
+                 'metadata': None,
+                 'operation': 'CREATE',
+                 'outputs': [{'amount': '1',
+                              'condition': {'details': {'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
+                                                        'type': 'ed25519-sha-256'},
+                                            'uri': 'ni:///sha-256;7ApQLsLLQgj5WOUipJg1txojmge68pctwFxvc3iOl54?fpt=ed25519-sha-256&cost=131072'},
+                              'public_keys': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
+                 'version': '1.0'}
 
         Then, the input may be constructed in this way::
 
-            cid = 0
-            condition = tx['transaction']['conditions'][cid]
+            output_index
+            output = tx['transaction']['outputs'][output_index]
             input_ = {
-                'fulfillment': condition['condition']['details'],
+                'fulfillment': output['condition']['details'],
                 'input': {
-                    'cid': cid,
+                    'output_index': output_index,
                     'transaction_id': tx['id'],
                 },
-                'owners_before': condition['owners_after'],
+                'owners_before': output['owners_after'],
             }
 
         Displaying the input on the prompt would look like::
 
             >>> input_
-            {'fulfillment': {'bitmask': 32,
+            {'fulfillment': {
               'public_key': '3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf',
-              'type': 'fulfillment',
-              'type_id': 4},
-             'input': {'cid': 0,
-              'txid': '57cff2b9490468bdb6d4767a1b07905fdbe18d638d9c7783f639b4b2bc165c39'},
+              'type': 'ed25519-sha-256'},
+             'input': {'output_index': 0,
+              'transaction_id': '9650055df2539223586d33d273cb8fd05bd6d485b1fef1caf7c8901a49464c87'},
              'owners_before': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}
 
 
