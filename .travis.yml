@@ -4,8 +4,6 @@ python:
   - 3.6
 
 env:
-  - TOXENV=py35
-  - TOXENV=py36
   - TOXENV=flake8
   - TOXENV=docs
   
@@ -16,21 +14,26 @@ matrix:
     env: TOXENV=flake8 
   - python: 3.5 
     env: TOXENV=docs
+  include:
   - python: 3.5
-    env: TOXENV=py36
+    addons: 
+      rethinkdb: '2.3.5'
+    env: BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+  - python: 3.5
+    env:
+    - BIGCHAINDB_DATABASE_BACKEND=mongodb
   - python: 3.6
-    env: TOXENV=py35
+    addons: 
+      rethinkdb: '2.3.5'
+    env: BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+  - python: 3.6
+    env:
+    - BIGCHAINDB_DATABASE_BACKEND=mongodb
 
-before_install:
-  - sudo .ci/travis-before-install.sh
+install: .ci/travis-install.sh
 
-install:
-  - .ci/travis-install.sh
+before_script: .ci/travis-before-script.sh
 
-before_script:
-  - .ci/travis-before-script.sh
+script: .ci/travis_script.sh
 
-script: tox -e ${TOXENV}
-
-after_success:
-  - .ci/travis-after-success.sh
+after_success: .ci/travis-after-success.sh
