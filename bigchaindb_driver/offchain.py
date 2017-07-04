@@ -13,7 +13,6 @@ from bigchaindb.common.transaction import (
     _fulfillment_from_details
 )
 from bigchaindb.common.exceptions import KeypairMismatchException
-from cryptoconditions import Fulfillment
 
 from .exceptions import BigchaindbException, MissingPrivateKeyError
 from .utils import (
