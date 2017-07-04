@@ -80,7 +80,7 @@ def test_prepare_transfer_transaction(alice_transaction, recipients):
     input_ = {
         'fulfillment': condition['condition']['details'],
         'fulfills': {
-            'output': condition_index,
+            'output_index': condition_index,
             'transaction_id': alice_transaction['id'],
         },
         'owners_before': condition['public_keys']

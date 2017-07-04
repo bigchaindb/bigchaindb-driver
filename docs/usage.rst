@@ -213,7 +213,7 @@ Let's now prepare the transfer transaction:
     In [0]: transfer_input = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
-       ...:          'output': output_index,
+       ...:          'output_index': output_index,
        ...:          'transaction_id': creation_tx['id'],
        ...:      },
        ...:      'owners_before': output['public_keys'],
@@ -350,7 +350,7 @@ Recap: Asset Creation & Transfer
     transfer_input = {
         'fulfillment': output['condition']['details'],
         'fulfills': {
-            'output': output_index,
+            'output_index': output_index,
             'transaction_id': fulfilled_creation_tx['id']
         },
         'owners_before': output['public_keys']
@@ -525,7 +525,7 @@ To do so, she needs to send two tokens to Bob:
     In [0]: transfer_input = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
-       ...:         'output': output_index,
+       ...:         'output_index': output_index,
        ...:         'transaction_id': prepared_token_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],

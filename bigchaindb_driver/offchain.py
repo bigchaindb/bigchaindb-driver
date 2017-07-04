@@ -314,7 +314,7 @@ def prepare_transfer_transaction(*,
               input_['owners_before'],
               fulfills=TransactionLink(
                   txid=input_['fulfills']['transaction_id'],
-                  output=input_['fulfills']['output']))
+                  output=input_['fulfills']['output_index']))
         for input_ in inputs
     ]
 
