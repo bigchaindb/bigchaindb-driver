@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.4.0 (2017-07-05)
+------------------
+Added
+^^^^^
+* Support for BigchainDB server (HTTP API) 1.0.0.
+
 0.3.0 (2017-06-23)
 ------------------
 Added
