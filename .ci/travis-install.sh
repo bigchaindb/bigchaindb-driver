@@ -7,6 +7,6 @@ pip install --upgrade tox
 
 if [[ "${TOXENV}" == "py35" || "${TOXENV}" == "py36" ]]; then
     sudo apt-get install rethinkdb
-    pip install git+https://github.com/bigchaindb/bigchaindb.git
+    pip install bigchaindb
     pip install --upgrade codecov
 fi
