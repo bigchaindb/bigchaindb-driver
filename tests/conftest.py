@@ -11,7 +11,7 @@ from cryptoconditions import Ed25519Sha256
 from pytest import fixture
 from sha3 import sha3_256
 
-from bigchaindb.common.transaction import Transaction
+from bigchaindb.common.transaction import Transaction, _fulfillment_to_details
 
 
 # FIXME The sleep, or some other approach is required to wait for the
@@ -31,7 +31,7 @@ def make_ed25519_condition(public_key, *, amount=1):
     return {
         'amount': str(amount),
         'condition': {
-            'details': ed25519.to_dict(),
+            'details': _fulfillment_to_details(ed25519),
             'uri': ed25519.condition_uri,
         },
         'public_keys': (public_key,),
@@ -367,7 +367,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
         'outputs': ({
             'amount': '1',
             'condition': {
-                'details': ed25519_dimi.to_dict(),
+                'details': _fulfillment_to_details(ed25519_dimi),
                 'uri': ed25519_dimi.condition_uri,
             },
             'public_keys': (dimi_pubkey,),
@@ -375,7 +375,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
         'inputs': ({
             'fulfillment': None,
             'fulfills': {
-                'output': 0,
+                'output_index': 0,
                 'transaction_id': output_txid,
             },
             'owners_before': (carol_keypair.public_key,),
@@ -418,7 +418,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
         'outputs': ({
             'amount': '1',
             'condition': {
-                'details': ed25519_ewy.to_dict(),
+                'details': _fulfillment_to_details(ed25519_ewy),
                 'uri': ed25519_ewy.condition_uri,
             },
             'public_keys': (ewy_pubkey,),
@@ -426,7 +426,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
         'inputs': ({
             'fulfillment': None,
             'fulfills': {
-                'output': 0,
+                'output_index': 0,
                 'transaction_id': output_txid,
             },
             'owners_before': (dimi_keypair.public_key,),
@@ -470,7 +470,6 @@ def unsigned_transaction():
                 'condition': {
                     'details': {
                         'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa E501
-                        'signature': None,
                         'type': 'ed25519-sha-256'
                     },
                     'uri': 'ni:///sha-256;7U_VA9u_5e4hsgGkaxO_n0W3ZtSlzhCNYWV6iEYU7mo?fpt=ed25519-sha-256&cost=131072'  # noqa E501
@@ -489,12 +488,11 @@ def unsigned_transaction():
                 ],
                 'fulfillment': {
                     'public_key': 'G7J7bXF8cqSrjrxUKwcF8tCriEKC5CgyPHmtGwUi4BK3',   # noqa E501
-                    'signature': None,
                     'type': 'ed25519-sha-256'
                 }
             }
         ],
-        'id': '5a33929b5d25af195b1374d1b0c07fd1f0718484dae82139e228fb05bd862769',   # noqa E501
+        'id': '10b816bd61d2fd00a7999c86c63d333c3e478205b8d6befdccb0837945465845',   # noqa E501
         'metadata': None
     }
 

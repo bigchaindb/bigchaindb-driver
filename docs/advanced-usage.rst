@@ -133,7 +133,7 @@ referred to as a ``condition`` (put inside an "output") and a corresponding
 
 Since a transaction can have multiple outputs each with their own
 (crypto)condition, each transaction input is required to refer to the output
-condition that they fulfill via ``fulfills['output']``.
+condition that they fulfill via ``fulfills['output_index']``.
 
 .. image:: _static/tx_single_condition_single_fulfillment_v1.png
     :scale: 70%
@@ -159,7 +159,7 @@ To construct the input:
     In [0]: input_ = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
-       ...:         'output': output_index,
+       ...:         'output_index': output_index,
        ...:         'transaction_id': tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
@@ -366,7 +366,7 @@ input:
     In [0]: input_ = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
-       ...:         'output': output_index,
+       ...:         'output_index': output_index,
        ...:         'transaction_id': signed_car_creation_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
@@ -711,7 +711,7 @@ correct secret:
 ..     hashlock_fulfill_tx = b.create_transaction(
 ..         None,
 ..         hashlockuser.public_key,
-..         {'txid': hashlock_tx['id'], 'output': 0},
+..         {'transaction_id': hashlock_tx['id'], 'output_index': 0},
 ..         'TRANSFER'
 ..     )
 ..
@@ -807,7 +807,7 @@ occurs:
 ..     from time import sleep
 ..
 ..     # Create a timeout fulfillment tx
-..     tx_timeout_transfer = b.create_transaction(None, alice.public_key, {'txid': tx_timeout['id'], 'output': 0}, 'TRANSFER')
+..     tx_timeout_transfer = b.create_transaction(None, alice.public_key, {'transaction_id': tx_timeout['id'], 'output_index': 0}, 'TRANSFER')
 ..
 ..     # Parse the timeout condition and create the corresponding fulfillment
 ..     timeout_fulfillment = cc.Fulfillment.from_dict(
@@ -972,7 +972,7 @@ The following code snippet shows how to create an escrow condition:
 .. .. code-block:: python
 ..
 ..     # Create a base template for execute fulfillment
-..     tx_escrow_execute = b.create_transaction([bob.public_key, alice.public_key], alice.public_key, {'txid': tx_escrow_signed['id'], 'output': 0}, 'TRANSFER')
+..     tx_escrow_execute = b.create_transaction([bob.public_key, alice.public_key], alice.public_key, {'transaction_id': tx_escrow_signed['id'], 'output_index': 0}, 'TRANSFER')
 ..
 ..     # Parse the Escrow cryptocondition
 ..     escrow_fulfillment = cc.Fulfillment.from_dict(
@@ -1023,7 +1023,7 @@ In the case of ``bob``, we create the ``abort`` fulfillment:
 ..     tx_escrow_abort = b.create_transaction(
 ..         [bob.public_key, alice.public_key],
 ..         bob.public_key,
-..         {'txid': tx_escrow_signed['id'], 'output': 0},
+..         {'transaction_id': tx_escrow_signed['id'], 'output_index': 0},
 ..         'TRANSFER'
 ..     )
 ..

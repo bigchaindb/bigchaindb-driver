@@ -162,11 +162,11 @@ class TestOutputsEndpoint:
         assert len(outputs) == 2
         assert {
             'transaction_id': persisted_carol_bicycle_transaction['id'],
-            'output': 0
+            'output_index': 0
         } in outputs
         assert {
             'transaction_id': persisted_carol_car_transaction['id'],
-            'output': 0
+            'output_index': 0
         } in outputs
 
     @mark.parametrize('spent,outputs_qty', ((False, 1), (True, 1), (None, 2)))
@@ -182,23 +182,23 @@ class TestOutputsEndpoint:
         if spent is False:
             assert {
                 'transaction_id': persisted_carol_bicycle_transaction['id'],
-                'output': 0
+                'output_index': 0
             } in outputs
         # Return only spent outputs
         elif spent is True:
             assert {
                 'transaction_id': persisted_carol_car_transaction['id'],
-                'output': 0
+                'output_index': 0
             } in outputs
         # Return all outputs for carol
         elif spent is None:
             assert {
                 'transaction_id': persisted_carol_bicycle_transaction['id'],
-                'output': 0
+                'output_index': 0
             } in outputs
             assert {
                 'transaction_id': persisted_carol_car_transaction['id'],
-                'output': 0
+                'output_index': 0
             } in outputs
 
 
