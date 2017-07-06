@@ -262,7 +262,10 @@ As for the details:
 
 .. ipython::
 
-    In [0]: ed25519.to_dict()
+    In [0]: condition_details = {
+       ...:     'type': ed25519.TYPE_NAME,
+       ...:     'public_key': base58.b58encode(ed25519.public_key),
+       ...: }
 
 We can now easily assemble the ``dict`` for the output:
 
@@ -271,7 +274,7 @@ We can now easily assemble the ``dict`` for the output:
     In [0]: output = {
        ...:     'amount': '1',
        ...:     'condition': {
-       ...:         'details': ed25519.to_dict(),
+       ...:         'details': condition_details,
        ...:         'uri': ed25519.condition_uri,
        ...:     },
        ...:     'public_keys': (alice.public_key,),
@@ -288,7 +291,10 @@ Let's recap and set the ``outputs`` key with our self-constructed condition:
     In [0]: output = {
        ...:     'amount': '1',
        ...:     'condition': {
-       ...:         'details': ed25519.to_dict(),
+       ...:         'details': {
+       ...:             'type': ed25519.TYPE_NAME,
+       ...:             'public_key': base58.b58encode(ed25519.public_key),
+       ...:         },
        ...:         'uri': ed25519.condition_uri,
        ...:     },
        ...:     'public_keys': (alice.public_key,),
@@ -401,7 +407,10 @@ above payload:
     output = {
         'amount': '1',
         'condition': {
-            'details': ed25519.to_dict(),
+            'details': {
+                'type': ed25519.TYPE_NAME,
+                'public_key': base58.b58encode(ed25519.public_key),
+            },
             'uri': ed25519.condition_uri,
         },
         'public_keys': (alice.public_key,),
@@ -555,6 +564,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
     import json
     from uuid import uuid4
 
+    import base58
     import sha3
     from cryptoconditions import Ed25519Sha256
 
@@ -583,7 +593,10 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
     output = {
         'amount': '1',
         'condition': {
-            'details': ed25519.to_dict(),
+            'details': {
+                'type': ed25519.TYPE_NAME,
+                'public_key': base58.b58encode(ed25519.public_key),
+            },
             'uri': ed25519.condition_uri,
         },
         'public_keys': (alice.public_key,),
@@ -676,7 +689,7 @@ transfer transaction was prepared and fulfilled as follows:
     In [0]: transfer_input = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
-       ...:          'output': output_index,
+       ...:          'output_index': output_index,
        ...:          'transaction_id': creation_tx['id'],
        ...:      },
        ...:      'owners_before': output['public_keys'],
@@ -749,7 +762,10 @@ outputs
     In [0]: output = {
        ...:     'amount': '1',
        ...:     'condition': {
-       ...:         'details': ed25519.to_dict(),
+       ...:         'details': {
+       ...:             'type': ed25519.TYPE_NAME,
+       ...:             'public_key': base58.b58encode(ed25519.public_key),
+       ...:         },
        ...:         'uri': ed25519.condition_uri,
        ...:     },
        ...:     'public_keys': (bob.public_key,),
@@ -765,7 +781,7 @@ fulfillments
        ...:     'fulfillment': None,
        ...:     'fulfills': {
        ...:         'transaction_id': creation_tx['id'],
-       ...:         'output': 0,
+       ...:         'output_index': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key,)
        ...: }
@@ -820,7 +836,10 @@ Before we generate the ``id``, let's recap how we got here:
     output = {
         'amount': '1',
         'condition': {
-            'details': ed25519.to_dict(),
+            'details': {
+                'type': ed25519.TYPE_NAME,
+                'public_key': base58.b58encode(ed25519.public_key),
+            },
             'uri': ed25519.condition_uri,
         },
         'public_keys': (bob.public_key,),
@@ -831,7 +850,7 @@ Before we generate the ``id``, let's recap how we got here:
         'fulfillment': None,
         'fulfills': {
             'transaction_id': creation_tx['id'],
-            'output': 0,
+            'output_index': 0,
         },
         'owners_before': (alice.public_key,)
     }
@@ -963,6 +982,7 @@ In a nutshell
 
     import json
 
+    import base58
     import sha3
     from cryptoconditions import Ed25519Sha256
 
@@ -973,7 +993,7 @@ In a nutshell
 
     operation = 'TRANSFER'
     version = '1.0'
-    asset = {'id': creation_tx['id']}
+    asset = {'id': handcrafted_creation_tx['id']}
     metadata = None
 
     ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
@@ -981,7 +1001,10 @@ In a nutshell
     output = {
         'amount': '1',
         'condition': {
-            'details': ed25519.to_dict(),
+            'details': {
+                'type': ed25519.TYPE_NAME,
+                'public_key': base58.b58encode(ed25519.public_key),
+            },
             'uri': ed25519.condition_uri,
         },
         'public_keys': (bob.public_key,),
@@ -992,7 +1015,7 @@ In a nutshell
         'fulfillment': None,
         'fulfills': {
             'transaction_id': creation_txid,
-            'output': 0,
+            'output_index': 0,
         },
         'owners_before': (alice.public_key,)
     }
@@ -1095,8 +1118,11 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = ed25519.condition.serialize_uri()
 
-    # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
-    unsigned_fulfillment_dict = ed25519.to_dict()
+    # CRYPTO-CONDITIONS: construct an unsigned fulfillment dictionary
+    unsigned_fulfillment_dict = {
+        'type': ed25519.TYPE_NAME,
+        'public_key': base58.b58encode(ed25519.public_key),
+    }
 
     output = {
         'amount': '10',
@@ -1204,8 +1230,14 @@ to Bob:
     carly_condition_uri = carly_ed25519.condition.serialize_uri()
 
     # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
-    bob_unsigned_fulfillment_dict = bob_ed25519.to_dict()
-    carly_unsigned_fulfillment_dict = carly_ed25519.to_dict()
+    bob_unsigned_fulfillment_dict = {
+        'type': bob_ed25519.TYPE_NAME,
+        'public_key': base58.b58encode(bob_ed25519.public_key),
+    }
+    carly_unsigned_fulfillment_dict = {
+        'type': carly_ed25519.TYPE_NAME,
+        'public_key': base58.b58encode(carly_ed25519.public_key),
+    }
 
     bob_output = {
         'amount': '2',
@@ -1228,7 +1260,7 @@ to Bob:
         'fulfillment': None,
         'fulfills': {
             'transaction_id': token_creation_tx['id'],
-            'output': 0,
+            'output_index': 0,
         },
         'owners_before': (carly.public_key,)
     }
@@ -1355,7 +1387,7 @@ their car over to ``carol``:
     In [0]: input_ = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
-       ...:         'output': output_index,
+       ...:         'output_index': output_index,
        ...:         'transaction_id': signed_car_creation_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
@@ -1422,14 +1454,24 @@ Generate the output condition:
 
     In [0]: threshold_sha256.add_subfulfillment(bob_ed25519)
 
-    In [0]: unsigned_subfulfillments_dict = threshold_sha256.to_dict()
-
     In [0]: condition_uri = threshold_sha256.condition.serialize_uri()
+
+    In [0]: condition_details = {
+       ...:     'subconditions': [
+       ...:         {'type': s['body'].TYPE_NAME,
+       ...:          'public_key': base58.b58encode(s['body'].public_key)}
+       ...:         for s in threshold_sha256.subconditions
+       ...:         if (s['type'] == 'fulfillment' and
+       ...:             s['body'].TYPE_NAME == 'ed25519-sha-256')
+       ...:      ],
+       ...:     'threshold': threshold_sha256.threshold,
+       ...:     'type': threshold_sha256.TYPE_NAME,
+       ...: }
 
     In [0]: output = {
        ...:     'amount': '1',
        ...:     'condition': {
-       ...:         'details': unsigned_subfulfillments_dict,
+       ...:         'details': condition_details,
        ...:         'uri': condition_uri,
        ...:     },
        ...:     'public_keys': (alice.public_key, bob.public_key),
@@ -1449,7 +1491,7 @@ Generate the output condition:
 
         In [0]: alt_threshold_sha256.condition.serialize_uri() == condition_uri
 
-    The ``details`` on the other hand holds the associated fulfillments not yet
+    The ``details`` on the other hand hold the associated fulfillments not yet
     fulfilled.
 
 The yet to be fulfilled input:
@@ -1533,7 +1575,10 @@ The transfer to Carol:
 
     In [0]: carol_ed25519 = Ed25519Sha256(public_key=base58.b58decode(carol.public_key))
 
-    In [0]: unsigned_fulfillments_dict = carol_ed25519.to_dict()
+    In [0]: unsigned_fulfillments_dict = {
+       ...:     'type': carol_ed25519.TYPE_NAME,
+       ...:     'public_key': base58.b58encode(carol_ed25519.public_key),
+       ...: }
 
     In [0]: condition_uri = carol_ed25519.condition.serialize_uri()
 
@@ -1554,7 +1599,7 @@ The yet to be fulfilled input:
        ...:     'fulfillment': None,
        ...:     'fulfills': {
        ...:         'transaction_id': handcrafted_car_creation_tx['id'],
-       ...:         'output': 0,
+       ...:         'output_index': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key, bob.public_key),
        ...: }
@@ -1607,17 +1652,15 @@ Sign the transaction:
 
     In [0]: threshold_sha256 = ThresholdSha256(threshold=2)
 
+    In [0]: alice_ed25519.sign(message=message.encode(),
+                               private_key=base58.b58decode(alice.private_key))
+    
+    In [0]: bob_ed25519.sign(message=message.encode(),
+                             private_key=base58.b58decode(bob.private_key))
+
     In [0]: threshold_sha256.add_subfulfillment(alice_ed25519)
 
     In [0]: threshold_sha256.add_subfulfillment(bob_ed25519)
-
-    In [102]: alice_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(alice.public_key))[0]
-
-    In [103]: bob_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(bob.public_key))[0]
-
-    In [106]: alice_condition.sign(message.encode(), private_key=base58.b58decode(alice.private_key))
-
-    In [107]: bob_condition.sign(message.encode(), private_key=base58.b58decode(bob.private_key))
 
     In [0]: fulfillment_uri = threshold_sha256.serialize_uri()
 
@@ -1640,6 +1683,7 @@ Handcrafting the ``'CREATE'`` transaction
 
     import json
 
+    import base58
     import sha3
     from cryptoconditions import Ed25519Sha256, ThresholdSha256
 
@@ -1672,17 +1716,27 @@ Handcrafting the ``'CREATE'`` transaction
 
     # CRYPTO-CONDITIONS: add bob ed25519 to the threshold SHA 256 condition
     threshold_sha256.add_subfulfillment(bob_ed25519)
-
-    # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
-    unsigned_subfulfillments_dict = threshold_sha256.to_dict()
-
+    
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = threshold_sha256.condition.serialize_uri()
+
+    # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
+    condition_details = {
+        'subconditions': [
+            {'type': s['body'].TYPE_NAME,
+             'public_key': base58.b58encode(s['body'].public_key)}
+            for s in threshold_sha256.subconditions
+            if (s['type'] == 'fulfillment' and
+                s['body'].TYPE_NAME == 'ed25519-sha-256')
+        ],
+        'threshold': threshold_sha256.threshold,
+        'type': threshold_sha256.TYPE_NAME,
+    }
 
     output = {
         'amount': '1',
         'condition': {
-            'details': unsigned_subfulfillments_dict,
+            'details': condition_details,
             'uri': threshold_sha256.condition_uri,
         },
         'public_keys': (alice.public_key, bob.public_key),
@@ -1770,7 +1824,10 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     carol_ed25519 = Ed25519Sha256(public_key=base58.b58decode(carol.public_key))
 
-    unsigned_fulfillments_dict = carol_ed25519.to_dict()
+    unsigned_fulfillments_dict = {
+        'type': carol_ed25519.TYPE_NAME,
+        'public_key': base58.b58encode(carol_ed25519.public_key),
+    }
 
     condition_uri = carol_ed25519.condition.serialize_uri()
 
@@ -1788,7 +1845,7 @@ Handcrafting the ``'TRANSFER'`` transaction
         'fulfillment': None,
         'fulfills': {
             'transaction_id': handcrafted_car_creation_tx['id'],
-            'output': 0,
+            'output_index': 0,
         },
         'owners_before': (alice.public_key, bob.public_key),
     }
@@ -1796,7 +1853,7 @@ Handcrafting the ``'TRANSFER'`` transaction
     # Craft the payload:
     handcrafted_car_transfer_tx = {
         'operation': 'TRANSFER',
-        'asset': {'id': car_asset['id']},
+        'asset': {'id': handcrafted_car_creation_tx['id']},
         'metadata': None,
         'outputs': (output,),
         'inputs': (input_,),
@@ -1826,17 +1883,14 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     threshold_sha256 = ThresholdSha256(threshold=2)
 
+    alice_ed25519.sign(message=message.encode(),
+                       private_key=base58.b58decode(alice.private_key))
+    bob_ed25519.sign(message=message.encode(),
+                     private_key=base58.b58decode(bob.private_key))
+    
     threshold_sha256.add_subfulfillment(alice_ed25519)
 
     threshold_sha256.add_subfulfillment(bob_ed25519)
-
-    alice_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(alice.public_key))[0]
-
-    bob_condition = threshold_sha256.get_subcondition_from_vk(base58.b58decode(bob.public_key))[0]
-
-    alice_condition.sign(message.encode(), private_key=base58.b58decode(alice.private_key))
-
-    bob_condition.sign(message.encode(), private_key=base58.b58decode(bob.private_key))
 
     fulfillment_uri = threshold_sha256.serialize_uri()
 
@@ -1878,6 +1932,7 @@ Handcrafting the ``'CREATE'`` transaction
 
     import json
 
+    import base58
     import sha3
     from cryptoconditions import Ed25519Sha256, ThresholdSha256
 
@@ -1911,17 +1966,27 @@ Handcrafting the ``'CREATE'`` transaction
 
     # CRYPTO-CONDITIONS: add bob ed25519 to the threshold SHA 256 condition
     threshold_sha256.add_subfulfillment(bob_ed25519)
-
-    # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
-    unsigned_subfulfillments_dict = threshold_sha256.to_dict()
-
+    
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = threshold_sha256.condition.serialize_uri()
+
+    # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
+    condition_details = {
+        'subconditions': [
+            {'type': s['body'].TYPE_NAME,
+             'public_key': base58.b58encode(s['body'].public_key)}
+            for s in threshold_sha256.subconditions
+            if (s['type'] == 'fulfillment' and
+                s['body'].TYPE_NAME == 'ed25519-sha-256')
+        ],
+        'threshold': threshold_sha256.threshold,
+        'type': threshold_sha256.TYPE_NAME,
+    }
 
     output = {
         'amount': '1',
         'condition': {
-            'details': unsigned_subfulfillments_dict,
+            'details': condition_details,
             'uri': threshold_sha256.condition_uri,
         },
         'public_keys': (alice.public_key, bob.public_key),
@@ -2010,14 +2075,15 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     carol_ed25519 = Ed25519Sha256(public_key=base58.b58decode(carol.public_key))
 
-    unsigned_fulfillments_dict = carol_ed25519.to_dict()
-
     condition_uri = carol_ed25519.condition.serialize_uri()
 
     output = {
         'amount': '1',
         'condition': {
-            'details': unsigned_fulfillments_dict,
+            'details': {
+                'type': carol_ed25519.TYPE_NAME,
+                'public_key': base58.b58encode(carol_ed25519.public_key),
+            },
             'uri': condition_uri,
         },
         'public_keys': (carol.public_key,),
@@ -2028,7 +2094,7 @@ Handcrafting the ``'TRANSFER'`` transaction
         'fulfillment': None,
         'fulfills': {
             'transaction_id': handcrafted_car_creation_tx['id'],
-            'output': 0,
+            'output_index': 0,
         },
         'owners_before': (alice.public_key, bob.public_key),
     }
@@ -2066,7 +2132,8 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     threshold_sha256 = ThresholdSha256(threshold=1)
 
-    alice_ed25519.sign(message.encode(), private_key=base58.b58decode(alice.private_key))
+    alice_ed25519.sign(message.encode(),
+                       private_key=base58.b58decode(alice.private_key))
 
     threshold_sha256.add_subfulfillment(alice_ed25519)
 
