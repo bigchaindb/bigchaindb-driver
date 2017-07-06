@@ -562,7 +562,6 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 .. code-block:: python
 
     import json
-    from uuid import uuid4
 
     import base58
     import sha3
@@ -1089,7 +1088,6 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 .. code-block:: python
 
     import json
-    from uuid import uuid4
 
     import sha3
     from cryptoconditions import Ed25519Sha256
