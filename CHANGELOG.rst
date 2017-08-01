@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.4.1 (2017-08-02)
+------------------
+Fixed
+^^^^^
+* Handcrafting transactions documentation. `Pull request #312
+  <https://github.com/bigchaindb/bigchaindb-driver/pull/312>`_.
+* Quickstart guide. `Pull request #316
+  <https://github.com/bigchaindb/bigchaindb-driver/pull/316>`_.
+
 0.4.0 (2017-07-05)
 ------------------
 Added
