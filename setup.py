@@ -23,7 +23,7 @@ tests_require = [
     'pytest-env',
     'pytest-sugar',
     'pytest-xdist',
-    'responses',
+    'responses~=0.5.1',
 ]
 
 dev_require = [
