@@ -6,4 +6,8 @@ if [[ "${TOXENV}" == *-rdb ]]; then
     echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | tee -a /etc/apt/sources.list.d/rethinkdb.list
     wget -qO- https://download.rethinkdb.com/apt/pubkey.gpg | apt-key add -
     apt-get update -qq
+elif [[ "${TOXENV}" == *-mongodb ]]; then
+    wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1404-3.4.4.tgz -O /tmp/mongodb.tgz
+    tar -xvf /tmp/mongodb.tgz
+    mkdir /tmp/mongodb-data
 fi
