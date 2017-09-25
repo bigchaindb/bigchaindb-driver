@@ -19,4 +19,5 @@ elif [[ "${BIGCHAINDB_DATABASE_BACKEND}" == mongodb ]]; then
     mkdir /tmp/mongodb-data
     ${PWD}/mongodb-linux-x86_64-ubuntu1404-3.4.4/bin/mongod \
         --dbpath=/tmp/mongodb-data --replSet=bigchain-rs &> /dev/null &
+    bigchaindb start >/dev/null 2>&1 &
 fi
