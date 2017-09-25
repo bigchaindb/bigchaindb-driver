@@ -6,29 +6,35 @@ python:
 env:
   - TOXENV=flake8
   - TOXENV=docs
-  
+  - TOXENV=py35-rethinkdb
+  - TOXENV=py35-mongodb
+  - TOXENV=py36-rethinkdb
+  - TOXENV=py36-mongodb
+
 matrix:
   fast_finish: true
   exclude:
   - python: 3.5
-    env: TOXENV=flake8 
-  - python: 3.5 
+    env: TOXENV=flake8
+  - python: 3.5
     env: TOXENV=docs
   include:
   - python: 3.5
-    addons: 
+    addons:
       rethinkdb: '2.3.5'
-    env: BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+    #env: BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+    env: TOXENV=py35-rethinkdb
   - python: 3.5
-    env:
-    - BIGCHAINDB_DATABASE_BACKEND=mongodb
+    #env: BIGCHAINDB_DATABASE_BACKEND=mongodb
+    env: TOXENV=py35-mongodb
   - python: 3.6
-    addons: 
+    addons:
       rethinkdb: '2.3.5'
-    env: BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+    #env: BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+    env: TOXENV=py36-rethinkdb
   - python: 3.6
-    env:
-    - BIGCHAINDB_DATABASE_BACKEND=mongodb
+    #env: BIGCHAINDB_DATABASE_BACKEND=mongodb
+    env: TOXENV=py36-mongodb
 
 install: .ci/travis-install.sh
 
