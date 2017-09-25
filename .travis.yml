@@ -4,33 +4,48 @@ python:
   - 3.6
 
 env:
-  - TOXENV=py35
-  - TOXENV=py36
   - TOXENV=flake8
   - TOXENV=docs
-  
+  #- TOXENV=py35-rethinkdb
+  #- TOXENV=py35-mongodb
+  #- TOXENV=py36-rethinkdb
+  #- TOXENV=py36-mongodb
+
 matrix:
   fast_finish: true
   exclude:
   - python: 3.5
-    env: TOXENV=flake8 
-  - python: 3.5 
-    env: TOXENV=docs
+    env: TOXENV=flake8
   - python: 3.5
-    env: TOXENV=py36
+    env: TOXENV=docs
+  include:
+  - python: 3.5
+    #addons:
+    #  rethinkdb: '2.3.5'
+    env:
+      - BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+      - TOXENV=py35-rethinkdb
+  - python: 3.5
+    env:
+      - BIGCHAINDB_DATABASE_BACKEND=mongodb
+      - TOXENV=py35-mongodb
   - python: 3.6
-    env: TOXENV=py35
+    #addons:
+    #  rethinkdb: '2.3.5'
+    env:
+      - BIGCHAINDB_DATABASE_BACKEND=rethinkdb
+      - TOXENV=py36-rethinkdb
+  - python: 3.6
+    env:
+      - BIGCHAINDB_DATABASE_BACKEND=mongodb
+      - TOXENV=py36-mongodb
 
-before_install:
-  - sudo .ci/travis-before-install.sh
+before_install: sudo .ci/travis-before-install.sh
 
-install:
-  - .ci/travis-install.sh
+install: .ci/travis-install.sh
 
-before_script:
-  - .ci/travis-before-script.sh
+before_script: .ci/travis-before-script.sh
 
-script: tox -e ${TOXENV}
+script: .ci/travis-script.sh
 
-after_success:
-  - .ci/travis-after-success.sh
+after_success: .ci/travis-after-success.sh
