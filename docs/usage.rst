@@ -22,7 +22,7 @@ We begin by creating an object of class BigchainDB:
 
     In [0]: bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
 
-If the BigchainDB node or cluster doesn't require authentication tokens, you can do: 
+If the BigchainDB node or cluster doesn't require authentication tokens, you can do:
 
 .. ipython::
 
@@ -104,7 +104,7 @@ The ``prepared_creation_tx`` dictionary should be similar to:
 
 .. ipython::
 
-   In [0]: prepared_creation_tx
+    In [0]: prepared_creation_tx
 
 
 The transaction now needs to be fulfilled by signing it with Alice's private
