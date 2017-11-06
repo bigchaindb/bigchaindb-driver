@@ -235,6 +235,12 @@ fulfill it:
        ...:     private_keys=alice.private_key,
        ...: )
 
+The ``fulfilled_transfer_tx`` dictionary should look something like:
+
+.. ipython::
+
+    In [0]: fulfilled_transfer_tx
+
 and finally send it to the connected BigchainDB node:
 
 .. code-block:: python
@@ -243,12 +249,6 @@ and finally send it to the connected BigchainDB node:
 
     >>> sent_transfer_tx == fulfilled_transfer_tx
     True
-
-The ``fulfilled_transfer_tx`` dictionary should look something like:
-
-.. ipython::
-
-    In [0]: fulfilled_transfer_tx
 
 Bob is the new owner:
 
@@ -459,6 +459,12 @@ denote Carly as receiving 10 tokens by using a tuple:
     In [0]: fulfilled_token_tx = bdb.transactions.fulfill(
        ...:     prepared_token_tx, private_keys=bob.private_key)
 
+The ``fulfilled_token_tx`` dictionary should look something like:
+
+.. ipython::
+
+    In [0]: fulfilled_token_tx
+
 Sending the transaction:
 
 .. code-block:: python
@@ -491,12 +497,6 @@ Sending the transaction:
 
         recipients=[([carly.public_key, alice.public_key], 10)]
 
-
-The ``fulfilled_token_tx`` dictionary should look something like:
-
-.. ipython::
-
-    In [0]: fulfilled_token_tx
 
 Bob is the issuer:
 
@@ -545,13 +545,6 @@ To do so, she needs to send two tokens to Bob:
     In [0]: fulfilled_transfer_tx = bdb.transactions.fulfill(
        ...:     prepared_transfer_tx, private_keys=carly.private_key)
 
-.. code-block:: python
-
-    >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
-
-    >>> sent_transfer_tx == fulfilled_transfer_tx
-    True
-
 Notice how Carly needs to reassign the remaining eight tokens to herself if she
 wants to only transfer two tokens (out of the available 10) to Bob. BigchainDB
 ensures that the amount being consumed in each transaction (with divisible
@@ -569,6 +562,14 @@ The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
 
     In [0]: fulfilled_transfer_tx
 
+.. code-block:: python
+
+    >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+
+    >>> sent_transfer_tx == fulfilled_transfer_tx
+    True
+
+
 Querying for Assets
 -------------------
 
@@ -576,16 +577,49 @@ BigchainDB allows you to query for assets using simple text search. This search
 is applied to all the strings inside the asset payload and returns all the
 assets that match a given text search string.
 
-Let's assume that we :ref:`created <asset-creation>` 3 assets that look like
-this:
+Let's create 3 assets:
 
-.. ipython::
+.. code-block:: python
 
-    In [0]: assets = [
-       ...:    {'data': {'msg': 'Hello BigchainDB 1!'}},
-       ...:    {'data': {'msg': 'Hello BigchainDB 2!'}},
-       ...:    {'data': {'msg': 'Hello BigchainDB 3!'}}
-       ...: ]
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.crypto import generate_keypair
+
+    bdb_root_url = 'https://example.com:9984'
+
+    bdb = BigchainDB(bdb_root_url)
+
+    alice = generate_keypair()
+
+    hello_1 = {'data': {'msg': 'Hello BigchainDB 1!'},}
+    hello_2 = {'data': {'msg': 'Hello BigchainDB 2!'},}
+    hello_3 = {'data': {'msg': 'Hello BigchainDB 3!'},}
+
+    prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=alice.public_key,
+        asset=hello_1
+    )
+    fulfilled_creation_tx = bdb.transactions.fulfill(
+        prepared_creation_tx, private_keys=alice.private_key)
+    bdb.transactions.send(fulfilled_creation_tx)
+
+    prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=alice.public_key,
+        asset=hello_2
+    )
+    fulfilled_creation_tx = bdb.transactions.fulfill(
+        prepared_creation_tx, private_keys=alice.private_key)
+    bdb.transactions.send(fulfilled_creation_tx)
+
+    prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=alice.public_key,
+        asset=hello_3
+    )
+    fulfilled_creation_tx = bdb.transactions.fulfill(
+        prepared_creation_tx, private_keys=alice.private_key)
+    bdb.transactions.send(fulfilled_creation_tx)
 
 Let's perform a text search for all assets that contain the word ``bigchaindb``:
 

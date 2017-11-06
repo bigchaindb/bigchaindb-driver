@@ -119,6 +119,14 @@ Because a transaction must be signed before being sent, the ``id`` and
 Bicycle Asset Creation Revisited
 ********************************
 
+We begin by creating a test user: alice
+
+.. ipython::
+
+    In [0]: from bigchaindb_driver.crypto import generate_keypair
+
+    In [0]: alice = generate_keypair()
+
 The Prepared Transaction
 ========================
 Recall that in order to prepare a transaction, we had to do something similar
@@ -126,11 +134,7 @@ to:
 
 .. ipython::
 
-    In [0]: from bigchaindb_driver.crypto import generate_keypair
-
     In [0]: from bigchaindb_driver.offchain import prepare_transaction
-
-    In [0]: alice = generate_keypair()
 
     In [0]: bicycle = {
        ...:     'data': {
@@ -221,7 +225,7 @@ aiming for:
 
     In [0]: prepared_creation_tx['outputs'][0]
 
-The difficult parts are the condition details and URI. We''ll now see how to
+The difficult parts are the condition details and URI. We'll now see how to
 generate them using the ``cryptoconditions`` library:
 
 .. note:: In BigchainDB keys are encoded in base58 but the cryptoconditions
@@ -380,12 +384,10 @@ above payload:
 .. code-block:: python
 
     from cryptoconditions import Ed25519Sha256
-    from bigchaindb_driver.crypto import CryptoKeypair
+    from bigchaindb_driver.crypto import generate_keypair
+    import base58
 
-    alice = CryptoKeypair(
-        public_key=alice.public_key,
-        private_key=alice.private_key,
-    )
+    alice = generate_keypair()
 
     operation = 'CREATE'
 
@@ -452,16 +454,16 @@ The transaction's id is essentially a SHA3-256 hash of the entire transaction
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: txid = sha3_256(json_str_tx.encode()).hexdigest()
+    In [0]: creation_txid = sha3_256(json_str_tx.encode()).hexdigest()
 
-    In [0]: handcrafted_creation_tx['id'] = txid
+    In [0]: handcrafted_creation_tx['id'] = creation_txid
 
 Compare this to the txid of the transaction generated via
 ``prepare_transaction()``:
 
 .. ipython::
 
-    In [0]: txid == prepared_creation_tx['id']
+    In [0]: creation_txid == prepared_creation_tx['id']
 
 You may observe that
 
@@ -550,7 +552,7 @@ Let's check this:
 The fulfilled transaction, ready to be sent over to a BigchainDB node:
 
 .. ipython::
-    
+
     In [0]: fulfilled_creation_tx
 
 
@@ -677,9 +679,42 @@ transfer transaction was prepared and fulfilled as follows:
 
 .. ipython::
 
-    In [0]: creation_tx = fulfilled_creation_tx
+    In [0]: from bigchaindb_driver import BigchainDB
 
-    In [0]: bob = generate_keypair()
+    In [0]: from bigchaindb_driver.offchain import fulfill_transaction, prepare_transaction
+
+    In [0]: from bigchaindb_driver.crypto import generate_keypair
+
+    In [0]: alice, bob = generate_keypair(), generate_keypair()
+
+    In [0]: bdb = BigchainDB('https://example.com:9984') # Use YOUR BigchainDB Root URL here
+
+    In [0]: bicycle_asset = {
+       ...:     'data': {
+       ...:          'bicycle': {
+       ...:               'serial_number': 'abcd1234',
+       ...:               'manufacturer': 'bkfab'
+       ...:          },
+       ...:     },
+       ...: }
+
+    In [0]: bicycle_asset_metadata = {
+       ...:     'planet': 'earth'
+       ...: }
+
+    In [0]: prepared_creation_tx = bdb.transactions.prepare(
+       ...:     operation='CREATE',
+       ...:     signers=alice.public_key,
+       ...:     asset=bicycle_asset,
+       ...:     metadata=bicycle_asset_metadata
+       ...: )
+
+    In [0]: fulfilled_creation_tx = bdb.transactions.fulfill(
+       ...:     prepared_creation_tx,
+       ...:     private_keys=alice.private_key
+       ...: )
+
+    In [0]: creation_tx = fulfilled_creation_tx
 
     In [0]: output_index = 0
 
@@ -690,8 +725,8 @@ transfer transaction was prepared and fulfilled as follows:
        ...:     'fulfills': {
        ...:          'output_index': output_index,
        ...:          'transaction_id': creation_tx['id'],
-       ...:      },
-       ...:      'owners_before': output['public_keys'],
+       ...:     },
+       ...:     'owners_before': output['public_keys'],
        ...: }
 
     In [0]: transfer_asset = {
@@ -736,7 +771,7 @@ asset id (i.e. the id of the ``CREATE`` transaction for the asset):
 
 .. ipython::
 
-    In [0]: asset = {'id': creation_tx['id']}
+    In [0]: asset = {'id': handcrafted_creation_tx['id']}
 
 metadata
 --------
@@ -755,6 +790,10 @@ outputs
 .. ipython::
 
     In [0]: from cryptoconditions import Ed25519Sha256
+
+    In [0]: import base58
+
+    In [0]: bob = generate_keypair()
 
     In [0]: ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
@@ -779,7 +818,7 @@ fulfillments
     In [0]: input_ = {
        ...:     'fulfillment': None,
        ...:     'fulfills': {
-       ...:         'transaction_id': creation_tx['id'],
+       ...:         'transaction_id': handcrafted_creation_tx['id'],
        ...:         'output_index': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key,)
@@ -819,6 +858,7 @@ Before we generate the ``id``, let's recap how we got here:
 
     from cryptoconditions import Ed25519Sha256
     from bigchaindb_driver.crypto import CryptoKeypair
+    import base58
 
     bob = CryptoKeypair(
         public_key=bob.public_key,
@@ -827,7 +867,7 @@ Before we generate the ``id``, let's recap how we got here:
 
     operation = 'TRANSFER'
     version = '1.0'
-    asset = {'id': creation_tx['id']}
+    asset = {'id': handcrafted_creation_tx['id']}
     metadata = None
 
     ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
@@ -848,7 +888,7 @@ Before we generate the ``id``, let's recap how we got here:
     input_ = {
         'fulfillment': None,
         'fulfills': {
-            'transaction_id': creation_tx['id'],
+            'transaction_id': handcrafted_creation_tx['id'],
             'output_index': 0,
         },
         'owners_before': (alice.public_key,)
@@ -880,16 +920,16 @@ id
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: txid = sha3_256(json_str_tx.encode()).hexdigest()
+    In [0]: transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
 
-    In [0]: handcrafted_transfer_tx['id'] = txid
+    In [0]: handcrafted_transfer_tx['id'] = transfer_txid
 
 Compare this to the txid of the transaction generated via
 ``prepare_transaction()``
 
 .. ipython::
 
-    In [0]: txid == prepared_transfer_tx['id']
+    In [0]: transfer_txid == prepared_transfer_tx['id']
 
 You may observe that
 
@@ -987,7 +1027,6 @@ In a nutshell
 
     from bigchaindb_driver.crypto import generate_keypair
 
-
     bob = generate_keypair()
 
     operation = 'TRANSFER'
@@ -1013,7 +1052,7 @@ In a nutshell
     input_ = {
         'fulfillment': None,
         'fulfills': {
-            'transaction_id': creation_txid,
+            'transaction_id': handcrafted_creation_tx['id'],
             'output_index': 0,
         },
         'owners_before': (alice.public_key,)
@@ -1089,6 +1128,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 
     import json
 
+    import base58
     import sha3
     from cryptoconditions import Ed25519Sha256
 
@@ -1155,10 +1195,10 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     )
 
     # SHA3: hash the serialized id-less transaction to generate the id
-    creation_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+    shared_creation_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
 
     # add the id
-    token_creation_tx['id'] = creation_txid
+    token_creation_tx['id'] = shared_creation_txid
 
     # JSON: serialize the transaction-with-id to a json formatted string
     message = json.dumps(
@@ -1205,7 +1245,7 @@ A few checks:
 
 .. code-block:: python
 
-    >>> bdb.transactions.status(creation_txid)
+    >>> bdb.transactions.status(shared_creation_txid)
     {'status': 'valid'}
 
 .. tip:: When checking for the status of a transaction, one should keep in
@@ -1281,10 +1321,10 @@ to Bob:
     )
 
     # SHA3: hash the serialized id-less transaction to generate the id
-    transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+    shared_transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
 
     # add the id
-    token_transfer_tx['id'] = transfer_txid
+    token_transfer_tx['id'] = shared_transfer_txid
 
     # JSON: serialize the transaction-with-id to a json formatted string
     message = json.dumps(
@@ -1323,7 +1363,7 @@ A few checks:
 
 .. code-block:: python
 
-    >>> bdb.transactions.status(creation_txid)
+    >>> bdb.transactions.status(shared_transfer_txid)
     {'status': 'valid'}
 
 .. tip:: When checking for the status of a transaction, one should keep in
@@ -1339,15 +1379,25 @@ Walkthrough
 We'll re-use the :ref:`example of Alice and Bob owning a car together
 <car-multiple-owners>` to handcraft transactions with multiple owners.
 
-Say ``alice`` and ``bob`` own a car together:
+Create a test user: alice and bob
 
 .. ipython::
 
     In [0]: from bigchaindb_driver.crypto import generate_keypair
 
+    In [0]: alice, bob = generate_keypair(), generate_keypair()
+
+Say ``alice`` and ``bob`` own a car together:
+
+.. ipython::
+
     In [0]: from bigchaindb_driver import offchain
 
-    In [0]: alice, bob = generate_keypair(), generate_keypair()
+    In [0]: from bigchaindb_driver import BigchainDB
+
+    In [0]: bdb_root_url = 'https://example.com:9984' # Use YOUR BigchainDB Root URL here
+
+    In [0]: bdb = BigchainDB(bdb_root_url)
 
     In [0]: car_asset = {'data': {'car': {'vin': '5YJRE11B781000196'}}}
 
@@ -1421,6 +1471,8 @@ sha3, and cryptoconditions):
 .. ipython::
 
     In [0]: import json
+
+    In [0]: import base58
 
     In [0]: from sha3 import sha3_256
 
@@ -1567,6 +1619,8 @@ The transfer to Carol:
 
 .. ipython::
 
+    In [0]: carol = generate_keypair()
+
     In [0]: alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
     In [0]: bob_ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
@@ -1651,10 +1705,10 @@ Sign the transaction:
     In [0]: threshold_sha256 = ThresholdSha256(threshold=2)
 
     In [0]: alice_ed25519.sign(message=message.encode(),
-                               private_key=base58.b58decode(alice.private_key))
-    
+       ...:     private_key=base58.b58decode(alice.private_key))
+
     In [0]: bob_ed25519.sign(message=message.encode(),
-                             private_key=base58.b58decode(bob.private_key))
+       ...:     private_key=base58.b58decode(bob.private_key))
 
     In [0]: threshold_sha256.add_subfulfillment(alice_ed25519)
 
@@ -1682,11 +1736,10 @@ Handcrafting the ``'CREATE'`` transaction
     import json
 
     import base58
-    import sha3
+    from sha3 import sha3_256
     from cryptoconditions import Ed25519Sha256, ThresholdSha256
 
     from bigchaindb_driver.crypto import generate_keypair
-
 
     version = '1.0'
 
@@ -1714,7 +1767,7 @@ Handcrafting the ``'CREATE'`` transaction
 
     # CRYPTO-CONDITIONS: add bob ed25519 to the threshold SHA 256 condition
     threshold_sha256.add_subfulfillment(bob_ed25519)
-    
+
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = threshold_sha256.condition.serialize_uri()
 
@@ -1735,7 +1788,7 @@ Handcrafting the ``'CREATE'`` transaction
         'amount': '1',
         'condition': {
             'details': condition_details,
-            'uri': threshold_sha256.condition_uri,
+            'uri': condition_uri,
         },
         'public_keys': (alice.public_key, bob.public_key),
     }
@@ -1768,7 +1821,7 @@ Handcrafting the ``'CREATE'`` transaction
     )
 
     # SHA3: hash the serialized id-less transaction to generate the id
-    car_creation_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+    car_creation_txid = sha3_256(json_str_tx.encode()).hexdigest()
 
     # add the id
     handcrafted_car_creation_tx['id'] = car_creation_txid
@@ -1811,8 +1864,6 @@ Handcrafting the ``'TRANSFER'`` transaction
 -------------------------------------------
 
 .. code-block:: python
-
-    version = '1.0'
 
     carol = generate_keypair()
 
@@ -1867,7 +1918,7 @@ Handcrafting the ``'TRANSFER'`` transaction
         ensure_ascii=False,
     )
 
-    car_transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+    car_transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
 
     handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
@@ -1879,13 +1930,11 @@ Handcrafting the ``'TRANSFER'`` transaction
         ensure_ascii=False,
     )
 
-    threshold_sha256 = ThresholdSha256(threshold=2)
-
     alice_ed25519.sign(message=message.encode(),
                        private_key=base58.b58decode(alice.private_key))
     bob_ed25519.sign(message=message.encode(),
                      private_key=base58.b58decode(bob.private_key))
-    
+
     threshold_sha256.add_subfulfillment(alice_ed25519)
 
     threshold_sha256.add_subfulfillment(bob_ed25519)
@@ -1964,7 +2013,7 @@ Handcrafting the ``'CREATE'`` transaction
 
     # CRYPTO-CONDITIONS: add bob ed25519 to the threshold SHA 256 condition
     threshold_sha256.add_subfulfillment(bob_ed25519)
-    
+
     # CRYPTO-CONDITIONS: generate the condition uri
     condition_uri = threshold_sha256.condition.serialize_uri()
 
@@ -1985,7 +2034,7 @@ Handcrafting the ``'CREATE'`` transaction
         'amount': '1',
         'condition': {
             'details': condition_details,
-            'uri': threshold_sha256.condition_uri,
+            'uri': condition_uri,
         },
         'public_keys': (alice.public_key, bob.public_key),
     }
