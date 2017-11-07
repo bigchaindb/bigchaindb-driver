@@ -57,43 +57,8 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `bigchaindb-driver`_ for local
-development.
-
-1. Fork the `bigchaindb-driver`_ repo on GitHub.
-2. Clone your fork locally and enter into the project::
-
-    $ git clone git@github.com:your_name_here/bigchaindb-driver.git
-    $ cd bigchaindb-driver/
-
-3. Create a branch for local development::
-
-    $ git checkout -b name-of-your-bugfix-or-feature
-
-   Now you can make your changes locally.
-
-4. When you're done making changes, check that your changes pass flake8
-   and the tests. For the tests, you'll need to  start the MongoDB and
-   BigchainDB servers::
-
-    $ docker-compose up -d db
-    $ docker-compose up -d bdb-server
-
-5. flake8 check::
-
-    $ docker-compose run --rm bdb flake8 bigchaindb_driver tests
-
-6. To run the tests::
-
-    $ docker-compose run --rm bdb pytest -v
-
-7. Commit your changes and push your branch to GitHub::
-
-    $ git add .
-    $ git commit -m "Your detailed description of your changes."
-    $ git push origin name-of-your-bugfix-or-feature
-
-8. Submit a pull request through the GitHub website.
+Ready to contribute?
+See the :doc:`Installation Guide for Developers <quickstart>` page.
 
 
 Pull Request Guidelines
@@ -141,7 +106,7 @@ To run a subset of tests::
     not require a connection with the BigchainDB server, you need to run the
     BigchainDB and MongoDB servers::
 
-    $ docker-compose up -d db 
+    $ docker-compose up -d db
     $ docker-compose up -d bdb-server
 
 
@@ -174,6 +139,5 @@ are set to depend from BigchainDB's master branch to more easily track changes
 against BigchainDB's API.
 
 
-.. _bigchaindb-driver: https://github.com/bigchaindb/bigchaindb-driver
 .. _docker-compose.yml: https://github.com/bigchaindb/bigchaindb-driver/blob/master/docker-compose.yml
 .. _multiple compose files: https://docs.docker.com/compose/extends/#multiple-compose-files
