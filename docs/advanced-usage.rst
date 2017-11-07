@@ -345,6 +345,37 @@ list or tuple of ``recipients``:
     >>> sent_car_tx == signed_car_creation_tx
     True
 
+Let's see how the example looks like when ``alice`` and ``bob`` are the issuers:
+
+.. code-block:: python
+
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.crypto import generate_keypair
+
+    bdb_root_url = 'https://example.com:9984'
+    bdb = BigchainDB(bdb_root_url)
+
+    alice, bob = generate_keypair(), generate_keypair()
+
+    car_asset = {
+        'data': {
+            'car': {
+                'vin': '5YJRE11B781000196'
+            }
+        }
+    }
+    car_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=(alice.public_key, bob.public_key),
+        recipients=(alice.public_key, bob.public_key),
+        asset=car_asset,
+    )
+    signed_car_creation_tx = bdb.transactions.fulfill(
+        car_creation_tx,
+        private_keys=[alice.private_key, bob.private_key],
+    )
+    sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
+
 
 One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
 and realizing they no longer need their car, wish to transfer the ownership of
