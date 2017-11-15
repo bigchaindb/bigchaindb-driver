@@ -663,3 +663,82 @@ argument:
             'id': 'e40f4b6ac70b9c1b3b237ec13f4174384fd4d54d36dfde25520171577c49caa4'
         }
     ]
+
+Querying for Transactions
+-------------------------
+
+For this query we need to provide an ``asset_id`` and we will get back a list of transactions
+that use the asset with the ID ``asset_id``.
+
+.. note::
+    Please note that the id of an asset in BigchainDB is actually the id of the
+    transaction which created the asset. In other words, when querying for an asset
+    id with the operation set to ``CREATE``, only one transaction should be expected.
+    This transaction will be the transaction in which the asset was created, and the
+    transaction id will be equal to the given asset id.
+
+We will use the id of our last example :ref:`Divisible Assets <bicycle-divisible-assets>`.
+Let's try it:
+
+.. code-block:: python
+
+    >>> bdb.transactions.get(asset_id=sent_token_tx['id'])
+    [{'asset': {'data': {'description': 'Time share token. Each token equals one '
+                                    'hour of riding.',
+                     'token_for': {'bicycle': {'manufacturer': 'bkfab',
+                                               'serial_number': 'abcd1234'}}}},
+    'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7',
+    'inputs': [{'fulfillment': 'pGSAIFetX0Fz6ZUN20tJp_dWJKs0_nDDz7oOmTaToGrzzw5zgUBPJsUGHcm8R-ntQSHvK3tgoyHIvCrrNrI6lJkud81cZKWFb9XehNAvWswPWSx1_6EwFKVYV-fjlxPvExm8XZIH',
+              'fulfills': None,
+              'owners_before': ['6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt']}],
+    'metadata': None,
+    'operation': 'CREATE',
+    'outputs': [{'amount': '10',
+               'condition': {'details': {'public_key': '8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'version': '1.0'},
+    {'asset': {'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7'},
+    'id': '3ce3a5d4d984ca92f4a34967a2c181dbe8da8d6e4477220d7869ada9379dc410',
+    'inputs': [{'fulfillment': 'pGSAIHTmVLbdfDFHTBx6gVr4NczRN-D1MhHltB0nn79luYlfgUCrppCotKAZoVW7nKye4I2HzGxlgwjmx47w_HxGXOFVbvCppNTLeVX4NrHYFRJlv8QKgj_ZaLctHpT6HPLLYIIG',
+              'fulfills': {'output_index': 0,
+                           'transaction_id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7'},
+              'owners_before': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'metadata': None,
+    'operation': 'TRANSFER',
+    'outputs': [{'amount': '2',
+               'condition': {'details': {'public_key': '6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;HapGwR7oqOS3oZSICryoGJL0SfQF2LcSJe98jBKmdqo?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt']},
+              {'amount': '8',
+               'condition': {'details': {'public_key': '8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'version': '1.0'}]
+
+
+If you were busy sharing your bicycle with the whole city you might have a really long list.
+So let's limit the results and just see the ``CREATE`` transaction.
+
+.. code-block:: python
+
+    >>> bdb.transactions.get(asset_id=some_id, operation='CREATE')
+    [{'asset': {'data': {'description': 'Time share token. Each token equals one '
+                                    'hour of riding.',
+                     'token_for': {'bicycle': {'manufacturer': 'bkfab',
+                                               'serial_number': 'abcd1234'}}}},
+    'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7',
+    'inputs': [{'fulfillment': 'pGSAIFetX0Fz6ZUN20tJp_dWJKs0_nDDz7oOmTaToGrzzw5zgUBPJsUGHcm8R-ntQSHvK3tgoyHIvCrrNrI6lJkud81cZKWFb9XehNAvWswPWSx1_6EwFKVYV-fjlxPvExm8XZIH',
+              'fulfills': None,
+              'owners_before': ['6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt']}],
+    'metadata': None,
+    'operation': 'CREATE',
+    'outputs': [{'amount': '10',
+               'condition': {'details': {'public_key': '8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'version': '1.0'}]
