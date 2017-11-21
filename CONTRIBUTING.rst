@@ -108,6 +108,8 @@ Before you submit a pull request, check that it meets these guidelines:
 3. The pull request should work for Python 3.5, and pass the flake8 check.
    Check https://travis-ci.org/bigchaindb/bigchaindb-driver/pull_requests
    and make sure that the tests pass for all supported Python versions.
+4. Follow the pull request template while creating new PRs, the template will
+   be visible to you when you create a new pull request.
 
 Tips
 ----
