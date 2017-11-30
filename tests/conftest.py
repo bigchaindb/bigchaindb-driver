@@ -59,7 +59,7 @@ def hash_transaction(transaction):
     return sha3_256(serialize_transaction(transaction).encode()).hexdigest()
 
 
-def add_transaction_id(transaction):
+def set_transaction_id(transaction):
     tx_id = hash_transaction(transaction)
     transaction['id'] = tx_id
 
@@ -232,13 +232,17 @@ def alice_transaction(alice_transaction_obj):
 
 
 @fixture
-@await_transaction
-def persisted_alice_transaction(alice_privkey,
-                                alice_transaction_obj,
-                                transactions_api_full_url):
+def signed_alice_transaction(alice_privkey, alice_transaction_obj):
     signed_transaction = alice_transaction_obj.sign([alice_privkey])
-    json = signed_transaction.to_dict()
-    response = requests.post(transactions_api_full_url, json=json)
+    return signed_transaction.to_dict()
+
+
+@fixture
+@await_transaction
+def persisted_alice_transaction(signed_alice_transaction,
+                                transactions_api_full_url):
+    response = requests.post(transactions_api_full_url,
+                             json=signed_alice_transaction)
     return response.json()
 
 
@@ -284,8 +288,8 @@ def prepared_carol_bicycle_transaction(carol_keypair, bicycle_data):
         'outputs': (condition,),
         'inputs': (fulfillment,),
         'version': '1.0',
+        'id': None,
     }
-    add_transaction_id(tx)
     return tx
 
 
@@ -300,6 +304,7 @@ def signed_carol_bicycle_transaction(request, carol_keypair,
     prepared_carol_bicycle_transaction['inputs'][0].update(
         {'fulfillment': fulfillment_uri},
     )
+    set_transaction_id(prepared_carol_bicycle_transaction)
     return prepared_carol_bicycle_transaction
 
 
@@ -325,8 +330,8 @@ def prepared_carol_car_transaction(carol_keypair, car_data):
         'outputs': (condition,),
         'inputs': (fulfillment,),
         'version': '1.0',
+        'id': None,
     }
-    add_transaction_id(tx)
     return tx
 
 
@@ -341,6 +346,7 @@ def signed_carol_car_transaction(request, carol_keypair,
     prepared_carol_car_transaction['inputs'][0].update(
         {'fulfillment': fulfillment_uri},
     )
+    set_transaction_id(prepared_carol_car_transaction)
     return prepared_carol_car_transaction
 
 
@@ -381,15 +387,9 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
             'owners_before': (carol_keypair.public_key,),
         },),
         'version': '1.0',
+        'id': None,
     }
-    serialized_transaction_without_id = json.dumps(
-        transaction,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    ).encode()
-    transaction['id'] = sha3_256(serialized_transaction_without_id).hexdigest()
-    serialized_transaction_with_id = json.dumps(
+    serialized_transaction = json.dumps(
         transaction,
         sort_keys=True,
         separators=(',', ':'),
@@ -397,9 +397,10 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
     ).encode()
     ed25519_carol = Ed25519Sha256(
         public_key=base58.b58decode(carol_keypair.public_key))
-    ed25519_carol.sign(serialized_transaction_with_id,
+    ed25519_carol.sign(serialized_transaction,
                        base58.b58decode(carol_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_carol.serialize_uri()
+    set_transaction_id(transaction)
     response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
 
@@ -432,15 +433,9 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
             'owners_before': (dimi_keypair.public_key,),
         },),
         'version': '1.0',
+        'id': None,
     }
-    serialized_transaction_without_id = json.dumps(
-        transaction,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    ).encode()
-    transaction['id'] = sha3_256(serialized_transaction_without_id).hexdigest()
-    serialized_transaction_with_id = json.dumps(
+    serialized_transaction = json.dumps(
         transaction,
         sort_keys=True,
         separators=(',', ':'),
@@ -448,9 +443,10 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
     ).encode()
     ed25519_dimi = Ed25519Sha256(
         public_key=base58.b58decode(dimi_keypair.public_key))
-    ed25519_dimi.sign(serialized_transaction_with_id,
+    ed25519_dimi.sign(serialized_transaction,
                       base58.b58decode(dimi_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_dimi.serialize_uri()
+    set_transaction_id(transaction)
     response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
 
@@ -492,7 +488,7 @@ def unsigned_transaction():
                 }
             }
         ],
-        'id': '10b816bd61d2fd00a7999c86c63d333c3e478205b8d6befdccb0837945465845',   # noqa E501
+        'id': None,
         'metadata': None
     }
 
