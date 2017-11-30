@@ -11,7 +11,7 @@ with open('CHANGELOG.rst') as changelog_file:
 
 install_requires = [
     'requests>=2.11.0',
-    'bigchaindb~=1.0.0',
+    'bigchaindb==1.4.0.dev',
 ]
 
 tests_require = [
@@ -73,4 +73,7 @@ setup(
         'dev': dev_require + tests_require + docs_require,
         'docs': docs_require,
     },
+    dependency_links=[
+        'git+https://github.com/bigchaindb/bigchaindb.git@master#egg=bigchaindb-1.4.0.dev',
+    ],
 )

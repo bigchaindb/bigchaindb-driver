@@ -9,4 +9,4 @@ RUN pip install --upgrade pip ipdb ipython
 
 COPY . /usr/src/app/
 
-RUN pip install bigchaindb
+RUN pip install git+https://github.com/bigchaindb/bigchaindb.git
