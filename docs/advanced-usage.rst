@@ -124,7 +124,7 @@ block:
 .. code-block:: python
 
     # Retrieve a validated transaction
-    >>> tx_retrieved = bdb.transactions.retrieve(tx['id'])
+    >>> tx_retrieved = bdb.transactions.retrieve(signed_tx['id'])
 
 The new owner of the digital asset is now Alice (or more correctly, her *public
 key*):
@@ -175,13 +175,13 @@ To construct the input:
 
     In [0]: output_index = 0
 
-    In [0]: output = tx['outputs'][output_index]
+    In [0]: output = signed_tx['outputs'][output_index]
 
     In [0]: input_ = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output_index': output_index,
-       ...:         'transaction_id': tx['id'],
+       ...:         'transaction_id': signed_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }
@@ -194,7 +194,7 @@ simply points to the id of the asset's ``CREATE`` transaction):
 
 .. ipython::
 
-    In [0]: transfer_asset_id = tx['id']
+    In [0]: transfer_asset_id = signed_tx['id']
 
     In [0]: transfer_asset = {
        ...:     'id': transfer_asset_id,
@@ -277,16 +277,16 @@ Recap: Asset Transfer
 .. code-block:: python
 
     output_index = 0
-    output = tx['outputs'][output_index]
+    output = signed_tx['outputs'][output_index]
     input_ = {
         'fulfillment': output['condition']['details'],
         'fulfills': {
             'output_index': output_index,
-            'transaction_id': tx['id'],
+            'transaction_id': signed_tx['id'],
         },
         'owners_before': output['public_keys'],
     }
-    transfer_asset_id = tx['id']
+    transfer_asset_id = signed_tx['id']
     transfer_asset = {
         'id': transfer_asset_id,
     }

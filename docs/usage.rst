@@ -520,19 +520,19 @@ To do so, she needs to send two tokens to Bob:
 
     In [0]: output_index = 0
 
-    In [0]: output = prepared_token_tx['outputs'][output_index]
+    In [0]: output = fulfilled_token_tx['outputs'][output_index]
 
     In [0]: transfer_input = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output_index': output_index,
-       ...:         'transaction_id': prepared_token_tx['id'],
+       ...:         'transaction_id': fulfilled_token_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }
 
     In [0]: transfer_asset = {
-       ...:     'id': prepared_token_tx['id'],
+       ...:     'id': fulfilled_token_tx['id'],
        ...: }
 
     In [0]: prepared_transfer_tx = bdb.transactions.prepare(
