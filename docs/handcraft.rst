@@ -93,13 +93,13 @@ From the point of view of Python, a transaction is simply a dictionary:
                 }
             }
         ],
-        'id': '52f8ec4d56b4187be256231ef11017038f316d16ef0a0d250e235d39e901f4d1',
+        'id': None,
         'metadata': {
             'planet': 'earth'
         }
     }
 
-Because a transaction must be signed before being sent, the ``id`` and
+Because a transaction must be signed before being sent, the
 ``fulfillment`` must be provided by the client.
 
 .. important:: **Implications of Signed Payloads**
@@ -373,13 +373,54 @@ Putting it all together:
        ...:     'outputs': outputs,
        ...:     'inputs': inputs,
        ...:     'version': version,
+       ...:     'id': None,
        ...: }
+
+Note how ``handcrafted_creation_tx`` includes a key-value pair ``'id': None``. The 'id' value is None as it will be set during the fulfillment step.
+
+.. ipython::
 
     In [0]: handcrafted_creation_tx
 
-The only thing we're missing now is the ``id``. We'll generate it soon, but
-before that, let's recap how we've put all the code together to generate the
-above payload:
+You may observe that
+
+.. ipython::
+
+    In [0]: handcrafted_creation_tx == prepared_creation_tx
+
+.. ipython::
+
+    In [0]: from copy import deepcopy
+
+    In [0]: # back up
+
+    In [0]: prepared_creation_tx_bk = deepcopy(prepared_creation_tx)
+
+    In [0]: # set input fulfillment to None
+
+    In [0]: prepared_creation_tx['inputs'][0]['fulfillment'] = None
+
+    In [0]: handcrafted_creation_tx == prepared_creation_tx
+
+Are still not equal because we used tuples instead of lists.
+
+.. ipython::
+
+    In [0]: import json
+
+    In [0]: # serialize to json str
+
+    In [0]: json_str_handcrafted_tx = json.dumps(handcrafted_creation_tx, sort_keys=True)
+
+    In [0]: json_str_prepared_tx = json.dumps(prepared_creation_tx, sort_keys=True)
+
+.. ipython::
+
+    In [0]: json_str_handcrafted_tx == json_str_prepared_tx
+
+    In [0]: prepared_creation_tx = prepared_creation_tx_bk
+
+Let's recap how we've put all the code together to generate the above payload:
 
 .. code-block:: python
 
@@ -433,7 +474,43 @@ above payload:
         'outputs': outputs,
         'inputs': inputs,
         'version': version,
+        'id': None,
     }
+
+The Fulfilled Transaction
+=========================
+
+.. ipython::
+
+    In [0]: from cryptoconditions.crypto import Ed25519SigningKey
+
+    In [0]: import json
+
+    In [0]: # fulfill prepared transaction
+
+    In [0]: from bigchaindb_driver.offchain import fulfill_transaction
+
+    In [0]: fulfilled_creation_tx = fulfill_transaction(
+       ...:     prepared_creation_tx,
+       ...:     private_keys=alice.private_key,
+       ...: )
+
+    In [0]: # fulfill handcrafted transaction (with our previously built ED25519 fulfillment)
+
+    In [0]: ed25519.to_dict()
+
+    In [0]: message = json.dumps(
+       ...:     handcrafted_creation_tx,
+       ...:     sort_keys=True,
+       ...:     separators=(',', ':'),
+       ...:     ensure_ascii=False,
+       ...: )
+
+    In [0]: ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+
+    In [0]: fulfillment_uri = ed25519.serialize_uri()
+
+    In [0]: handcrafted_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 id
 --
@@ -463,83 +540,7 @@ Compare this to the txid of the transaction generated via
 
 .. ipython::
 
-    In [0]: creation_txid == prepared_creation_tx['id']
-
-You may observe that
-
-.. ipython::
-
-    In [0]: handcrafted_creation_tx == prepared_creation_tx
-
-.. ipython::
-
-    In [0]: from copy import deepcopy
-
-    In [0]: # back up
-
-    In [0]: prepared_creation_tx_bk = deepcopy(prepared_creation_tx)
-
-    In [0]: # set input fulfillment to None
-
-    In [0]: prepared_creation_tx['inputs'][0]['fulfillment'] = None
-
-    In [0]: handcrafted_creation_tx == prepared_creation_tx
-
-Are still not equal because we used tuples instead of lists.
-
-.. ipython::
-
-    In [0]: # serialize to json str
-
-    In [0]: json_str_handcrafted_tx = json.dumps(handcrafted_creation_tx, sort_keys=True)
-
-    In [0]: json_str_prepared_tx = json.dumps(prepared_creation_tx, sort_keys=True)
-
-.. ipython::
-
-    In [0]: json_str_handcrafted_tx == json_str_prepared_tx
-
-    In [0]: prepared_creation_tx = prepared_creation_tx_bk
-
-The fully handcrafted, yet-to-be-fulfilled ``CREATE`` transaction payload:
-
-.. ipython::
-
-    In [0]: handcrafted_creation_tx
-
-
-The Fulfilled Transaction
-=========================
-
-.. ipython::
-
-    In [0]: from cryptoconditions.crypto import Ed25519SigningKey
-
-    In [0]: # fulfill prepared transaction
-
-    In [0]: from bigchaindb_driver.offchain import fulfill_transaction
-
-    In [0]: fulfilled_creation_tx = fulfill_transaction(
-       ...:     prepared_creation_tx,
-       ...:     private_keys=alice.private_key,
-       ...: )
-
-    In [0]: # fulfill handcrafted transaction (with our previously built ED25519 fulfillment)
-
-    In [0]: ed25519.to_dict()
-
-    In [0]: message = json.dumps(
-       ...:     handcrafted_creation_tx,
-       ...:     sort_keys=True,
-       ...:     separators=(',', ':'),
-       ...:     ensure_ascii=False,
-       ...: )
-
-    In [0]: ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
-
-    In [0]: fulfillment_uri = ed25519.serialize_uri()
-
-    In [0]: handcrafted_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+    In [0]: creation_txid == fulfilled_creation_tx['id']
 
 Let's check this:
 
@@ -618,18 +619,8 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
         'outputs': outputs,
         'inputs': inputs,
         'version': version,
+        'id': None,
     }
-
-    json_str_tx = json.dumps(
-        handcrafted_creation_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    creation_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
-
-    handcrafted_creation_tx['id'] = creation_txid
 
     message = json.dumps(
         handcrafted_creation_tx,
@@ -643,6 +634,17 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
     fulfillment_uri = ed25519.serialize_uri()
 
     handcrafted_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+
+    json_str_tx = json.dumps(
+    handcrafted_creation_tx,
+    sort_keys=True,
+    separators=(',', ':'),
+    ensure_ascii=False,
+    )
+
+    creation_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+
+    handcrafted_creation_tx['id'] = creation_txid
 
 Sending it over to a BigchainDB node:
 
@@ -771,7 +773,7 @@ asset id (i.e. the id of the ``CREATE`` transaction for the asset):
 
 .. ipython::
 
-    In [0]: asset = {'id': handcrafted_creation_tx['id']}
+    In [0]: asset = {'id': creation_tx['id']}
 
 metadata
 --------
@@ -792,8 +794,6 @@ outputs
     In [0]: from cryptoconditions import Ed25519Sha256
 
     In [0]: import base58
-
-    In [0]: bob = generate_keypair()
 
     In [0]: ed25519 = Ed25519Sha256(public_key=base58.b58decode(bob.public_key))
 
@@ -818,7 +818,7 @@ fulfillments
     In [0]: input_ = {
        ...:     'fulfillment': None,
        ...:     'fulfills': {
-       ...:         'transaction_id': handcrafted_creation_tx['id'],
+       ...:         'transaction_id': creation_tx['id'],
        ...:         'output_index': 0,
        ...:     },
        ...:     'owners_before': (alice.public_key,)
@@ -845,14 +845,55 @@ Putting it all together:
        ...:     'outputs': outputs,
        ...:     'inputs': inputs,
        ...:     'version': version,
+       ...:     'id': None,
        ...: }
 
     In [0]: handcrafted_transfer_tx
 
+Note how ``handcrafted_creation_tx`` includes a key-value pair ``'id': None``. The ‘id’ value is None as it will be set during the fulfillment step.
+
+You may observe that
+
+.. ipython::
+
+    In [0]: handcrafted_transfer_tx == prepared_transfer_tx
+
+.. ipython::
+
+    In [0]: from copy import deepcopy
+
+    In [0]: # back up
+
+    In [0]: prepared_transfer_tx_bk = deepcopy(prepared_transfer_tx)
+
+    In [0]: # set fulfillment to None
+
+    In [0]: prepared_transfer_tx['inputs'][0]['fulfillment'] = None
+
+    In [0]: handcrafted_transfer_tx == prepared_transfer_tx
+
+Are still not equal because we used tuples instead of lists.
+
+.. ipython::
+
+    In [0]: # serialize to json str
+
+    In [0]: import json
+
+    In [0]: json_str_handcrafted_tx = json.dumps(handcrafted_transfer_tx, sort_keys=True)
+
+    In [0]: json_str_prepared_tx = json.dumps(prepared_transfer_tx, sort_keys=True)
+
+.. ipython::
+
+    In [0]: json_str_handcrafted_tx == json_str_prepared_tx
+
+    In [0]: prepared_transfer_tx = prepared_transfer_tx_bk
+
 Up to now
 ---------
 
-Before we generate the ``id``, let's recap how we got here:
+Let's recap how we got here:
 
 .. code-block:: python
 
@@ -902,76 +943,8 @@ Before we generate the ``id``, let's recap how we got here:
         'outputs': outputs,
         'inputs': inputs,
         'version': version,
+        'id': None,
     }
-
-id
---
-
-.. ipython::
-
-    In [0]: import json
-
-    In [0]: from sha3 import sha3_256
-
-    In [0]: json_str_tx = json.dumps(
-       ...:     handcrafted_transfer_tx,
-       ...:     sort_keys=True,
-       ...:     separators=(',', ':'),
-       ...:     ensure_ascii=False,
-       ...: )
-
-    In [0]: transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
-
-    In [0]: handcrafted_transfer_tx['id'] = transfer_txid
-
-Compare this to the txid of the transaction generated via
-``prepare_transaction()``
-
-.. ipython::
-
-    In [0]: transfer_txid == prepared_transfer_tx['id']
-
-You may observe that
-
-.. ipython::
-
-    In [0]: handcrafted_transfer_tx == prepared_transfer_tx
-
-.. ipython::
-
-    In [0]: from copy import deepcopy
-
-    In [0]: # back up
-
-    In [0]: prepared_transfer_tx_bk = deepcopy(prepared_transfer_tx)
-
-    In [0]: # set fulfillment to None
-
-    In [0]: prepared_transfer_tx['inputs'][0]['fulfillment'] = None
-
-    In [0]: handcrafted_transfer_tx == prepared_transfer_tx
-
-Are still not equal because we used tuples instead of lists.
-
-.. ipython::
-
-    In [0]: # serialize to json str
-
-    In [0]: json_str_handcrafted_tx = json.dumps(handcrafted_transfer_tx, sort_keys=True)
-
-    In [0]: json_str_prepared_tx = json.dumps(prepared_transfer_tx, sort_keys=True)
-
-.. ipython::
-
-    In [0]: json_str_handcrafted_tx == json_str_prepared_tx
-
-    In [0]: prepared_transfer_tx = prepared_transfer_tx_bk
-
-The fully handcrafted, yet-to-be-fulfilled ``TRANSFER`` transaction payload:
-
-.. ipython::
-
-    In [0]: handcrafted_transfer_tx
 
 
 The Fulfilled Transaction
@@ -1004,6 +977,33 @@ The Fulfilled Transaction
     In [0]: fulfillment_uri = ed25519.serialize_uri()
 
     In [0]: handcrafted_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+
+id
+--
+
+.. ipython::
+
+    In [0]: import json
+
+    In [0]: from sha3 import sha3_256
+
+    In [0]: json_str_tx = json.dumps(
+       ...:     handcrafted_transfer_tx,
+       ...:     sort_keys=True,
+       ...:     separators=(',', ':'),
+       ...:     ensure_ascii=False,
+       ...: )
+
+    In [0]: transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
+
+    In [0]: handcrafted_transfer_tx['id'] = transfer_txid
+
+Compare this to the txid of the transaction generated via
+``prepare_transaction()``
+
+.. ipython::
+
+    In [0]: transfer_txid == fulfilled_transfer_tx['id']
 
 Let's check this:
 
@@ -1066,18 +1066,8 @@ In a nutshell
         'outputs': outputs,
         'inputs': inputs,
         'version': version,
+        'id': None,
     }
-
-    json_str_tx = json.dumps(
-        handcrafted_transfer_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
-
-    handcrafted_transfer_tx['id'] = transfer_txid
 
     message = json.dumps(
         handcrafted_transfer_tx,
@@ -1091,6 +1081,17 @@ In a nutshell
     fulfillment_uri = ed25519.serialize_uri()
 
     handcrafted_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+
+    json_str_tx = json.dumps(
+        handcrafted_transfer_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+
+    handcrafted_transfer_tx['id'] = transfer_txid
 
 Sending it over to a BigchainDB node:
 
@@ -1138,15 +1139,15 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     bob, carly = generate_keypair(), generate_keypair()
     version = '1.0'
 
-    asset = {
+    bicycle_token = {
         'data': {
             'token_for': {
                 'bicycle': {
-                    'manufacturer': 'bkfab',
                     'serial_number': 'abcd1234',
-                },
-                'description': 'time share token. each token equals 1 hour of riding.'
+                    'manufacturer': 'bkfab'
+                }
             },
+            'description': 'Time share token. Each token equals one hour of riding.',
         },
     }
 
@@ -1179,12 +1180,30 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 
     token_creation_tx = {
         'operation': 'CREATE',
-        'asset': asset,
+        'asset': bicycle_token,
         'metadata': None,
         'outputs': (output,),
         'inputs': (input_,),
         'version': version,
+        'id': None,
     }
+
+    # JSON: serialize the transaction-without-id to a json formatted string
+    message = json.dumps(
+        token_creation_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    # CRYPTO-CONDITIONS: sign the serialized transaction-without-id
+    ed25519.sign(message.encode(), base58.b58decode(bob.private_key))
+
+    # CRYPTO-CONDITIONS: generate the fulfillment uri
+    fulfillment_uri = ed25519.serialize_uri()
+
+    # add the fulfillment uri (signature)
+    token_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
     # JSON: serialize the id-less transaction to a json formatted string
     json_str_tx = json.dumps(
@@ -1199,23 +1218,6 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 
     # add the id
     token_creation_tx['id'] = shared_creation_txid
-
-    # JSON: serialize the transaction-with-id to a json formatted string
-    message = json.dumps(
-        token_creation_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
-    ed25519.sign(message.encode(), base58.b58decode(bob.private_key))
-
-    # CRYPTO-CONDITIONS: generate the fulfillment uri
-    fulfillment_uri = ed25519.serialize_uri()
-
-    # add the fulfillment uri (signature)
-    token_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Sending it over to a BigchainDB node:
 
@@ -1272,6 +1274,7 @@ to Bob:
         'type': bob_ed25519.TYPE_NAME,
         'public_key': base58.b58encode(bob_ed25519.public_key),
     }
+
     carly_unsigned_fulfillment_dict = {
         'type': carly_ed25519.TYPE_NAME,
         'public_key': base58.b58encode(carly_ed25519.public_key),
@@ -1285,6 +1288,7 @@ to Bob:
         },
         'public_keys': (bob.public_key,),
     }
+
     carly_output = {
         'amount': '8',
         'condition': {
@@ -1310,7 +1314,25 @@ to Bob:
         'outputs': (bob_output, carly_output),
         'inputs': (input_,),
         'version': version,
+        'id': None,
     }
+
+    # JSON: serialize the transaction-without-id to a json formatted string
+    message = json.dumps(
+        token_transfer_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    # CRYPTO-CONDITIONS: sign the serialized transaction-without-id for bob
+    carly_ed25519.sign(message.encode(), base58.b58decode(carly.private_key))
+
+    # CRYPTO-CONDITIONS: generate bob's fulfillment uri
+    fulfillment_uri = carly_ed25519.serialize_uri()
+
+    # add bob's fulfillment uri (signature)
+    token_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
     # JSON: serialize the id-less transaction to a json formatted string
     json_str_tx = json.dumps(
@@ -1325,23 +1347,6 @@ to Bob:
 
     # add the id
     token_transfer_tx['id'] = shared_transfer_txid
-
-    # JSON: serialize the transaction-with-id to a json formatted string
-    message = json.dumps(
-        token_transfer_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    # CRYPTO-CONDITIONS: sign the serialized transaction-with-id for bob
-    carly_ed25519.sign(message.encode(), base58.b58decode(carly.private_key))
-
-    # CRYPTO-CONDITIONS: generate bob's fulfillment uri
-    fulfillment_uri = carly_ed25519.serialize_uri()
-
-    # add bob's fulfillment uri (signature)
-    token_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Sending it over to a BigchainDB node:
 
@@ -1379,7 +1384,7 @@ Walkthrough
 We'll re-use the :ref:`example of Alice and Bob owning a car together
 <car-multiple-owners>` to handcraft transactions with multiple owners.
 
-Create a test user: alice and bob
+Create test user: alice and bob
 
 .. ipython::
 
@@ -1446,7 +1451,7 @@ their car over to ``carol``:
     In [0]: car_transfer_tx = offchain.prepare_transaction(
        ...:     operation='TRANSFER',
        ...:     recipients=carol.public_key,
-       ...:     asset={'id': car_creation_tx['id']},
+       ...:     asset={'id': asset},
        ...:     inputs=input_,
        ...: )
 
@@ -1567,7 +1572,25 @@ Craft the payload:
        ...:     'outputs': (output,),
        ...:     'inputs': (input_,),
        ...:     'version': version,
+       ...:     'id': None,
        ...: }
+
+Sign the transaction:
+
+.. ipython::
+
+    In [0]: message = json.dumps(
+       ...:     handcrafted_car_creation_tx,
+       ...:     sort_keys=True,
+       ...:     separators=(',', ':'),
+       ...:     ensure_ascii=False,
+       ...: )
+
+    In [0]: alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+
+    In [0]: fulfillment_uri = alice_ed25519.serialize_uri()
+
+    In [0]: handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
 Generate the id, by hashing the encoded json formatted string representation of
 the transaction:
@@ -1589,26 +1612,9 @@ Let's make sure our txid is the same as the one provided by the driver:
 
 .. ipython::
 
-    In [0]: handcrafted_car_creation_tx['id'] == car_creation_tx['id']
+    In [0]: handcrafted_car_creation_tx['id'] == signed_car_creation_tx['id']
 
-Sign the transaction:
-
-.. ipython::
-
-    In [0]: message = json.dumps(
-       ...:     handcrafted_car_creation_tx,
-       ...:     sort_keys=True,
-       ...:     separators=(',', ':'),
-       ...:     ensure_ascii=False,
-       ...: )
-
-    In [0]: alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
-
-    In [0]: fulfillment_uri = alice_ed25519.serialize_uri()
-
-    In [0]: handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
-
-Compare our signed ``CREATE`` transaction with the driver's:
+Compare our ``CREATE`` transaction with the driver's:
 
 .. ipython::
 
@@ -1618,8 +1624,6 @@ Compare our signed ``CREATE`` transaction with the driver's:
 The transfer to Carol:
 
 .. ipython::
-
-    In [0]: carol = generate_keypair()
 
     In [0]: alice_ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice.public_key))
 
@@ -1667,29 +1671,8 @@ Craft the payload:
        ...:     'outputs': (output,),
        ...:     'inputs': (input_,),
        ...:     'version': version,
+       ...:     'id': None,
        ...: }
-
-Generate the id, by hashing the encoded json formatted string representation of
-the transaction:
-
-.. ipython::
-
-    In [0]: json_str_tx = json.dumps(
-       ...:     handcrafted_car_transfer_tx,
-       ...:     sort_keys=True,
-       ...:     separators=(',', ':'),
-       ...:     ensure_ascii=False,
-       ...: )
-
-    In [0]: car_transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
-
-    In [0]: handcrafted_car_transfer_tx['id'] = car_transfer_txid
-
-Let's make sure our txid is the same as the one provided by the driver:
-
-.. ipython::
-
-    In [0]: handcrafted_car_transfer_tx['id'] == car_transfer_tx['id']
 
 Sign the transaction:
 
@@ -1718,7 +1701,29 @@ Sign the transaction:
 
     In [0]: handcrafted_car_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
-Compare our signed ``TRANSFER`` transaction with the driver's:
+Generate the id, by hashing the encoded json formatted string representation of
+the transaction:
+
+.. ipython::
+
+    In [0]: json_str_tx = json.dumps(
+       ...:     handcrafted_car_transfer_tx,
+       ...:     sort_keys=True,
+       ...:     separators=(',', ':'),
+       ...:     ensure_ascii=False,
+       ...: )
+
+    In [0]: car_transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
+
+    In [0]: handcrafted_car_transfer_tx['id'] = car_transfer_txid
+
+Let's make sure our txid is the same as the one provided by the driver:
+
+.. ipython::
+
+    In [0]: handcrafted_car_transfer_tx['id'] == signed_car_transfer_tx['id']
+
+Compare our ``TRANSFER`` transaction with the driver's:
 
 .. ipython::
 
@@ -1808,7 +1813,25 @@ Handcrafting the ``'CREATE'`` transaction
         'outputs': (output,),
         'inputs': (input_,),
         'version': version,
+        'id': None,
     }
+
+    # JSON: serialize the transaction-without-id to a json formatted string
+    message = json.dumps(
+        handcrafted_car_creation_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    # CRYPTO-CONDITIONS: sign the serialized transaction-without-id
+    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+
+    # CRYPTO-CONDITIONS: generate the fulfillment uri
+    fulfillment_uri = alice_ed25519.serialize_uri()
+
+    # add the fulfillment uri (signature)
+    handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
     # JSON: serialize the id-less transaction to a json formatted string
     # Generate the id, by hashing the encoded json formatted string representation of
@@ -1825,24 +1848,6 @@ Handcrafting the ``'CREATE'`` transaction
 
     # add the id
     handcrafted_car_creation_tx['id'] = car_creation_txid
-
-    # JSON: serialize the transaction-with-id to a json formatted string
-    message = json.dumps(
-        handcrafted_car_creation_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
-    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
-
-    # CRYPTO-CONDITIONS: generate the fulfillment uri
-    fulfillment_uri = alice_ed25519.serialize_uri()
-
-    # add the fulfillment uri (signature)
-    handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
-
 
 Sending it over to a BigchainDB node:
 
@@ -1907,20 +1912,8 @@ Handcrafting the ``'TRANSFER'`` transaction
         'outputs': (output,),
         'inputs': (input_,),
         'version': version,
+        'id': None,
     }
-
-    # Generate the id, by hashing the encoded json formatted string
-    # representation of the transaction:
-    json_str_tx = json.dumps(
-        handcrafted_car_transfer_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    car_transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
-
-    handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
     # Sign the transaction:
     message = json.dumps(
@@ -1942,6 +1935,19 @@ Handcrafting the ``'TRANSFER'`` transaction
     fulfillment_uri = threshold_sha256.serialize_uri()
 
     handcrafted_car_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+
+    # Generate the id, by hashing the encoded json formatted string
+    # representation of the transaction:
+    json_str_tx = json.dumps(
+        handcrafted_car_transfer_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    car_transfer_txid = sha3_256(json_str_tx.encode()).hexdigest()
+
+    handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
 Sending it over to a BigchainDB node:
 
@@ -2054,7 +2060,25 @@ Handcrafting the ``'CREATE'`` transaction
         'outputs': (output,),
         'inputs': (input_,),
         'version': version,
+        'id': None,
     }
+
+    # JSON: serialize the transaction-without-id to a json formatted string
+    message = json.dumps(
+        handcrafted_car_creation_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    # CRYPTO-CONDITIONS: sign the serialized transaction-without-id
+    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+
+    # CRYPTO-CONDITIONS: generate the fulfillment uri
+    fulfillment_uri = alice_ed25519.serialize_uri()
+
+    # add the fulfillment uri (signature)
+    handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
 
     # JSON: serialize the id-less transaction to a json formatted string
     # Generate the id, by hashing the encoded json formatted string representation of
@@ -2071,24 +2095,6 @@ Handcrafting the ``'CREATE'`` transaction
 
     # add the id
     handcrafted_car_creation_tx['id'] = car_creation_txid
-
-    # JSON: serialize the transaction-with-id to a json formatted string
-    message = json.dumps(
-        handcrafted_car_creation_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    # CRYPTO-CONDITIONS: sign the serialized transaction-with-id
-    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
-
-    # CRYPTO-CONDITIONS: generate the fulfillment uri
-    fulfillment_uri = alice_ed25519.serialize_uri()
-
-    # add the fulfillment uri (signature)
-    handcrafted_car_creation_tx['inputs'][0]['fulfillment'] = fulfillment_uri
-
 
 Sending it over to a BigchainDB node:
 
@@ -2154,20 +2160,8 @@ Handcrafting the ``'TRANSFER'`` transaction
         'outputs': (output,),
         'inputs': (input_,),
         'version': version,
+        'id': None,
     }
-
-    # Generate the id, by hashing the encoded json formatted string
-    # representation of the transaction:
-    json_str_tx = json.dumps(
-        handcrafted_car_transfer_tx,
-        sort_keys=True,
-        separators=(',', ':'),
-        ensure_ascii=False,
-    )
-
-    car_transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
-
-    handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
     # Sign the transaction:
     message = json.dumps(
@@ -2189,6 +2183,19 @@ Handcrafting the ``'TRANSFER'`` transaction
     fulfillment_uri = threshold_sha256.serialize_uri()
 
     handcrafted_car_transfer_tx['inputs'][0]['fulfillment'] = fulfillment_uri
+
+    # Generate the id, by hashing the encoded json formatted string
+    # representation of the transaction:
+    json_str_tx = json.dumps(
+        handcrafted_car_transfer_tx,
+        sort_keys=True,
+        separators=(',', ':'),
+        ensure_ascii=False,
+    )
+
+    car_transfer_txid = sha3.sha3_256(json_str_tx.encode()).hexdigest()
+
+    handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
 Sending it over to a BigchainDB node:
 
