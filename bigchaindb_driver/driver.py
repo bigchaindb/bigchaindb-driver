@@ -35,6 +35,7 @@ class BigchainDB:
         self._outputs = OutputsEndpoint(self)
         self._blocks = BlocksEndpoint(self)
         self._assets = AssetsEndpoint(self)
+        self._metadata = MetadataEndpoint(self)
         self.api_prefix = '/api/v1'
 
     @property
@@ -70,6 +71,13 @@ class BigchainDB:
             Exposes functionalities of the ``'/assets'`` endpoint.
         """
         return self._assets
+
+    @property
+    def metadata(self):
+        """:class:`~bigchaindb_driver.driver.MetadataEndpoint`:
+            Exposes functionalities of the ``'/metadata'`` endpoint.
+        """
+        return self._metadata
 
     @property
     def blocks(self):
@@ -461,6 +469,35 @@ class AssetsEndpoint(NamespacedDriver):
 
         Returns:
             :obj:`list` of :obj:`dict`: List of assets that match the query.
+
+        """
+        return self.transport.forward_request(
+            method='GET',
+            path=self.path,
+            params={'search': search, 'limit': limit},
+            headers=headers
+        )
+
+class MetadataEndpoint(NamespacedDriver):
+    """Exposes functionality of the ``'/metadata'`` endpoint.
+
+    Attributes:
+        path (str): The path of the endpoint.
+
+    """
+    PATH = '/metadata/'
+
+    def get(self, *, search, limit=0, headers=None):
+        """Retrieves the metadata that match a given text search string.
+
+        Args:
+            search (str): Text search string.
+            limit (int): Limit the number of returned documents. Defaults to
+                zero meaning that it returns all the matching metadata.
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            :obj:`list` of :obj:`dict`: List of metadata that match the query.
 
         """
         return self.transport.forward_request(
