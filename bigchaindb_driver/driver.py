@@ -478,6 +478,7 @@ class AssetsEndpoint(NamespacedDriver):
             headers=headers
         )
 
+
 class MetadataEndpoint(NamespacedDriver):
     """Exposes functionality of the ``'/metadata'`` endpoint.
 
