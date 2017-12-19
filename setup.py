@@ -29,6 +29,7 @@ tests_require = [
 dev_require = [
     'ipdb',
     'ipython',
+    'pre-commit'
 ]
 
 docs_require = [
