@@ -28,6 +28,7 @@ class RoundRobinPicker(AbstractPicker):
             instance that has been picked.
 
     """
+
     def __init__(self):
         """Initializes a :class:`~bigchaindb_driver.pool.RoundRobinPicker`
         instance. Sets :attr:`picked` to ``-1``.

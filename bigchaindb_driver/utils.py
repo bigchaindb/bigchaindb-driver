@@ -26,8 +26,7 @@ ops_map = {
 
 
 def _normalize_operation(operation):
-    """
-    Normalizes the given operation string. For now, this simply means
+    """Normalizes the given operation string. For now, this simply means
     converting the given string to uppercase, looking it up in
     :attr:`~.ops_map`, and returning the corresponding class if
     present.
