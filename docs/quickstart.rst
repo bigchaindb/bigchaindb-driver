@@ -194,8 +194,8 @@ development.
     $ git add .
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
-..
 
+..
 
     We use pre-commit_ which should be triggered with every commit. Some hooks will change files but others will give errors that needs to be fixed. Every time a hook is failing you need to add the changed files again.
     The hooks we use can be found in the yaml_ config file.
