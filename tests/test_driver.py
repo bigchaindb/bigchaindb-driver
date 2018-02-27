@@ -98,6 +98,7 @@ class TestTransactionsEndpoint:
         assert not transaction['metadata']
 
     def test_fulfill(self, driver, alice_keypair, unsigned_transaction):
+        from sha3 import sha3_256
         signed_transaction = driver.transactions.fulfill(
             unsigned_transaction, private_keys=alice_keypair.sk)
         unsigned_transaction['inputs'][0]['fulfillment'] = None
@@ -106,9 +107,10 @@ class TestTransactionsEndpoint:
             sort_keys=True,
             separators=(',', ':'),
             ensure_ascii=False,
-        ).encode()
+        )
+        message = sha3_256(message.encode())
         ed25519 = Ed25519Sha256(public_key=base58.b58decode(alice_keypair.vk))
-        ed25519.sign(message, base58.b58decode(alice_keypair.sk))
+        ed25519.sign(message.digest(), base58.b58decode(alice_keypair.sk))
         fulfillment_uri = ed25519.serialize_uri()
         assert signed_transaction['inputs'][0]['fulfillment'] == fulfillment_uri   # noqa
 
