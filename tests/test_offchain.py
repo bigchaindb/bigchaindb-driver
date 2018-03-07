@@ -1,5 +1,6 @@
 import rapidjson
 from cryptoconditions import Fulfillment
+from sha3 import sha3_256
 
 from pytest import raises, mark
 
@@ -116,9 +117,11 @@ def test_fulfill_transaction(alice_transaction, alice_sk):
         skipkeys=False,
         ensure_ascii=False,
         sort_keys=True,
-    ).encode()
+    )
+    message = sha3_256(message.encode())
     fulfillment_uri = inputs[0]['fulfillment']
-    assert Fulfillment.from_uri(fulfillment_uri).validate(message=message)
+    assert Fulfillment.from_uri(fulfillment_uri).\
+        validate(message=message.digest())
 
 
 def test_fulfill_transaction_raises(alice_transaction, bob_privkey):
