@@ -1,4 +1,5 @@
 * bigchaindb-driver version:
+* bigchaindb **server** version (`bigchaindb -v`):
 * Python version:
 * Operating System:
 

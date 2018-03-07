@@ -729,7 +729,7 @@ So let's limit the results and just see the ``CREATE`` transaction.
 
 .. code-block:: python
 
-    >>> bdb.transactions.get(asset_id=some_id, operation='CREATE')
+    >>> bdb.transactions.get(asset_id=sent_token_tx['id'], operation='CREATE')
     [{'asset': {'data': {'description': 'Time share token. Each token equals one '
                                     'hour of riding.',
                      'token_for': {'bicycle': {'manufacturer': 'bkfab',

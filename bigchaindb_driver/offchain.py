@@ -1,5 +1,4 @@
-"""
-Module for operations that can be performed "offchain", meaning without
+"""Module for operations that can be performed "offchain", meaning without
 a connection to one or more  BigchainDB federation nodes.
 
 """
@@ -51,8 +50,7 @@ def _prepare_transfer_transaction_dispatcher(operation, **kwargs):
 def prepare_transaction(*, operation='CREATE', signers=None,
                         recipients=None, asset=None, metadata=None,
                         inputs=None):
-    """
-    Prepares a transaction payload, ready to be fulfilled. Depending on
+    """Prepares a transaction payload, ready to be fulfilled. Depending on
     the value of ``operation``, simply dispatches to either
     :func:`~.prepare_create_transaction` or
     :func:`~.prepare_transfer_transaction`.
@@ -136,8 +134,7 @@ def prepare_create_transaction(*,
                                recipients=None,
                                asset=None,
                                metadata=None):
-    """
-    Prepares a ``"CREATE"`` transaction payload, ready to be
+    """Prepares a ``"CREATE"`` transaction payload, ready to be
     fulfilled.
 
     Args:
@@ -202,8 +199,7 @@ def prepare_transfer_transaction(*,
                                  recipients,
                                  asset,
                                  metadata=None):
-    """
-    Prepares a ``"TRANSFER"`` transaction payload, ready to be
+    """Prepares a ``"TRANSFER"`` transaction payload, ready to be
     fulfilled.
 
     Args:
@@ -320,8 +316,7 @@ def prepare_transfer_transaction(*,
 
 
 def fulfill_transaction(transaction, *, private_keys):
-    """
-    Fulfills the given transaction.
+    """Fulfills the given transaction.
 
     Args:
         transaction (dict): The transaction to be fulfilled.
