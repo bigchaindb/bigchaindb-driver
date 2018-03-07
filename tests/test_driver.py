@@ -5,6 +5,7 @@ import json
 import base58
 from pytest import mark, raises
 from requests.utils import default_headers
+from sha3 import sha3_256
 
 import bigchaindb
 from cryptoconditions import Ed25519Sha256
@@ -98,7 +99,6 @@ class TestTransactionsEndpoint:
         assert not transaction['metadata']
 
     def test_fulfill(self, driver, alice_keypair, unsigned_transaction):
-        from sha3 import sha3_256
         signed_transaction = driver.transactions.fulfill(
             unsigned_transaction, private_keys=alice_keypair.sk)
         unsigned_transaction['inputs'][0]['fulfillment'] = None

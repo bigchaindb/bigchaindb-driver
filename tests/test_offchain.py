@@ -1,5 +1,6 @@
 import rapidjson
 from cryptoconditions import Fulfillment
+from sha3 import sha3_256
 
 from pytest import raises, mark
 
@@ -105,7 +106,6 @@ def test_prepare_transfer_transaction(signed_alice_transaction, recipients):
     ['CT6nWhSyE7dF2znpx3vwXuceSrmeMy9ChBfi9U92HMSP'],
 ))
 def test_fulfill_transaction(alice_transaction, alice_sk):
-    from sha3 import sha3_256
     from bigchaindb_driver.offchain import fulfill_transaction
     fulfilled_transaction = fulfill_transaction(
         alice_transaction, private_keys=alice_sk)
