@@ -486,6 +486,8 @@ The Fulfilled Transaction
 
     In [0]: import json
 
+    In [0]: from sha3 import sha3_256
+
     In [0]: # fulfill prepared transaction
 
     In [0]: from bigchaindb_driver.offchain import fulfill_transaction
@@ -506,7 +508,9 @@ The Fulfilled Transaction
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+    In [0]: message = sha3_256(message.encode())
+
+    In [0]: ed25519.sign(message.digest(), base58.b58decode(alice.private_key))
 
     In [0]: fulfillment_uri = ed25519.serialize_uri()
 
@@ -629,7 +633,9 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
         ensure_ascii=False,
     )
 
-    ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+    message = sha3.sha3_256(message.encode())
+
+    ed25519.sign(message.digest(), base58.b58decode(alice.private_key))
 
     fulfillment_uri = ed25519.serialize_uri()
 
@@ -954,6 +960,8 @@ The Fulfilled Transaction
 
     In [0]: from bigchaindb_driver.offchain import fulfill_transaction
 
+    In [0]: from sha3 import sha3_256
+
     In [0]: # fulfill prepared transaction
 
     In [0]: fulfilled_transfer_tx = fulfill_transaction(
@@ -972,7 +980,14 @@ The Fulfilled Transaction
        ...:     ensure_ascii=False,
        ...: )
 
-    In [0]: ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+    In [0]: message = sha3_256(message.encode())
+
+    In [0]: message.update('{}{}'.format(
+       ...:     handcrafted_transfer_tx['inputs'][0]['fulfills']['transaction_id'],
+       ...:     handcrafted_transfer_tx['inputs'][0]['fulfills']['output_index']).encode()
+       ...: )
+
+    In [0]: ed25519.sign(message.digest(), base58.b58decode(alice.private_key))
 
     In [0]: fulfillment_uri = ed25519.serialize_uri()
 
@@ -1076,7 +1091,14 @@ In a nutshell
         ensure_ascii=False,
     )
 
-    ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+    message = sha3.sha3_256(message.encode())
+
+    message.update('{}{}'.format(
+        handcrafted_transfer_tx['inputs'][0]['fulfills']['transaction_id'],
+        handcrafted_transfer_tx['inputs'][0]['fulfills']['output_index']).encode()
+    )
+
+    ed25519.sign(message.digest(), base58.b58decode(alice.private_key))
 
     fulfillment_uri = ed25519.serialize_uri()
 
@@ -1196,8 +1218,10 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
         ensure_ascii=False,
     )
 
+    message = sha3.sha3_256(message.encode())
+
     # CRYPTO-CONDITIONS: sign the serialized transaction-without-id
-    ed25519.sign(message.encode(), base58.b58decode(bob.private_key))
+    ed25519.sign(message.digest(), base58.b58decode(bob.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = ed25519.serialize_uri()
@@ -1325,8 +1349,15 @@ to Bob:
         ensure_ascii=False,
     )
 
+    message = sha3.sha3_256(message.encode())
+
+    message.update('{}{}'.format(
+        token_transfer_tx['inputs'][0]['fulfills']['transaction_id'],
+        token_transfer_tx['inputs'][0]['fulfills']['output_index']).encode()
+    )
+
     # CRYPTO-CONDITIONS: sign the serialized transaction-without-id for bob
-    carly_ed25519.sign(message.encode(), base58.b58decode(carly.private_key))
+    carly_ed25519.sign(message.digest(), base58.b58decode(carly.private_key))
 
     # CRYPTO-CONDITIONS: generate bob's fulfillment uri
     fulfillment_uri = carly_ed25519.serialize_uri()
@@ -1823,9 +1854,10 @@ Handcrafting the ``'CREATE'`` transaction
         separators=(',', ':'),
         ensure_ascii=False,
     )
+    message = sha3_256(message.encode())
 
     # CRYPTO-CONDITIONS: sign the serialized transaction-without-id
-    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+    alice_ed25519.sign(message.digest(), base58.b58decode(alice.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = alice_ed25519.serialize_uri()
@@ -1923,9 +1955,18 @@ Handcrafting the ``'TRANSFER'`` transaction
         ensure_ascii=False,
     )
 
-    alice_ed25519.sign(message=message.encode(),
+    message = sha3_256(message.encode())
+
+    message.update('{}{}'.format(
+        handcrafted_car_transfer_tx['inputs'][0]['fulfills']['transaction_id'],
+        handcrafted_car_transfer_tx['inputs'][0]['fulfills']['output_index']).encode()
+    )
+
+    threshold_sha256 = ThresholdSha256(threshold=2)
+
+    alice_ed25519.sign(message=message.digest(),
                        private_key=base58.b58decode(alice.private_key))
-    bob_ed25519.sign(message=message.encode(),
+    bob_ed25519.sign(message=message.digest(),
                      private_key=base58.b58decode(bob.private_key))
 
     threshold_sha256.add_subfulfillment(alice_ed25519)
@@ -2071,8 +2112,10 @@ Handcrafting the ``'CREATE'`` transaction
         ensure_ascii=False,
     )
 
+    message = sha3.sha3_256(message.encode())
+
     # CRYPTO-CONDITIONS: sign the serialized transaction-without-id
-    alice_ed25519.sign(message.encode(), base58.b58decode(alice.private_key))
+    alice_ed25519.sign(message.digest(), base58.b58decode(alice.private_key))
 
     # CRYPTO-CONDITIONS: generate the fulfillment uri
     fulfillment_uri = alice_ed25519.serialize_uri()
@@ -2171,9 +2214,15 @@ Handcrafting the ``'TRANSFER'`` transaction
         ensure_ascii=False,
     )
 
+    message = sha3.sha3_256(message.encode())
+
+    message.update('{}{}'.format(
+        handcrafted_car_transfer_tx['inputs'][0]['fulfills']['transaction_id'],
+        handcrafted_car_transfer_tx['inputs'][0]['fulfills']['output_index']).encode())
+
     threshold_sha256 = ThresholdSha256(threshold=1)
 
-    alice_ed25519.sign(message.encode(),
+    alice_ed25519.sign(message.digest(),
                        private_key=base58.b58decode(alice.private_key))
 
     threshold_sha256.add_subfulfillment(alice_ed25519)

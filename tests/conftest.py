@@ -72,7 +72,8 @@ def sign_transaction(transaction, *, public_key, private_key):
         separators=(',', ':'),
         ensure_ascii=False,
     )
-    ed25519.sign(message.encode(), base58.b58decode(private_key))
+    message = sha3_256(message.encode())
+    ed25519.sign(message.digest(), base58.b58decode(private_key))
     return ed25519.serialize_uri()
 
 
@@ -394,10 +395,17 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
         sort_keys=True,
         separators=(',', ':'),
         ensure_ascii=False,
-    ).encode()
+    )
+    serialized_transaction = sha3_256(serialized_transaction.encode())
+
+    if transaction['inputs'][0]['fulfills']:
+        serialized_transaction.update('{}{}'.format(
+            transaction['inputs'][0]['fulfills']['transaction_id'],
+            transaction['inputs'][0]['fulfills']['output_index']).encode())
+
     ed25519_carol = Ed25519Sha256(
         public_key=base58.b58decode(carol_keypair.public_key))
-    ed25519_carol.sign(serialized_transaction,
+    ed25519_carol.sign(serialized_transaction.digest(),
                        base58.b58decode(carol_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_carol.serialize_uri()
     set_transaction_id(transaction)
@@ -440,10 +448,16 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
         sort_keys=True,
         separators=(',', ':'),
         ensure_ascii=False,
-    ).encode()
+    )
+    serialized_transaction = sha3_256(serialized_transaction.encode())
+    if transaction['inputs'][0]['fulfills']:
+        serialized_transaction.update('{}{}'.format(
+            transaction['inputs'][0]['fulfills']['transaction_id'],
+            transaction['inputs'][0]['fulfills']['output_index']).encode())
+
     ed25519_dimi = Ed25519Sha256(
         public_key=base58.b58decode(dimi_keypair.public_key))
-    ed25519_dimi.sign(serialized_transaction,
+    ed25519_dimi.sign(serialized_transaction.digest(),
                       base58.b58decode(dimi_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_dimi.serialize_uri()
     set_transaction_id(transaction)
