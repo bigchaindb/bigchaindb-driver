@@ -32,6 +32,15 @@ Features
 * Retrieval of transactions by id.
 * Getting status of a transaction by id.
 
+Install
+----------
+
+Install and update using `pip`:
+
+.. code-block:: text
+
+    pip install -U bigchaindb-driver
+
 
 Compatibility Matrix
 --------------------
