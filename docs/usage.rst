@@ -698,7 +698,7 @@ Let's try it:
                                          'type': 'ed25519-sha-256'},
                              'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
                'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
-    'version': '1.0'},
+    'version': '2.0'},
     {'asset': {'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7'},
     'id': '3ce3a5d4d984ca92f4a34967a2c181dbe8da8d6e4477220d7869ada9379dc410',
     'inputs': [{'fulfillment': 'pGSAIHTmVLbdfDFHTBx6gVr4NczRN-D1MhHltB0nn79luYlfgUCrppCotKAZoVW7nKye4I2HzGxlgwjmx47w_HxGXOFVbvCppNTLeVX4NrHYFRJlv8QKgj_ZaLctHpT6HPLLYIIG',
@@ -717,7 +717,7 @@ Let's try it:
                                          'type': 'ed25519-sha-256'},
                              'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
                'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
-    'version': '1.0'}]
+    'version': '2.0'}]
 
 
 If you were busy sharing your bicycle with the whole city you might have a really long list.
@@ -741,4 +741,4 @@ So let's limit the results and just see the ``CREATE`` transaction.
                                          'type': 'ed25519-sha-256'},
                              'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
                'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
-    'version': '1.0'}]
+    'version': '2.0'}]

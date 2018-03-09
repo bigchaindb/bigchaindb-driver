@@ -288,7 +288,7 @@ def prepared_carol_bicycle_transaction(carol_keypair, bicycle_data):
         'operation': 'CREATE',
         'outputs': (condition,),
         'inputs': (fulfillment,),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     return tx
@@ -330,7 +330,7 @@ def prepared_carol_car_transaction(carol_keypair, car_data):
         'operation': 'CREATE',
         'outputs': (condition,),
         'inputs': (fulfillment,),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     return tx
@@ -387,7 +387,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
             },
             'owners_before': (carol_keypair.public_key,),
         },),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     serialized_transaction = json.dumps(
@@ -440,7 +440,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
             },
             'owners_before': (dimi_keypair.public_key,),
         },),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     serialized_transaction = json.dumps(
@@ -474,7 +474,7 @@ def unsigned_transaction():
                 'serial_number': 'NNP43x-DaYoSWg=='
             }
         },
-        'version': '1.0',
+        'version': '2.0',
         'outputs': [
             {
                 'condition': {
