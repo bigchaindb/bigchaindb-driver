@@ -1,4 +1,4 @@
-FROM python:3.6.2rc1
+FROM python:3.6
 
 RUN apt-get update && apt-get install -y vim
 
@@ -9,4 +9,4 @@ RUN pip install --upgrade pip
 
 COPY . /usr/src/app/
 
-RUN pip install --no-cache-dir -e .[dev]
+RUN pip install --no-cache-dir --process-dependency-links -e .[dev]

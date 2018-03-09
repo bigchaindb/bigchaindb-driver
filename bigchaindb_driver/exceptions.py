@@ -6,7 +6,8 @@ class BigchaindbException(Exception):
 
 
 class KeypairNotFoundException(BigchaindbException):
-    """Raised if an operation cannot proceed because the keypair was not given.
+    """Raised if an operation cannot proceed because the keypair
+    was not given.
     """
 
 
@@ -29,6 +30,7 @@ class TransportError(BigchaindbException):
     for cases in which there was a connection error.
 
     """
+
     @property
     def status_code(self):
         return self.args[0]

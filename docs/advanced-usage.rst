@@ -93,6 +93,27 @@ to the signed transaction payload.
     >>> sent_tx == signed_tx
     True
 
+Recap: Asset Creation
+---------------------
+
+.. code-block:: python
+
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.crypto import generate_keypair
+
+    bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
+    bdb = BigchainDB(bdb_root_url)
+
+    alice = generate_keypair()
+
+    digital_asset_payload = {'data': {'msg': 'Hello BigchainDB!'}}
+    tx = bdb.transactions.prepare(operation='CREATE',
+                              signers=alice.public_key,
+                              asset=digital_asset_payload)
+
+    signed_tx = bdb.transactions.fulfill(tx, private_keys=alice.private_key)
+    sent_tx = bdb.transactions.send(signed_tx)
+    sent_tx == signed_tx
 
 Read the Creation Transaction from the DB
 -----------------------------------------
@@ -103,7 +124,7 @@ block:
 .. code-block:: python
 
     # Retrieve a validated transaction
-    >>> tx_retrieved = bdb.transactions.retrieve(tx['id'])
+    >>> tx_retrieved = bdb.transactions.retrieve(signed_tx['id'])
 
 The new owner of the digital asset is now Alice (or more correctly, her *public
 key*):
@@ -154,13 +175,13 @@ To construct the input:
 
     In [0]: output_index = 0
 
-    In [0]: output = tx['outputs'][output_index]
+    In [0]: output = signed_tx['outputs'][output_index]
 
     In [0]: input_ = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output_index': output_index,
-       ...:         'transaction_id': tx['id'],
+       ...:         'transaction_id': signed_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }
@@ -173,7 +194,7 @@ simply points to the id of the asset's ``CREATE`` transaction):
 
 .. ipython::
 
-    In [0]: transfer_asset_id = tx['id']
+    In [0]: transfer_asset_id = signed_tx['id']
 
     In [0]: transfer_asset = {
        ...:     'id': transfer_asset_id,
@@ -240,7 +261,7 @@ the need to have a connection to a BigchainDB federation.
 
 .. code-block:: python
 
-    sent_tx_transfer = bdb.transactions.send(signed_tx_transfer)
+    >>> sent_tx_transfer = bdb.transactions.send(signed_tx_transfer)
 
 Again, as with the ``'CREATE'`` transaction, notice how the payload returned
 by the server is equal to the signed one.
@@ -250,6 +271,37 @@ by the server is equal to the signed one.
     >>> sent_tx_transfer == signed_tx_transfer
     True
 
+Recap: Asset Transfer
+--------------------------------
+
+.. code-block:: python
+
+    output_index = 0
+    output = signed_tx['outputs'][output_index]
+    input_ = {
+        'fulfillment': output['condition']['details'],
+        'fulfills': {
+            'output_index': output_index,
+            'transaction_id': signed_tx['id'],
+        },
+        'owners_before': output['public_keys'],
+    }
+    transfer_asset_id = signed_tx['id']
+    transfer_asset = {
+        'id': transfer_asset_id,
+    }
+    bob = generate_keypair()
+    tx_transfer = bdb.transactions.prepare(
+        operation='TRANSFER',
+        inputs=input_,
+        asset=transfer_asset,
+        recipients=bob.public_key,
+    )
+    signed_tx_transfer = bdb.transactions.fulfill(
+        tx_transfer,
+        private_keys=alice.private_key,
+    )
+    sent_tx_transfer = bdb.transactions.send(signed_tx_transfer)
 
 Double Spends
 -------------
@@ -310,6 +362,16 @@ Multiple Owners
 
 Say ``alice`` and ``bob`` own a car together:
 
+.. code-block:: python
+
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.crypto import generate_keypair
+
+    bdb_root_url = 'https://example.com:9984' # Use YOUR BigchainDB Root URL here
+    bdb = BigchainDB(bdb_root_url)
+
+    alice, bob = generate_keypair(), generate_keypair()
+
 .. ipython::
 
     In [0]: car_asset = {
@@ -344,6 +406,37 @@ list or tuple of ``recipients``:
 
     >>> sent_car_tx == signed_car_creation_tx
     True
+
+Let's see how the example looks like when ``alice`` and ``bob`` are the issuers:
+
+.. code-block:: python
+
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.crypto import generate_keypair
+
+    bdb_root_url = 'https://example.com:9984'
+    bdb = BigchainDB(bdb_root_url)
+
+    alice, bob = generate_keypair(), generate_keypair()
+
+    car_asset = {
+        'data': {
+            'car': {
+                'vin': '5YJRE11B781000196'
+            }
+        }
+    }
+    car_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=(alice.public_key, bob.public_key),
+        recipients=(alice.public_key, bob.public_key),
+        asset=car_asset,
+    )
+    signed_car_creation_tx = bdb.transactions.fulfill(
+        car_creation_tx,
+        private_keys=[alice.private_key, bob.private_key],
+    )
+    sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
 
 
 One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
@@ -402,16 +495,16 @@ The asset can be transfered as soon as each of the original transaction's
 
 To do so, simply provide a list of all private keys to the fulfill method.
 
-.. danger:: We are currently working to support partial fulfillments, such that
-    not all keys of all parties involved need to be supplied at once. The issue
-    `bigchaindb/bigchaindb/issues/729 <https://github.com/bigchaindb/bigchaindb/issues/729>`_
-    addresses the current limitation. Your feedback is welcome!
-
 .. ipython::
 
     In [0]: signed_car_transfer_tx = bdb.transactions.fulfill(
        ...:     car_transfer_tx, private_keys=[alice.private_key, bob.private_key]
        ...: )
+
+.. danger:: We are currently working to support partial fulfillments, such that
+    not all keys of all parties involved need to be supplied at once. The issue
+    `bigchaindb/bigchaindb/issues/729 <https://github.com/bigchaindb/bigchaindb/issues/729>`_
+    addresses the current limitation. Your feedback is welcome!
 
 Note, that if one of the private keys is missing, the fulfillment will fail. If
 we omit ``bob``:

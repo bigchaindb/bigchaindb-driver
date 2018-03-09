@@ -13,6 +13,7 @@ class BigchainDB:
     to different nodes in a round-robin fashion (this will be customizable in
     the future).
     """
+
     def __init__(self, *nodes, transport_class=Transport, headers=None):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
@@ -126,6 +127,7 @@ class NamespacedDriver:
     """Base class for creating endpoints (namespaced objects) that can be added
     under the :class:`~bigchaindb_driver.driver.BigchainDB` driver.
     """
+
     PATH = '/'
 
     def __init__(self, driver):
@@ -159,13 +161,13 @@ class TransactionsEndpoint(NamespacedDriver):
         path (str): The path of the endpoint.
 
     """
+
     PATH = '/transactions/'
 
     @staticmethod
     def prepare(*, operation='CREATE', signers=None,
                 recipients=None, asset=None, metadata=None, inputs=None):
-        """
-        Prepares a transaction payload, ready to be fulfilled.
+        """Prepares a transaction payload, ready to be fulfilled.
 
         Args:
             operation (str): The operation to perform. Must be ``'CREATE'``
@@ -241,8 +243,7 @@ class TransactionsEndpoint(NamespacedDriver):
 
     @staticmethod
     def fulfill(transaction, private_keys):
-        """
-        Fulfills the given transaction.
+        """Fulfills the given transaction.
 
         Args:
             transaction (dict): The transaction to be fulfilled.
@@ -360,10 +361,13 @@ class OutputsEndpoint(NamespacedDriver):
         path (str): The path of the endpoint.
 
     """
+
     PATH = '/outputs/'
 
     def get(self, public_key, spent=None, headers=None):
-        """
+        """Get transaction outputs by public key. The public_key parameter
+        must be a base58 encoded ed25519 public key associated with
+        transaction output ownership.
 
         Args:
             public_key (str): Public key for which unfulfilled
@@ -402,6 +406,7 @@ class BlocksEndpoint(NamespacedDriver):
         path (str): The path of the endpoint.
 
     """
+
     PATH = '/blocks/'
 
     def get(self, *, txid, status=None, headers=None):
@@ -448,6 +453,7 @@ class AssetsEndpoint(NamespacedDriver):
         path (str): The path of the endpoint.
 
     """
+
     PATH = '/assets/'
 
     def get(self, *, search, limit=0, headers=None):

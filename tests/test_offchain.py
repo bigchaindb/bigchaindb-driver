@@ -1,5 +1,6 @@
 import rapidjson
 from cryptoconditions import Fulfillment
+from sha3 import sha3_256
 
 from pytest import raises, mark
 
@@ -73,19 +74,19 @@ def test_prepare_create_transaction(asset, signers, recipients):
     ('2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS',),
     [(['2dBVUoATxEzEqRdsi64AFsJnn2ywLCwnbNwW7K9BuVuS'], 1)],
 ))
-def test_prepare_transfer_transaction(alice_transaction, recipients):
+def test_prepare_transfer_transaction(signed_alice_transaction, recipients):
     from bigchaindb_driver.offchain import prepare_transfer_transaction
     condition_index = 0
-    condition = alice_transaction['outputs'][condition_index]
+    condition = signed_alice_transaction['outputs'][condition_index]
     input_ = {
         'fulfillment': condition['condition']['details'],
         'fulfills': {
             'output_index': condition_index,
-            'transaction_id': alice_transaction['id'],
+            'transaction_id': signed_alice_transaction['id'],
         },
         'owners_before': condition['public_keys']
     }
-    asset = {'id': alice_transaction['id']}
+    asset = {'id': signed_alice_transaction['id']}
     transfer_transaction = prepare_transfer_transaction(
         inputs=input_, recipients=recipients, asset=asset)
     assert 'id' in transfer_transaction
@@ -116,9 +117,11 @@ def test_fulfill_transaction(alice_transaction, alice_sk):
         skipkeys=False,
         ensure_ascii=False,
         sort_keys=True,
-    ).encode()
+    )
+    message = sha3_256(message.encode())
     fulfillment_uri = inputs[0]['fulfillment']
-    assert Fulfillment.from_uri(fulfillment_uri).validate(message=message)
+    assert Fulfillment.from_uri(fulfillment_uri).\
+        validate(message=message.digest())
 
 
 def test_fulfill_transaction_raises(alice_transaction, bob_privkey):

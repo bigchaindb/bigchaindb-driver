@@ -22,7 +22,7 @@ We begin by creating an object of class BigchainDB:
 
     In [0]: bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
 
-If the BigchainDB node or cluster doesn't require authentication tokens, you can do: 
+If the BigchainDB node or cluster doesn't require authentication tokens, you can do:
 
 .. ipython::
 
@@ -104,7 +104,7 @@ The ``prepared_creation_tx`` dictionary should be similar to:
 
 .. ipython::
 
-   In [0]: prepared_creation_tx
+    In [0]: prepared_creation_tx
 
 
 The transaction now needs to be fulfilled by signing it with Alice's private
@@ -235,6 +235,12 @@ fulfill it:
        ...:     private_keys=alice.private_key,
        ...: )
 
+The ``fulfilled_transfer_tx`` dictionary should look something like:
+
+.. ipython::
+
+    In [0]: fulfilled_transfer_tx
+
 and finally send it to the connected BigchainDB node:
 
 .. code-block:: python
@@ -243,12 +249,6 @@ and finally send it to the connected BigchainDB node:
 
     >>> sent_transfer_tx == fulfilled_transfer_tx
     True
-
-The ``fulfilled_transfer_tx`` dictionary should look something like:
-
-.. ipython::
-
-    In [0]: fulfilled_transfer_tx
 
 Bob is the new owner:
 
@@ -459,6 +459,12 @@ denote Carly as receiving 10 tokens by using a tuple:
     In [0]: fulfilled_token_tx = bdb.transactions.fulfill(
        ...:     prepared_token_tx, private_keys=bob.private_key)
 
+The ``fulfilled_token_tx`` dictionary should look something like:
+
+.. ipython::
+
+    In [0]: fulfilled_token_tx
+
 Sending the transaction:
 
 .. code-block:: python
@@ -492,12 +498,6 @@ Sending the transaction:
         recipients=[([carly.public_key, alice.public_key], 10)]
 
 
-The ``fulfilled_token_tx`` dictionary should look something like:
-
-.. ipython::
-
-    In [0]: fulfilled_token_tx
-
 Bob is the issuer:
 
 .. ipython::
@@ -520,19 +520,19 @@ To do so, she needs to send two tokens to Bob:
 
     In [0]: output_index = 0
 
-    In [0]: output = prepared_token_tx['outputs'][output_index]
+    In [0]: output = fulfilled_token_tx['outputs'][output_index]
 
     In [0]: transfer_input = {
        ...:     'fulfillment': output['condition']['details'],
        ...:     'fulfills': {
        ...:         'output_index': output_index,
-       ...:         'transaction_id': prepared_token_tx['id'],
+       ...:         'transaction_id': fulfilled_token_tx['id'],
        ...:     },
        ...:     'owners_before': output['public_keys'],
        ...: }
 
     In [0]: transfer_asset = {
-       ...:     'id': prepared_token_tx['id'],
+       ...:     'id': fulfilled_token_tx['id'],
        ...: }
 
     In [0]: prepared_transfer_tx = bdb.transactions.prepare(
@@ -544,13 +544,6 @@ To do so, she needs to send two tokens to Bob:
 
     In [0]: fulfilled_transfer_tx = bdb.transactions.fulfill(
        ...:     prepared_transfer_tx, private_keys=carly.private_key)
-
-.. code-block:: python
-
-    >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
-
-    >>> sent_transfer_tx == fulfilled_transfer_tx
-    True
 
 Notice how Carly needs to reassign the remaining eight tokens to herself if she
 wants to only transfer two tokens (out of the available 10) to Bob. BigchainDB
@@ -569,6 +562,14 @@ The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
 
     In [0]: fulfilled_transfer_tx
 
+.. code-block:: python
+
+    >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+
+    >>> sent_transfer_tx == fulfilled_transfer_tx
+    True
+
+
 Querying for Assets
 -------------------
 
@@ -576,16 +577,49 @@ BigchainDB allows you to query for assets using simple text search. This search
 is applied to all the strings inside the asset payload and returns all the
 assets that match a given text search string.
 
-Let's assume that we :ref:`created <asset-creation>` 3 assets that look like
-this:
+Let's create 3 assets:
 
-.. ipython::
+.. code-block:: python
 
-    In [0]: assets = [
-       ...:    {'data': {'msg': 'Hello BigchainDB 1!'}},
-       ...:    {'data': {'msg': 'Hello BigchainDB 2!'}},
-       ...:    {'data': {'msg': 'Hello BigchainDB 3!'}}
-       ...: ]
+    from bigchaindb_driver import BigchainDB
+    from bigchaindb_driver.crypto import generate_keypair
+
+    bdb_root_url = 'https://example.com:9984'
+
+    bdb = BigchainDB(bdb_root_url)
+
+    alice = generate_keypair()
+
+    hello_1 = {'data': {'msg': 'Hello BigchainDB 1!'},}
+    hello_2 = {'data': {'msg': 'Hello BigchainDB 2!'},}
+    hello_3 = {'data': {'msg': 'Hello BigchainDB 3!'},}
+
+    prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=alice.public_key,
+        asset=hello_1
+    )
+    fulfilled_creation_tx = bdb.transactions.fulfill(
+        prepared_creation_tx, private_keys=alice.private_key)
+    bdb.transactions.send(fulfilled_creation_tx)
+
+    prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=alice.public_key,
+        asset=hello_2
+    )
+    fulfilled_creation_tx = bdb.transactions.fulfill(
+        prepared_creation_tx, private_keys=alice.private_key)
+    bdb.transactions.send(fulfilled_creation_tx)
+
+    prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=alice.public_key,
+        asset=hello_3
+    )
+    fulfilled_creation_tx = bdb.transactions.fulfill(
+        prepared_creation_tx, private_keys=alice.private_key)
+    bdb.transactions.send(fulfilled_creation_tx)
 
 Let's perform a text search for all assets that contain the word ``bigchaindb``:
 
@@ -629,3 +663,82 @@ argument:
             'id': 'e40f4b6ac70b9c1b3b237ec13f4174384fd4d54d36dfde25520171577c49caa4'
         }
     ]
+
+Querying for Transactions
+-------------------------
+
+For this query we need to provide an ``asset_id`` and we will get back a list of transactions
+that use the asset with the ID ``asset_id``.
+
+.. note::
+    Please note that the id of an asset in BigchainDB is actually the id of the
+    transaction which created the asset. In other words, when querying for an asset
+    id with the operation set to ``CREATE``, only one transaction should be expected.
+    This transaction will be the transaction in which the asset was created, and the
+    transaction id will be equal to the given asset id.
+
+We will use the id of our last example :ref:`Divisible Assets <bicycle-divisible-assets>`.
+Let's try it:
+
+.. code-block:: python
+
+    >>> bdb.transactions.get(asset_id=sent_token_tx['id'])
+    [{'asset': {'data': {'description': 'Time share token. Each token equals one '
+                                    'hour of riding.',
+                     'token_for': {'bicycle': {'manufacturer': 'bkfab',
+                                               'serial_number': 'abcd1234'}}}},
+    'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7',
+    'inputs': [{'fulfillment': 'pGSAIFetX0Fz6ZUN20tJp_dWJKs0_nDDz7oOmTaToGrzzw5zgUBPJsUGHcm8R-ntQSHvK3tgoyHIvCrrNrI6lJkud81cZKWFb9XehNAvWswPWSx1_6EwFKVYV-fjlxPvExm8XZIH',
+              'fulfills': None,
+              'owners_before': ['6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt']}],
+    'metadata': None,
+    'operation': 'CREATE',
+    'outputs': [{'amount': '10',
+               'condition': {'details': {'public_key': '8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'version': '1.0'},
+    {'asset': {'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7'},
+    'id': '3ce3a5d4d984ca92f4a34967a2c181dbe8da8d6e4477220d7869ada9379dc410',
+    'inputs': [{'fulfillment': 'pGSAIHTmVLbdfDFHTBx6gVr4NczRN-D1MhHltB0nn79luYlfgUCrppCotKAZoVW7nKye4I2HzGxlgwjmx47w_HxGXOFVbvCppNTLeVX4NrHYFRJlv8QKgj_ZaLctHpT6HPLLYIIG',
+              'fulfills': {'output_index': 0,
+                           'transaction_id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7'},
+              'owners_before': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'metadata': None,
+    'operation': 'TRANSFER',
+    'outputs': [{'amount': '2',
+               'condition': {'details': {'public_key': '6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;HapGwR7oqOS3oZSICryoGJL0SfQF2LcSJe98jBKmdqo?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt']},
+              {'amount': '8',
+               'condition': {'details': {'public_key': '8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'version': '1.0'}]
+
+
+If you were busy sharing your bicycle with the whole city you might have a really long list.
+So let's limit the results and just see the ``CREATE`` transaction.
+
+.. code-block:: python
+
+    >>> bdb.transactions.get(asset_id=sent_token_tx['id'], operation='CREATE')
+    [{'asset': {'data': {'description': 'Time share token. Each token equals one '
+                                    'hour of riding.',
+                     'token_for': {'bicycle': {'manufacturer': 'bkfab',
+                                               'serial_number': 'abcd1234'}}}},
+    'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7',
+    'inputs': [{'fulfillment': 'pGSAIFetX0Fz6ZUN20tJp_dWJKs0_nDDz7oOmTaToGrzzw5zgUBPJsUGHcm8R-ntQSHvK3tgoyHIvCrrNrI6lJkud81cZKWFb9XehNAvWswPWSx1_6EwFKVYV-fjlxPvExm8XZIH',
+              'fulfills': None,
+              'owners_before': ['6uFoT6vd38qGqo2dRMBQsSojytUadyijBH4wgZGrPhZt']}],
+    'metadata': None,
+    'operation': 'CREATE',
+    'outputs': [{'amount': '10',
+               'condition': {'details': {'public_key': '8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne',
+                                         'type': 'ed25519-sha-256'},
+                             'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
+               'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
+    'version': '1.0'}]
