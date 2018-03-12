@@ -410,8 +410,7 @@ class BlocksEndpoint(NamespacedDriver):
     PATH = '/blocks/'
 
     def get(self, *, txid, headers=None):
-        """Get the block(s) that contain the given transaction id
-        (``txid``), and optionally that have the given ``status``.
+        """Get the block(s) that contain the given transaction id (``txid``).
 
         Args:
             txid (str): Transaction id.
