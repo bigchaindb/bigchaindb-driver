@@ -409,14 +409,12 @@ class BlocksEndpoint(NamespacedDriver):
 
     PATH = '/blocks/'
 
-    def get(self, *, txid, status=None, headers=None):
+    def get(self, *, txid, headers=None):
         """Get the block(s) that contain the given transaction id
         (``txid``), and optionally that have the given ``status``.
 
         Args:
             txid (str): Transaction id.
-            status (str): Status the block should have. Accepted values
-                are ``VALID``, ``UNDECIDED`` or ``INVALID``.
             headers (dict): Optional headers to pass to the request.
 
         Returns:
@@ -426,7 +424,7 @@ class BlocksEndpoint(NamespacedDriver):
         return self.transport.forward_request(
             method='GET',
             path=self.path,
-            params={'transaction_id': txid, 'status': status},
+            params={'transaction_id': txid},
             headers=headers,
         )
 
