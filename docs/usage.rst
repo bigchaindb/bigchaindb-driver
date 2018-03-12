@@ -140,30 +140,6 @@ Notice the transaction ``id``:
 
     In [0]: txid
 
-To check the status of the transaction:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(txid)
-
-.. note:: It may take a small amount of time before a BigchainDB cluster
-    confirms a transaction as being valid.
-
-Here's some code that keeps checking the status of the transaction until it is valid:
-
-.. code-block:: python
-
-    >>> trials = 0
-
-    >>> while trials < 100:
-    ...     try:
-    ...         if bdb.transactions.status(txid).get('status') == 'valid':
-    ...             break
-    ...     except bigchaindb_driver.exceptions.NotFoundError:
-    ...         trials += 1
-
-    >>> bdb.transactions.status(txid)
-    {'status': 'valid'}
 
 .. _bicycle-transfer:
 
@@ -324,20 +300,6 @@ Recap: Asset Creation & Transfer
 
     txid = fulfilled_creation_tx['id']
 
-    trials = 0
-    while trials < 60:
-        try:
-            if bdb.transactions.status(txid).get('status') == 'valid':
-                print('Tx valid in:', trials, 'secs')
-                break
-        except bigchaindb_driver.exceptions.NotFoundError:
-            trials += 1
-            sleep(1)
-
-    if trials == 60:
-        print('Tx is still being processed... Bye!')
-        exit(0)
-
     asset_id = txid
 
     transfer_asset = {
@@ -377,42 +339,6 @@ Recap: Asset Creation & Transfer
         fulfilled_transfer_tx['inputs'][0]['owners_before'][0] == alice.public_key)
 
 
-Transaction Status
-------------------
-Using the ``id`` of a transaction, its status can be obtained:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(creation_tx['id'])
-    {'status': 'valid'}
-
-Handling cases for which the transaction ``id`` may not be found:
-
-.. code-block:: python
-
-    import logging
-
-    from bigchaindb_driver import BigchainDB
-    from bigchaindb_driver.exceptions import NotFoundError
-
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(format='%(asctime)-15s %(status)-3s %(message)s')
-
-    bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
-    bdb = BigchainDB(bdb_root_url)
-    txid = '12345'
-    try:
-        status = bdb.transactions.status(txid)
-    except NotFoundError as e:
-        logger.error('Transaction "%s" was not found.',
-                     txid,
-                     extra={'status': e.status_code})
-
-Running the above code should give something similar to:
-
-.. code-block:: bash
-
-    2016-09-29 15:06:30,606 404 Transaction "12345" was not found.
 
 
 .. _bicycle-divisible-assets:

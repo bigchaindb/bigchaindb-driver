@@ -535,14 +535,6 @@ Sending the transaction over to a BigchainDB node:
 
     sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx)
 
-if ``alice`` and ``bob`` wish to check the status of the transfer they may use
-the :meth:`~bigchaindb_driver.BigchainDB.transactions.status` endpoint:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(sent_car_transfer_tx['id'])
-    {'status': 'valid'}
-
 Done!
 
 Happy, ``alice`` and ``bob`` have successfully transferred the ownership of
