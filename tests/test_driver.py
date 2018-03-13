@@ -120,6 +120,26 @@ class TestTransactionsEndpoint:
         sent_tx = driver.transactions.send(fulfilled_tx)
         assert sent_tx == fulfilled_tx
 
+    def test_send_wrong_mode(self, driver,
+                             alice_privkey, unsigned_transaction):
+        from bigchaindb_driver.exceptions import BadRequest
+        fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
+                                                   private_keys=alice_privkey)
+        with raises(BadRequest) as error:
+            driver.transactions.send(fulfilled_tx, mode='mode')
+        assert error.exception.message == \
+            'Mode must be "async", "sync" or "commit"'
+
+    @mark.parametrize('mode_params', (
+        'sync', 'commit'
+    ))
+    def test_send_with_mode(self, driver, alice_privkey,
+                            unsigned_transaction, mode_params):
+        fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
+                                                   private_keys=alice_privkey)
+        sent_tx = driver.transactions.send(fulfilled_tx, mode=mode_params)
+        assert sent_tx == fulfilled_tx
+
     def test_get_raises_type_error(self, driver):
         """This test is somewhat important as it ensures that the
         signature of the method requires the ``asset_id`` argument.

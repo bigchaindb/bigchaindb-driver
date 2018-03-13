@@ -652,14 +652,18 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     handcrafted_creation_tx['id'] = creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_creation_tx = bdb.transactions.send(handcrafted_creation_tx)
+    returned_creation_tx = bdb.transactions.send(handcrafted_creation_tx, mode='sync')
 
 A few checks:
 
@@ -1115,14 +1119,18 @@ In a nutshell
 
     handcrafted_transfer_tx['id'] = transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_transfer_tx = bdb.transactions.send(handcrafted_transfer_tx)
+    returned_transfer_tx = bdb.transactions.send(handcrafted_transfer_tx, mode='sync')
 
 A few checks:
 
@@ -1243,14 +1251,18 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     # add the id
     token_creation_tx['id'] = shared_creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_creation_tx = bdb.transactions.send(token_creation_tx)
+    returned_creation_tx = bdb.transactions.send(token_creation_tx, mode='sync')
 
 A few checks:
 
@@ -1379,12 +1391,18 @@ to Bob:
     # add the id
     token_transfer_tx['id'] = shared_transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
+    from bigchaindb_driver import BigchainDB
+
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_transfer_tx = bdb.transactions.send(token_transfer_tx)
+    returned_transfer_tx = bdb.transactions.send(token_transfer_tx, mode='sync')
 
 A few checks:
 
@@ -1451,10 +1469,15 @@ Say ``alice`` and ``bob`` own a car together:
 
     In [0]: signed_car_creation_tx
 
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
-    sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
+    sent_car_tx = bdb.transactions.send(signed_car_creation_tx, mode='sync')
 
 One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
 and realizing they no longer need their car, wish to transfer the ownership of
@@ -1492,11 +1515,9 @@ their car over to ``carol``:
 
     In [0]: signed_car_transfer_tx
 
-Sending the transaction to a BigchainDB node:
-
 .. code-block:: python
 
-    sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx)
+    sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx, mode='sync')
 
 Doing this manually
 -------------------
@@ -1881,14 +1902,18 @@ Handcrafting the ``'CREATE'`` transaction
     # add the id
     handcrafted_car_creation_tx['id'] = car_creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx)
+    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx, mode='sync')
 
 Wait for some nano seconds, and check the status:
 
@@ -1990,12 +2015,16 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx)
+    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx, mode='sync')
 
 Wait for some nano seconds, and check the status:
 
@@ -2139,14 +2168,18 @@ Handcrafting the ``'CREATE'`` transaction
     # add the id
     handcrafted_car_creation_tx['id'] = car_creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx)
+    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx, mode='sync')
 
 Wait for some nano seconds, and check the status:
 
@@ -2246,12 +2279,16 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx)
+    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx, mode='sync')
 
 Wait for some nano seconds, and check the status:
 
