@@ -4,6 +4,8 @@ python:
   - 3.6
 
 env:
+  global:
+    - DOCKER_COMPOSE_VERSION=1.19.0
   - TOXENV=py35
   - TOXENV=py36
   - TOXENV=flake8
@@ -30,7 +32,7 @@ install:
 before_script:
   - .ci/travis-before-script.sh
 
-script: tox -e ${TOXENV}
+script: .ci/travis_script.sh
 
 after_success:
   - .ci/travis-after-success.sh
