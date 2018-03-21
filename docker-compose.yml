@@ -62,6 +62,8 @@ services:
   # docker-compose build bdocs
   # docker-compose up -d bdocs
   bdocs:
+    depends_on:
+      - vdocs
     build:
       context: .
       dockerfile: ./compose/bigchaindb_server/Dockerfile
@@ -77,5 +79,4 @@ services:
       - '55555:80'
     volumes:
       - ./docs/_build/html:/usr/share/nginx/html
-
 
