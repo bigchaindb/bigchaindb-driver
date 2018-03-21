@@ -3,8 +3,8 @@ python:
   - 3.6
 
 env:
-  global:
-    - DOCKER_COMPOSE_VERSION=1.19.0
+  #global:
+  #  - DOCKER_COMPOSE_VERSION=1.19.0
   - TOXENV=py36
   - TOXENV=flake8
   - TOXENV=docs
