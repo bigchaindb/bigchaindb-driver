@@ -1,15 +1,29 @@
 language: python
 python:
+  - 3.5
   - 3.6
 
 env:
   global:
     - DOCKER_COMPOSE_VERSION=1.19.0
   matrix:
+    - TOXENV=py35
     - TOXENV=py36
     - TOXENV=flake8
     - TOXENV=docs
-  
+
+matrix:
+  fast_finish: true
+  exclude:
+    - python: 3.5
+      env: TOXENV=flake8
+    - python: 3.5
+      env: TOXENV=docs
+    - python: 3.5
+      env: TOXENV=py36
+    - python: 3.6
+      env: TOXENV=py35
+
 before_install:
   - sudo .ci/travis-before-install.sh
 

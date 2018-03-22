@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ "${TOXENV}" == "py36" ]]; then
+if [[ "${TOXENV}" == "py35" || "${TOXENV}" == "py36" ]]; then
   sudo apt-get update
   sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
