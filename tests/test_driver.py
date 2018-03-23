@@ -127,8 +127,8 @@ class TestTransactionsEndpoint:
                                                    private_keys=alice_privkey)
         with raises(BadRequest) as error:
             driver.transactions.send(fulfilled_tx, mode='mode')
-        assert error.exception.message == \
-            'Mode must be "async", "sync" or "commit"'
+            assert error.exception.message == \
+                'Mode must be "async", "sync" or "commit"'
 
     @mark.parametrize('mode_params', (
         'sync', 'commit'
