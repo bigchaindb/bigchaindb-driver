@@ -50,7 +50,6 @@ class TestBigchainDB:
         assert response['assets'] == '/assets/'
         assert response['outputs'] == '/outputs/'
         assert response['transactions'] == '/transactions/'
-        assert response['statuses'] == '/statuses/'
 
 
 class TestTransactionsEndpoint:
