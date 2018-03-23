@@ -51,7 +51,6 @@ class TestBigchainDB:
         assert response['assets'] == '/assets/'
         assert response['outputs'] == '/outputs/'
         assert response['transactions'] == '/transactions/'
-        assert response['statuses'] == '/statuses/'
 
 
 class TestTransactionsEndpoint:
@@ -66,17 +65,6 @@ class TestTransactionsEndpoint:
         txid = 'dummy_id'
         with raises(NotFoundError):
             driver.transactions.retrieve(txid)
-
-    def test_status(self, driver, persisted_alice_transaction):
-        txid = persisted_alice_transaction['id']
-        status = driver.transactions.status(txid)
-        assert status['status'] == 'valid'
-
-    def test_status_not_found(self, driver):
-        from bigchaindb_driver.exceptions import NotFoundError
-        txid = 'dummy_id'
-        with raises(NotFoundError):
-            driver.transactions.status(txid)
 
     def test_prepare(self, driver, alice_pubkey):
         transaction = driver.transactions.prepare(signers=[alice_pubkey])

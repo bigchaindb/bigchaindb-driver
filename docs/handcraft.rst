@@ -665,20 +665,12 @@ after the transaction is validated, while ``commit`` returns after the transacti
     bdb = BigchainDB('http://bdb-server:9984')
     returned_creation_tx = bdb.transactions.send(handcrafted_creation_tx, mode='sync')
 
-A few checks:
+A quick check:
 
 .. code-block:: python
 
     >>> json.dumps(returned_creation_tx, sort_keys=True) == json.dumps(handcrafted_creation_tx, sort_keys=True)
     True
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(creation_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
 
 
 .. _bicycle-asset-transfer-revisited:
@@ -1132,20 +1124,12 @@ after the transaction is validated, while ``commit`` returns after the transacti
     bdb = BigchainDB('http://bdb-server:9984')
     returned_transfer_tx = bdb.transactions.send(handcrafted_transfer_tx, mode='sync')
 
-A few checks:
+A quick check:
 
 .. code-block:: python
 
     >>> json.dumps(returned_transfer_tx, sort_keys=True) == json.dumps(handcrafted_transfer_tx, sort_keys=True)
     True
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(transfer_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
 
 
 *************************
@@ -1281,15 +1265,6 @@ A few checks:
     True
 
 
-.. code-block:: python
-
-    >>> bdb.transactions.status(shared_creation_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
-
-
 Now Carly wants to ride the bicycle for 2 hours so she needs to send 2 tokens
 to Bob:
 
@@ -1414,14 +1389,6 @@ A few checks:
     >>> token_transfer_tx['inputs'][0]['owners_before'][0] == carly.public_key
     True
 
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(shared_transfer_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
 
 *************************
 Multiple Owners Revisited
@@ -1915,12 +1882,6 @@ after the transaction is validated, while ``commit`` returns after the transacti
     bdb = BigchainDB('http://bdb-server:9984')
     returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx, mode='sync')
 
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_creation_tx['id'])
-    {'status': 'valid'}
 
 Handcrafting the ``'TRANSFER'`` transaction
 -------------------------------------------
@@ -2025,13 +1986,6 @@ after the transaction is validated, while ``commit`` returns after the transacti
 
     bdb = BigchainDB('http://bdb-server:9984')
     returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx, mode='sync')
-
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_transfer_tx['id'])
-    {'status': 'valid'}
 
 
 **************************************
@@ -2181,12 +2135,6 @@ after the transaction is validated, while ``commit`` returns after the transacti
     bdb = BigchainDB('http://bdb-server:9984')
     returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx, mode='sync')
 
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_creation_tx['id'])
-     {'status': 'valid'}
 
 
 Handcrafting the ``'TRANSFER'`` transaction
@@ -2289,13 +2237,6 @@ after the transaction is validated, while ``commit`` returns after the transacti
 
     bdb = BigchainDB('http://bdb-server:9984')
     returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx, mode='sync')
-
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_transfer_tx['id'])
-     {'status': 'valid'}
 
 
 .. _sha3: https://github.com/tiran/pysha3

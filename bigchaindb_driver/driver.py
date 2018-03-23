@@ -338,25 +338,6 @@ class TransactionsEndpoint(NamespacedDriver):
         return self.transport.forward_request(
             method='GET', path=path, headers=None)
 
-    def status(self, txid, headers=None):
-        """Retrieves the status of the transaction with the given id.
-
-        Args:
-            txid (str): Id of the transaction to retrieve the status for.
-            headers (dict): Optional headers to pass to the request.
-
-        Returns:
-            dict: A dict containing a 'status' item for the transaction.
-
-        """
-        # TODO Once the HTTP API has stabilized, especially with matters
-        # relating to the transaction status, this can be updated to match the
-        # HTTP API more thoroughly.
-        path = self.api_prefix + '/statuses'
-        return self.transport.forward_request(
-            method='GET', path=path, params={'transaction_id': txid},
-            headers=headers)
-
 
 class OutputsEndpoint(NamespacedDriver):
     """Exposes functionality of the ``'/outputs'`` endpoint.
