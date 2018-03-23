@@ -304,7 +304,7 @@ class TransactionsEndpoint(NamespacedDriver):
             headers=headers,
         )
 
-    def send(self, transaction, headers=None):
+    def send(self, transaction, mode='async', headers=None):
         """Submit a transaction to the Federation.
 
         Args:
@@ -317,7 +317,11 @@ class TransactionsEndpoint(NamespacedDriver):
 
         """
         return self.transport.forward_request(
-            method='POST', path=self.path, json=transaction, headers=headers)
+            method='POST',
+            path=self.path,
+            json=transaction,
+            params={'mode': mode},
+            headers=headers)
 
     def retrieve(self, txid, headers=None):
         """Retrieves the transaction with the given id.
