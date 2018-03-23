@@ -7,7 +7,6 @@ from pytest import mark, raises
 from requests.utils import default_headers
 from sha3 import sha3_256
 
-import bigchaindb
 from cryptoconditions import Ed25519Sha256
 
 
@@ -225,8 +224,6 @@ class TestBlocksEndppoint:
         assert block
 
 
-@mark.skipif(bigchaindb.config['database']['backend'] != 'mongodb',
-             reason='Requires MongoDB as the backend')
 class TestAssetsEndpoint:
 
     def test_get_search_no_results(self, driver):
