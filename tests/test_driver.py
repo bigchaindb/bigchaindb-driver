@@ -212,7 +212,8 @@ class TestBlocksEndppoint:
         assert len(blocks) == 1
 
     def test_retrieve(self, driver, block_with_alice_transaction):
-        block = driver.blocks.retrieve(block_id=block_with_alice_transaction)
+        block = driver.blocks.retrieve(
+            block_height=str(block_with_alice_transaction))
         assert block
 
 
