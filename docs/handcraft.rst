@@ -22,7 +22,7 @@ Submitting a transaction to a BigchainDB node consists of three main steps:
 Step 1 and 2 can be performed offline on the client. That is, they do not
 require any connection to any BigchainDB node.
 
-For convenience's sake, some utilites are provided to prepare and fulfill a
+For convenience's sake, some utilities are provided to prepare and fulfill a
 transaction via the :class:`~.bigchaindb_driver.BigchainDB` class, and via the
 :mod:`~bigchaindb_driver.offchain` module. For an introduction on using these
 utilities, see the :ref:`basic-usage` or :ref:`advanced-usage` sections.
@@ -45,10 +45,12 @@ In order to perform all of the above, we'll use the following Python libraries:
 * `sha3`_: to hash the serialized transaction; and
 * `cryptoconditions`_: to create conditions and fulfillments
 
+With BigchainDB Server version 2.0 some changes on how to handcraft a transaction were introduced. You can read about
+the changes to the BigchainDB Server in our `blog post`_.
 
 High-level view of a transaction in Python
 ==========================================
-For detailled documentation on the transaction schema, please consult
+For detailed documentation on the transaction schema, please consult
 `The Transaction Model`_ and `The Transaction Schema`_.
 
 From the point of view of Python, a transaction is simply a dictionary:
@@ -65,7 +67,7 @@ From the point of view of Python, a transaction is simply a dictionary:
                 }
             }
         },
-        'version': '1.0',
+        'version': '2.0',
         'outputs': [
             {
                 'condition': {
@@ -172,11 +174,11 @@ We are now going to craft this payload by hand.
 
 version
 -------
-As of BigchainDB 1.0, the transaction ``version`` is set to 1.0.
+As of BigchainDB 2.0, the transaction ``version`` is set to 2.0.
 
 .. ipython::
 
-    In [0]: version = '1.0'
+    In [0]: version = '2.0'
 
 asset
 -----
@@ -432,7 +434,7 @@ Let's recap how we've put all the code together to generate the above payload:
 
     operation = 'CREATE'
 
-    version = '1.0'
+    version = '2.0'
 
     asset = {
         'data': {
@@ -581,7 +583,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     operation = 'CREATE'
 
-    version = '1.0'
+    version = '2.0'
 
     asset = {
         'data': {
@@ -766,7 +768,7 @@ version
 -------
 .. ipython::
 
-    In [0]: version = '1.0'
+    In [0]: version = '2.0'
 
 asset
 -----
@@ -909,7 +911,7 @@ Let's recap how we got here:
     )
 
     operation = 'TRANSFER'
-    version = '1.0'
+    version = '2.0'
     asset = {'id': handcrafted_creation_tx['id']}
     metadata = None
 
@@ -1041,7 +1043,7 @@ In a nutshell
     bob = generate_keypair()
 
     operation = 'TRANSFER'
-    version = '1.0'
+    version = '2.0'
     asset = {'id': handcrafted_creation_tx['id']}
     metadata = None
 
@@ -1151,7 +1153,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 
 
     bob, carly = generate_keypair(), generate_keypair()
-    version = '1.0'
+    version = '2.0'
 
     bicycle_token = {
         'data': {
@@ -1582,7 +1584,7 @@ Craft the payload:
 
 .. ipython::
 
-    In [0]: version = '1.0'
+    In [0]: version = '2.0'
 
     In [0]: handcrafted_car_creation_tx = {
        ...:     'operation': 'CREATE',
@@ -1765,7 +1767,7 @@ Handcrafting the ``'CREATE'`` transaction
 
     from bigchaindb_driver.crypto import generate_keypair
 
-    version = '1.0'
+    version = '2.0'
 
     car_asset = {
         'data': {
@@ -2016,7 +2018,7 @@ Handcrafting the ``'CREATE'`` transaction
     from bigchaindb_driver.crypto import generate_keypair
 
 
-    version = '1.0'
+    version = '2.0'
 
     car_asset = {
         'data': {
@@ -2142,7 +2144,7 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
-    version = '1.0'
+    version = '2.0'
 
     carol = generate_keypair()
 
@@ -2244,3 +2246,4 @@ after the transaction is validated, while ``commit`` returns after the transacti
 .. _cryptoconditions internet draft: https://tools.ietf.org/html/draft-thomas-crypto-conditions-02
 .. _The Transaction Model: https://docs.bigchaindb.com/projects/server/en/latest/data-models/transaction-model.html
 .. _The Transaction Schema: https://docs.bigchaindb.com/projects/server/en/latest/schema/transaction.html
+.. _blog post: https://blog.bigchaindb.com/three-transaction-model-changes-in-the-next-release-dadbac50094a
