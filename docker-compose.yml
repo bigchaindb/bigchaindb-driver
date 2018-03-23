@@ -66,10 +66,7 @@ services:
       - vdocs
     build:
       context: .
-      dockerfile: ./compose/bigchaindb_server/Dockerfile
-      args:
-        branch: master
-        backend: localmongodb
+      dockerfile: ./compose/bigchaindb_driver/Dockerfile
     volumes:
       - .:/usr/src/app/
     command: make -C docs html
