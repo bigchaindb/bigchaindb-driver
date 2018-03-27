@@ -119,12 +119,20 @@ Read the Creation Transaction from the DB
 -----------------------------------------
 
 After a couple of seconds, we can check if the transaction was validated in a
-block:
+block.
 
 .. code-block:: python
 
-    # Retrieve a validated transaction
-    >>> tx_retrieved = bdb.transactions.retrieve(signed_tx['id'])
+    # Retrieve a block height
+    >>> block_height = bdb.transactions.get(txid=signed_tx['id'])
+
+This will return a list with block heights. If the transaction is not in any block an empty list will be returned.
+If we want some more data we can use the block height to retrieve the block itself.
+
+.. code-block:: python
+
+    # Retrieve a block
+    >>> block = bdb.transactions.retrieve(str(block_height[0]))
 
 The new owner of the digital asset is now Alice (or more correctly, her *public
 key*):

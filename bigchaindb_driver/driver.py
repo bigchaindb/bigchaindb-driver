@@ -402,7 +402,7 @@ class BlocksEndpoint(NamespacedDriver):
             headers (dict): Optional headers to pass to the request.
 
         Returns:
-            :obj:`list` of :obj:`str`: List of block ids.
+            :obj:`list` of :obj:`int`: List of block heights.
 
         """
         return self.transport.forward_request(
@@ -412,18 +412,18 @@ class BlocksEndpoint(NamespacedDriver):
             headers=headers,
         )
 
-    def retrieve(self, block_id, headers=None):
+    def retrieve(self, block_height, headers=None):
         """Retrieves the transaction with the given id.
 
         Args:
-            block_id (str): Id of the block to retrieve.
+            block_height (str): height of the block to retrieve.
             headers (dict): Optional headers to pass to the request.
 
         Returns:
             dict: The block with the given id.
 
         """
-        path = self.path + block_id
+        path = self.path + block_height
         return self.transport.forward_request(
             method='GET', path=path, headers=None)
 
