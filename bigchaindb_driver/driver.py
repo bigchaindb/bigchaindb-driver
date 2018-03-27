@@ -395,7 +395,8 @@ class BlocksEndpoint(NamespacedDriver):
     PATH = '/blocks/'
 
     def get(self, *, txid, headers=None):
-        """Get the block(s) that contain the given transaction id (``txid``).
+        """Get the block that contains the given transaction id (``txid``)
+           else return ``None``
 
         Args:
             txid (str): Transaction id.
@@ -405,12 +406,13 @@ class BlocksEndpoint(NamespacedDriver):
             :obj:`list` of :obj:`int`: List of block heights.
 
         """
-        return self.transport.forward_request(
+        block_list = self.transport.forward_request(
             method='GET',
             path=self.path,
             params={'transaction_id': txid},
             headers=headers,
         )
+        return block_list[0] if len(block_list) else None
 
     def retrieve(self, block_height, headers=None):
         """Retrieves the transaction with the given id.

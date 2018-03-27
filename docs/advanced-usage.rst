@@ -124,15 +124,14 @@ block.
 .. code-block:: python
 
     # Retrieve a block height
-    >>> block_height = bdb.transactions.get(txid=signed_tx['id'])
+    >>> block_height = bdb.blocks.get(txid=signed_tx['id'])
 
-This will return a list with block heights. If the transaction is not in any block an empty list will be returned.
-If we want some more data we can use the block height to retrieve the block itself.
+This will return the block height containing the transaction. If the transaction is not in any block then ``None`` is returned. If we want some more data we can use the block height to retrieve the block itself.
 
 .. code-block:: python
 
     # Retrieve a block
-    >>> block = bdb.transactions.retrieve(str(block_height[0]))
+    >>> block = bdb.blocks.retrieve(block_height)
 
 The new owner of the digital asset is now Alice (or more correctly, her *public
 key*):
