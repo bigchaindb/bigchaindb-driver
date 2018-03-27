@@ -405,12 +405,13 @@ class BlocksEndpoint(NamespacedDriver):
             :obj:`list` of :obj:`str`: List of block ids.
 
         """
-        return self.transport.forward_request(
+        block_list = self.transport.forward_request(
             method='GET',
             path=self.path,
             params={'transaction_id': txid},
             headers=headers,
         )
+        return block_list[0] if len(block_list) else None
 
     def retrieve(self, block_id, headers=None):
         """Retrieves the transaction with the given id.
