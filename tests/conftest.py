@@ -242,7 +242,7 @@ def signed_alice_transaction(alice_privkey, alice_transaction_obj):
 @await_transaction
 def persisted_alice_transaction(signed_alice_transaction,
                                 transactions_api_full_url):
-    response = requests.post(transactions_api_full_url,
+    response = requests.post(transactions_api_full_url + '?mode=commit',
                              json=signed_alice_transaction)
     return response.json()
 
