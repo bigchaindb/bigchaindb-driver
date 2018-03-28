@@ -239,7 +239,6 @@ def signed_alice_transaction(alice_privkey, alice_transaction_obj):
 
 
 @fixture
-@await_transaction
 def persisted_alice_transaction(signed_alice_transaction,
                                 transactions_api_full_url):
     response = requests.post(transactions_api_full_url + '?mode=commit',
@@ -310,11 +309,11 @@ def signed_carol_bicycle_transaction(request, carol_keypair,
 
 
 @fixture
-@await_transaction
 def persisted_carol_bicycle_transaction(transactions_api_full_url,
                                         signed_carol_bicycle_transaction):
     response = requests.post(
-        transactions_api_full_url, json=signed_carol_bicycle_transaction)
+        transactions_api_full_url + '?mode=commit',
+        json=signed_carol_bicycle_transaction)
     return response.json()
 
 
