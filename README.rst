@@ -39,7 +39,7 @@ Install and update using `pip`:
 
 .. code-block:: text
 
-    pip install -U bigchaindb-driver
+    pip3 install -U bigchaindb-driver
 
 
 Compatibility Matrix
