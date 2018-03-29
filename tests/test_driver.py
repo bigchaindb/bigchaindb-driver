@@ -39,8 +39,6 @@ class TestBigchainDB:
         assert 'api' in response
         assert 'docs' in response
         assert response['keyring'] == []
-        # TODO: update when server exposes public key
-        # assert response['public_key'] == bdb_node_pubkey
         assert response['software'] == 'BigchainDB'
         assert 'version' in response
 

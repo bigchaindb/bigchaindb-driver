@@ -172,11 +172,6 @@ def bdb_port():
 
 
 @fixture
-def bdb_node_pubkey():
-    return environ['BIGCHAINDB_KEYPAIR_PUBLIC']
-
-
-@fixture
 def bdb_node(bdb_host, bdb_port):
     return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
 
@@ -194,7 +189,7 @@ def api_root(bdb_node):
 
 @fixture
 def transactions_api_full_url(api_root):
-    return api_root + '/transactions'
+    return api_root + '/transactions?mode=commit'
 
 
 @fixture
@@ -241,7 +236,7 @@ def signed_alice_transaction(alice_privkey, alice_transaction_obj):
 @fixture
 def persisted_alice_transaction(signed_alice_transaction,
                                 transactions_api_full_url):
-    response = requests.post(transactions_api_full_url + '?mode=commit',
+    response = requests.post(transactions_api_full_url,
                              json=signed_alice_transaction)
     return response.json()
 
@@ -312,8 +307,7 @@ def signed_carol_bicycle_transaction(request, carol_keypair,
 def persisted_carol_bicycle_transaction(transactions_api_full_url,
                                         signed_carol_bicycle_transaction):
     response = requests.post(
-        transactions_api_full_url + '?mode=commit',
-        json=signed_carol_bicycle_transaction)
+        transactions_api_full_url, json=signed_carol_bicycle_transaction)
     return response.json()
 
 
@@ -355,8 +349,7 @@ def signed_carol_car_transaction(request, carol_keypair,
 def persisted_carol_car_transaction(transactions_api_full_url,
                                     signed_carol_car_transaction):
     response = requests.post(
-        transactions_api_full_url + '?mode=commit',
-        json=signed_carol_car_transaction)
+        transactions_api_full_url, json=signed_carol_car_transaction)
     return response.json()
 
 
@@ -409,7 +402,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
                        base58.b58decode(carol_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_carol.serialize_uri()
     set_transaction_id(transaction)
-    response = requests.post(transactions_api_full_url + '?mode=commit', json=transaction)
+    response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
 
 
@@ -461,8 +454,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
                       base58.b58decode(dimi_keypair.private_key))
     transaction['inputs'][0]['fulfillment'] = ed25519_dimi.serialize_uri()
     set_transaction_id(transaction)
-    response = requests.post(transactions_api_full_url + '?mode=commit',
-                             json=transaction)
+    response = requests.post(transactions_api_full_url, json=transaction)
     return response.json()
 
 
@@ -527,8 +519,7 @@ def text_search_assets(transactions_api_full_url, alice_pubkey, alice_privkey):
             asset=asset,
         )
         tx_signed = tx.sign([alice_privkey])
-        requests.post(transactions_api_full_url + '?mode=commit',
-                      json=tx_signed.to_dict())
+        requests.post(transactions_api_full_url, json=tx_signed.to_dict())
         assets_by_txid[tx_signed.id] = asset
 
     # return the assets indexed with the txid that created the asset
