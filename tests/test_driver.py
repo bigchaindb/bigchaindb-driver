@@ -34,13 +34,11 @@ class TestBigchainDB:
         assert driver.transactions
         assert driver.outputs
 
-    def test_info(self, driver, bdb_node_pubkey):
+    def test_info(self, driver):
         response = driver.info()
         assert 'api' in response
         assert 'docs' in response
         assert response['keyring'] == []
-        # TODO: update when server exposes public key
-        # assert response['public_key'] == bdb_node_pubkey
         assert response['software'] == 'BigchainDB'
         assert 'version' in response
 
@@ -146,9 +144,9 @@ class TestTransactionsEndpoint:
         response = driver.transactions.get(asset_id='a' * 64)
         assert response == []
 
-    @mark.parametrize('operation,tx_qty', (
+    @mark.parametrize('operation,tx_qty', [
         (None, 3), ('CREATE', 1), ('TRANSFER', 2)
-    ))
+    ])
     @mark.usefixtures('persisted_transfer_dimi_car_to_ewy')
     def test_get(self, driver,
                  signed_carol_car_transaction, operation, tx_qty):
