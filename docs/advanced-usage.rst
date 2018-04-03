@@ -119,12 +119,19 @@ Read the Creation Transaction from the DB
 -----------------------------------------
 
 After a couple of seconds, we can check if the transaction was validated in a
-block:
+block.
 
 .. code-block:: python
 
-    # Retrieve a validated transaction
-    >>> tx_retrieved = bdb.transactions.retrieve(signed_tx['id'])
+    # Retrieve a block height
+    >>> block_height = bdb.blocks.get(txid=signed_tx['id'])
+
+This will return the block height containing the transaction. If the transaction is not in any block then ``None`` is returned. If we want some more data we can use the block height to retrieve the block itself.
+
+.. code-block:: python
+
+    # Retrieve a block
+    >>> block = bdb.blocks.retrieve(block_height)
 
 The new owner of the digital asset is now Alice (or more correctly, her *public
 key*):
@@ -534,14 +541,6 @@ Sending the transaction over to a BigchainDB node:
 .. code-block:: python
 
     sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx)
-
-if ``alice`` and ``bob`` wish to check the status of the transfer they may use
-the :meth:`~bigchaindb_driver.BigchainDB.transactions.status` endpoint:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(sent_car_transfer_tx['id'])
-    {'status': 'valid'}
 
 Done!
 

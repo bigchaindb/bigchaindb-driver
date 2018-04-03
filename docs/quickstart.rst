@@ -154,19 +154,18 @@ development.
    Now you can make your changes locally.
 
 4. When you're done making changes, check that your changes pass flake8
-   and the tests. For the tests, you'll need to  start the MongoDB and
-   BigchainDB servers::
+   and the tests. For the tests, you'll need to  start the MongoDB, Tendermint
+   and BigchainDB servers::
 
-    $ docker-compose up -d db
-    $ docker-compose up -d bdb-server
+    $ docker-compose up -d bigchaindb
 
 5. flake8 check::
 
-    $ docker-compose run --rm bdb flake8 bigchaindb_driver tests
+    $ docker-compose run --rm bigchaindb-driver flake8 bigchaindb_driver tests
 
 6. To run the tests::
 
-    $ docker-compose run --rm bdb pytest -v
+    $ docker-compose run --rm bigchaindb-driver pytest -v
 
 7. Commit your changes and push your branch to GitHub::
 

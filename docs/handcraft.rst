@@ -22,7 +22,7 @@ Submitting a transaction to a BigchainDB node consists of three main steps:
 Step 1 and 2 can be performed offline on the client. That is, they do not
 require any connection to any BigchainDB node.
 
-For convenience's sake, some utilites are provided to prepare and fulfill a
+For convenience's sake, some utilities are provided to prepare and fulfill a
 transaction via the :class:`~.bigchaindb_driver.BigchainDB` class, and via the
 :mod:`~bigchaindb_driver.offchain` module. For an introduction on using these
 utilities, see the :ref:`basic-usage` or :ref:`advanced-usage` sections.
@@ -45,10 +45,12 @@ In order to perform all of the above, we'll use the following Python libraries:
 * `sha3`_: to hash the serialized transaction; and
 * `cryptoconditions`_: to create conditions and fulfillments
 
+With BigchainDB Server version 2.0 some changes on how to handcraft a transaction were introduced. You can read about
+the changes to the BigchainDB Server in our `blog post`_.
 
 High-level view of a transaction in Python
 ==========================================
-For detailled documentation on the transaction schema, please consult
+For detailed documentation on the transaction schema, please consult
 `The Transaction Model`_ and `The Transaction Schema`_.
 
 From the point of view of Python, a transaction is simply a dictionary:
@@ -65,7 +67,7 @@ From the point of view of Python, a transaction is simply a dictionary:
                 }
             }
         },
-        'version': '1.0',
+        'version': '2.0',
         'outputs': [
             {
                 'condition': {
@@ -172,11 +174,11 @@ We are now going to craft this payload by hand.
 
 version
 -------
-As of BigchainDB 1.0, the transaction ``version`` is set to 1.0.
+As of BigchainDB 2.0, the transaction ``version`` is set to 2.0.
 
 .. ipython::
 
-    In [0]: version = '1.0'
+    In [0]: version = '2.0'
 
 asset
 -----
@@ -432,7 +434,7 @@ Let's recap how we've put all the code together to generate the above payload:
 
     operation = 'CREATE'
 
-    version = '1.0'
+    version = '2.0'
 
     asset = {
         'data': {
@@ -581,7 +583,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     operation = 'CREATE'
 
-    version = '1.0'
+    version = '2.0'
 
     asset = {
         'data': {
@@ -652,29 +654,25 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 
     handcrafted_creation_tx['id'] = creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_creation_tx = bdb.transactions.send(handcrafted_creation_tx)
+    returned_creation_tx = bdb.transactions.send(handcrafted_creation_tx, mode='sync')
 
-A few checks:
+A quick check:
 
 .. code-block:: python
 
     >>> json.dumps(returned_creation_tx, sort_keys=True) == json.dumps(handcrafted_creation_tx, sort_keys=True)
     True
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(creation_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
 
 
 .. _bicycle-asset-transfer-revisited:
@@ -770,7 +768,7 @@ version
 -------
 .. ipython::
 
-    In [0]: version = '1.0'
+    In [0]: version = '2.0'
 
 asset
 -----
@@ -913,7 +911,7 @@ Let's recap how we got here:
     )
 
     operation = 'TRANSFER'
-    version = '1.0'
+    version = '2.0'
     asset = {'id': handcrafted_creation_tx['id']}
     metadata = None
 
@@ -1045,7 +1043,7 @@ In a nutshell
     bob = generate_keypair()
 
     operation = 'TRANSFER'
-    version = '1.0'
+    version = '2.0'
     asset = {'id': handcrafted_creation_tx['id']}
     metadata = None
 
@@ -1115,29 +1113,25 @@ In a nutshell
 
     handcrafted_transfer_tx['id'] = transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_transfer_tx = bdb.transactions.send(handcrafted_transfer_tx)
+    returned_transfer_tx = bdb.transactions.send(handcrafted_transfer_tx, mode='sync')
 
-A few checks:
+A quick check:
 
 .. code-block:: python
 
     >>> json.dumps(returned_transfer_tx, sort_keys=True) == json.dumps(handcrafted_transfer_tx, sort_keys=True)
     True
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(transfer_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
 
 
 *************************
@@ -1159,7 +1153,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 
 
     bob, carly = generate_keypair(), generate_keypair()
-    version = '1.0'
+    version = '2.0'
 
     bicycle_token = {
         'data': {
@@ -1243,14 +1237,18 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     # add the id
     token_creation_tx['id'] = shared_creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_creation_tx = bdb.transactions.send(token_creation_tx)
+    returned_creation_tx = bdb.transactions.send(token_creation_tx, mode='sync')
 
 A few checks:
 
@@ -1267,15 +1265,6 @@ A few checks:
 
     >>> token_creation_tx['outputs'][0]['amount'] == '10'
     True
-
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(shared_creation_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
 
 
 Now Carly wants to ride the bicycle for 2 hours so she needs to send 2 tokens
@@ -1379,12 +1368,18 @@ to Bob:
     # add the id
     token_transfer_tx['id'] = shared_transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
+    from bigchaindb_driver import BigchainDB
+
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_transfer_tx = bdb.transactions.send(token_transfer_tx)
+    returned_transfer_tx = bdb.transactions.send(token_transfer_tx, mode='sync')
 
 A few checks:
 
@@ -1396,14 +1391,6 @@ A few checks:
     >>> token_transfer_tx['inputs'][0]['owners_before'][0] == carly.public_key
     True
 
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(shared_transfer_txid)
-    {'status': 'valid'}
-
-.. tip:: When checking for the status of a transaction, one should keep in
-    mind tiny delays before a transaction reaches a valid status.
 
 *************************
 Multiple Owners Revisited
@@ -1451,10 +1438,15 @@ Say ``alice`` and ``bob`` own a car together:
 
     In [0]: signed_car_creation_tx
 
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
-    sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
+    sent_car_tx = bdb.transactions.send(signed_car_creation_tx, mode='sync')
 
 One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
 and realizing they no longer need their car, wish to transfer the ownership of
@@ -1492,11 +1484,9 @@ their car over to ``carol``:
 
     In [0]: signed_car_transfer_tx
 
-Sending the transaction to a BigchainDB node:
-
 .. code-block:: python
 
-    sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx)
+    sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx, mode='sync')
 
 Doing this manually
 -------------------
@@ -1594,7 +1584,7 @@ Craft the payload:
 
 .. ipython::
 
-    In [0]: version = '1.0'
+    In [0]: version = '2.0'
 
     In [0]: handcrafted_car_creation_tx = {
        ...:     'operation': 'CREATE',
@@ -1777,7 +1767,7 @@ Handcrafting the ``'CREATE'`` transaction
 
     from bigchaindb_driver.crypto import generate_keypair
 
-    version = '1.0'
+    version = '2.0'
 
     car_asset = {
         'data': {
@@ -1881,21 +1871,19 @@ Handcrafting the ``'CREATE'`` transaction
     # add the id
     handcrafted_car_creation_tx['id'] = car_creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx)
+    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx, mode='sync')
 
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_creation_tx['id'])
-    {'status': 'valid'}
 
 Handcrafting the ``'TRANSFER'`` transaction
 -------------------------------------------
@@ -1990,19 +1978,16 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx)
-
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_transfer_tx['id'])
-    {'status': 'valid'}
+    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx, mode='sync')
 
 
 **************************************
@@ -2033,7 +2018,7 @@ Handcrafting the ``'CREATE'`` transaction
     from bigchaindb_driver.crypto import generate_keypair
 
 
-    version = '1.0'
+    version = '2.0'
 
     car_asset = {
         'data': {
@@ -2139,21 +2124,19 @@ Handcrafting the ``'CREATE'`` transaction
     # add the id
     handcrafted_car_creation_tx['id'] = car_creation_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     from bigchaindb_driver import BigchainDB
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx)
+    returned_car_creation_tx = bdb.transactions.send(handcrafted_car_creation_tx, mode='sync')
 
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_creation_tx['id'])
-     {'status': 'valid'}
 
 
 Handcrafting the ``'TRANSFER'`` transaction
@@ -2161,7 +2144,7 @@ Handcrafting the ``'TRANSFER'`` transaction
 
 .. code-block:: python
 
-    version = '1.0'
+    version = '2.0'
 
     carol = generate_keypair()
 
@@ -2246,19 +2229,16 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     handcrafted_car_transfer_tx['id'] = car_transfer_txid
 
-Sending it over to a BigchainDB node:
+To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
+used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
+By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
+``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
+after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
 
 .. code-block:: python
 
     bdb = BigchainDB('http://bdb-server:9984')
-    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx)
-
-Wait for some nano seconds, and check the status:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(returned_car_transfer_tx['id'])
-     {'status': 'valid'}
+    returned_car_transfer_tx = bdb.transactions.send(handcrafted_car_transfer_tx, mode='sync')
 
 
 .. _sha3: https://github.com/tiran/pysha3
@@ -2266,3 +2246,4 @@ Wait for some nano seconds, and check the status:
 .. _cryptoconditions internet draft: https://tools.ietf.org/html/draft-thomas-crypto-conditions-02
 .. _The Transaction Model: https://docs.bigchaindb.com/projects/server/en/latest/data-models/transaction-model.html
 .. _The Transaction Schema: https://docs.bigchaindb.com/projects/server/en/latest/schema/transaction.html
+.. _blog post: https://blog.bigchaindb.com/three-transaction-model-changes-in-the-next-release-dadbac50094a

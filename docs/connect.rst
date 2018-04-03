@@ -62,7 +62,7 @@ Alternatively, you may connect to the containerized BigchainDB node from
 
 .. code-block:: bash
 
-    $ docker-compose port bdb-server 9984
+    $ docker-compose port bigchaindb 9984
     0.0.0.0:32780
 
 .. code-block:: python
