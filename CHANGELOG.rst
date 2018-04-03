@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.5.0a1 (2018-04-03)
+--------------------
+There were _many_ changes between BigchainDB 1.3 and BigchainDB 2.0 Alpha, too many to list here. We wrote a series of blog posts to summarize most changes, especially those that affect end users and application developers:
+
+* [Some HTTP API Changes in the Next Release](https://blog.bigchaindb.com/some-http-api-changes-in-the-next-release-49612a537b0c)
+* [Three Transaction Model Changes in the Next Release](https://blog.bigchaindb.com/three-transaction-model-changes-in-the-next-release-dadbac50094a)
+
+
 0.4.1 (2017-08-02)
 ------------------
 Fixed
@@ -34,8 +42,8 @@ Added
 Changed
 ^^^^^^^
 * Node URLs, passed to ``BigchainDB()`` MUST not include the api prefix
-  ``'/api/v1'``, e.g.: 
-    
+  ``'/api/v1'``, e.g.:
+
     * BEFORE: ``http://localhost:9984/api/v1``
     * NOW: ``http://localhost:9984``
 
@@ -59,7 +67,7 @@ Removed
 Added
 ^^^^^
 * Support for "canonical" transaction operations:
-    
+
     * ``prepare``
     * ``fulfill``
     * ``send``
