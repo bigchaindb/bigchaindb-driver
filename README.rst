@@ -35,12 +35,17 @@ Features
 Install
 ----------
 
-Install and update using `pip`:
+We recommend you use a virtual environment for running `bigchaindb-driver`, to install and update using `pip`:
+
+.. code-block:: text
+
+    pip install -U bigchaindb-driver
+    
+If this fails, ensure you have python 3 installed, if you have both versions of python installed, to install and update using `pip`:
 
 .. code-block:: text
 
     pip3 install -U bigchaindb-driver
-
 
 Compatibility Matrix
 --------------------
