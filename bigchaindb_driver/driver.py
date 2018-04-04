@@ -304,7 +304,7 @@ class TransactionsEndpoint(NamespacedDriver):
             headers=headers,
         )
 
-    def send(self, transaction, headers=None):
+    def send(self, transaction, mode='async', headers=None):
         """Submit a transaction to the Federation.
 
         Args:
@@ -317,7 +317,11 @@ class TransactionsEndpoint(NamespacedDriver):
 
         """
         return self.transport.forward_request(
-            method='POST', path=self.path, json=transaction, headers=headers)
+            method='POST',
+            path=self.path,
+            json=transaction,
+            params={'mode': mode},
+            headers=headers)
 
     def retrieve(self, txid, headers=None):
         """Retrieves the transaction with the given id.
@@ -333,25 +337,6 @@ class TransactionsEndpoint(NamespacedDriver):
         path = self.path + txid
         return self.transport.forward_request(
             method='GET', path=path, headers=None)
-
-    def status(self, txid, headers=None):
-        """Retrieves the status of the transaction with the given id.
-
-        Args:
-            txid (str): Id of the transaction to retrieve the status for.
-            headers (dict): Optional headers to pass to the request.
-
-        Returns:
-            dict: A dict containing a 'status' item for the transaction.
-
-        """
-        # TODO Once the HTTP API has stabilized, especially with matters
-        # relating to the transaction status, this can be updated to match the
-        # HTTP API more thoroughly.
-        path = self.api_prefix + '/statuses'
-        return self.transport.forward_request(
-            method='GET', path=path, params={'transaction_id': txid},
-            headers=headers)
 
 
 class OutputsEndpoint(NamespacedDriver):
@@ -409,39 +394,38 @@ class BlocksEndpoint(NamespacedDriver):
 
     PATH = '/blocks/'
 
-    def get(self, *, txid, status=None, headers=None):
-        """Get the block(s) that contain the given transaction id
-        (``txid``), and optionally that have the given ``status``.
+    def get(self, *, txid, headers=None):
+        """Get the block that contains the given transaction id (``txid``)
+           else return ``None``
 
         Args:
             txid (str): Transaction id.
-            status (str): Status the block should have. Accepted values
-                are ``VALID``, ``UNDECIDED`` or ``INVALID``.
             headers (dict): Optional headers to pass to the request.
 
         Returns:
-            :obj:`list` of :obj:`str`: List of block ids.
+            :obj:`list` of :obj:`int`: List of block heights.
 
         """
-        return self.transport.forward_request(
+        block_list = self.transport.forward_request(
             method='GET',
             path=self.path,
-            params={'transaction_id': txid, 'status': status},
+            params={'transaction_id': txid},
             headers=headers,
         )
+        return block_list[0] if len(block_list) else None
 
-    def retrieve(self, block_id, headers=None):
+    def retrieve(self, block_height, headers=None):
         """Retrieves the transaction with the given id.
 
         Args:
-            block_id (str): Id of the block to retrieve.
+            block_height (str): height of the block to retrieve.
             headers (dict): Optional headers to pass to the request.
 
         Returns:
             dict: The block with the given id.
 
         """
-        path = self.path + block_id
+        path = self.path + block_height
         return self.transport.forward_request(
             method='GET', path=path, headers=None)
 
