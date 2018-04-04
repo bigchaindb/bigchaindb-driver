@@ -1,10 +1,12 @@
-version: '2'
+version: '2.1'
 
 services:
-  bdb:
+  bigchaindb-driver:
+    depends_on:
+      - bigchaindb
     build:
       context: .
-      dockerfile: ./compose/driver/Dockerfile
+      dockerfile: ./compose/bigchaindb_driver/Dockerfile
     volumes:
       - ./docs:/usr/src/app/docs
       - ./tests:/usr/src/app/tests
@@ -12,26 +14,66 @@ services:
       - ./setup.py:/usr/src/app/setup.py
       - ./tox.ini:/usr/src/app/tox.ini
     environment:
-      BDB_HOST: bdb-server
-      BIGCHAINDB_KEYPAIR_PUBLIC: GW1nrdZm4mbVC8ePeiGWz6DqHexqewqy5teURVHi3RG4
+      BDB_HOST: bigchaindb
       BIGCHAINDB_DATABASE_BACKEND: mongodb
     command: pytest -v
-  db:
-    image: mongo:3.4.3
+  mongodb:
+    image: mongo:3.4.13
     ports:
       - "27017"
-    command: mongod --replSet=bigchain-rs
-  bdb-server:
-    build: ./compose/server
+    command: mongod
+  bigchaindb:
+    depends_on:
+      - mongodb
+      - tendermint
+    build:
+      context: .
+      dockerfile: ./compose/bigchaindb_server/Dockerfile
+      args:
+        branch: master
+        backend: localmongodb
     environment:
-      BIGCHAINDB_DATABASE_BACKEND: mongodb
-      BIGCHAINDB_DATABASE_HOST: db
+      BIGCHAINDB_DATABASE_HOST: mongodb
       BIGCHAINDB_DATABASE_PORT: 27017
       BIGCHAINDB_SERVER_BIND: 0.0.0.0:9984
       BIGCHAINDB_WSSERVER_HOST: 0.0.0.0
-      BIGCHAINDB_KEYPAIR_PUBLIC: GW1nrdZm4mbVC8ePeiGWz6DqHexqewqy5teURVHi3RG4
-      BIGCHAINDB_KEYPAIR_PRIVATE: 2kQgBtQnHoauw8QchKM7xYvEBW1QDoHzhBsCL9Vi1AzB 
+      BIGCHAINDB_TENDERMINT_HOST: tendermint
+      BIGCHAINDB_TENDERMINT_PORT: 46657
     ports:
       - "9984"
       - "9985"
-    command: bigchaindb start
+      - "46658"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl http://bigchaindb:9984 && curl http://tendermint:46657/abci_query"]
+      interval: 3s
+      timeout: 5s
+      retries: 3
+    command: bigchaindb -l DEBUG start
+  tendermint:
+    image: tendermint/tendermint:0.12
+    volumes:
+      - ./compose/tendermint/tmdata/config.toml:/tendermint/config.toml
+    entrypoint: ''
+    ports:
+      - "46656"
+      - "46657"
+    command: bash -c "tendermint init && tendermint node"
+  # Build docs only
+  # docker-compose build bdocs
+  # docker-compose up -d bdocs
+  bdocs:
+    depends_on:
+      - vdocs
+    build:
+      context: .
+      dockerfile: ./compose/bigchaindb_driver/Dockerfile
+    volumes:
+      - .:/usr/src/app/
+    command: make -C docs html
+  vdocs:
+    image: nginx
+    ports:
+      - '55555:80'
+    volumes:
+      - ./docs/_build/html:/usr/share/nginx/html
+

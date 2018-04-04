@@ -140,30 +140,6 @@ Notice the transaction ``id``:
 
     In [0]: txid
 
-To check the status of the transaction:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(txid)
-
-.. note:: It may take a small amount of time before a BigchainDB cluster
-    confirms a transaction as being valid.
-
-Here's some code that keeps checking the status of the transaction until it is valid:
-
-.. code-block:: python
-
-    >>> trials = 0
-
-    >>> while trials < 100:
-    ...     try:
-    ...         if bdb.transactions.status(txid).get('status') == 'valid':
-    ...             break
-    ...     except bigchaindb_driver.exceptions.NotFoundError:
-    ...         trials += 1
-
-    >>> bdb.transactions.status(txid)
-    {'status': 'valid'}
 
 .. _bicycle-transfer:
 
@@ -324,20 +300,6 @@ Recap: Asset Creation & Transfer
 
     txid = fulfilled_creation_tx['id']
 
-    trials = 0
-    while trials < 60:
-        try:
-            if bdb.transactions.status(txid).get('status') == 'valid':
-                print('Tx valid in:', trials, 'secs')
-                break
-        except bigchaindb_driver.exceptions.NotFoundError:
-            trials += 1
-            sleep(1)
-
-    if trials == 60:
-        print('Tx is still being processed... Bye!')
-        exit(0)
-
     asset_id = txid
 
     transfer_asset = {
@@ -377,42 +339,6 @@ Recap: Asset Creation & Transfer
         fulfilled_transfer_tx['inputs'][0]['owners_before'][0] == alice.public_key)
 
 
-Transaction Status
-------------------
-Using the ``id`` of a transaction, its status can be obtained:
-
-.. code-block:: python
-
-    >>> bdb.transactions.status(creation_tx['id'])
-    {'status': 'valid'}
-
-Handling cases for which the transaction ``id`` may not be found:
-
-.. code-block:: python
-
-    import logging
-
-    from bigchaindb_driver import BigchainDB
-    from bigchaindb_driver.exceptions import NotFoundError
-
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(format='%(asctime)-15s %(status)-3s %(message)s')
-
-    bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
-    bdb = BigchainDB(bdb_root_url)
-    txid = '12345'
-    try:
-        status = bdb.transactions.status(txid)
-    except NotFoundError as e:
-        logger.error('Transaction "%s" was not found.',
-                     txid,
-                     extra={'status': e.status_code})
-
-Running the above code should give something similar to:
-
-.. code-block:: bash
-
-    2016-09-29 15:06:30,606 404 Transaction "12345" was not found.
 
 
 .. _bicycle-divisible-assets:
@@ -702,7 +628,7 @@ Let's try it:
                                          'type': 'ed25519-sha-256'},
                              'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
                'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
-    'version': '1.0'},
+    'version': '2.0'},
     {'asset': {'id': 'b2403bb6bb7f9c0af2bc2b5b03b291a378fd8499f44cade4aa14dd5419e5b7c7'},
     'id': '3ce3a5d4d984ca92f4a34967a2c181dbe8da8d6e4477220d7869ada9379dc410',
     'inputs': [{'fulfillment': 'pGSAIHTmVLbdfDFHTBx6gVr4NczRN-D1MhHltB0nn79luYlfgUCrppCotKAZoVW7nKye4I2HzGxlgwjmx47w_HxGXOFVbvCppNTLeVX4NrHYFRJlv8QKgj_ZaLctHpT6HPLLYIIG',
@@ -721,7 +647,7 @@ Let's try it:
                                          'type': 'ed25519-sha-256'},
                              'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
                'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
-    'version': '1.0'}]
+    'version': '2.0'}]
 
 
 If you were busy sharing your bicycle with the whole city you might have a really long list.
@@ -745,7 +671,8 @@ So let's limit the results and just see the ``CREATE`` transaction.
                                          'type': 'ed25519-sha-256'},
                              'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
                'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
-    'version': '1.0'}]
+    'version': '2.0'}]
+
 
 Querying for Metadata
 ---------------------

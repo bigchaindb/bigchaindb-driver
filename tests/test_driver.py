@@ -7,7 +7,6 @@ from pytest import mark, raises
 from requests.utils import default_headers
 from sha3 import sha3_256
 
-import bigchaindb
 from cryptoconditions import Ed25519Sha256
 
 
@@ -35,12 +34,11 @@ class TestBigchainDB:
         assert driver.transactions
         assert driver.outputs
 
-    def test_info(self, driver, bdb_node_pubkey):
+    def test_info(self, driver):
         response = driver.info()
         assert 'api' in response
         assert 'docs' in response
         assert response['keyring'] == []
-        assert response['public_key'] == bdb_node_pubkey
         assert response['software'] == 'BigchainDB'
         assert 'version' in response
 
@@ -50,7 +48,6 @@ class TestBigchainDB:
         assert response['assets'] == '/assets/'
         assert response['outputs'] == '/outputs/'
         assert response['transactions'] == '/transactions/'
-        assert response['statuses'] == '/statuses/'
 
 
 class TestTransactionsEndpoint:
@@ -65,17 +62,6 @@ class TestTransactionsEndpoint:
         txid = 'dummy_id'
         with raises(NotFoundError):
             driver.transactions.retrieve(txid)
-
-    def test_status(self, driver, persisted_alice_transaction):
-        txid = persisted_alice_transaction['id']
-        status = driver.transactions.status(txid)
-        assert status['status'] == 'valid'
-
-    def test_status_not_found(self, driver):
-        from bigchaindb_driver.exceptions import NotFoundError
-        txid = 'dummy_id'
-        with raises(NotFoundError):
-            driver.transactions.status(txid)
 
     def test_prepare(self, driver, alice_pubkey):
         transaction = driver.transactions.prepare(signers=[alice_pubkey])
@@ -120,6 +106,26 @@ class TestTransactionsEndpoint:
         sent_tx = driver.transactions.send(fulfilled_tx)
         assert sent_tx == fulfilled_tx
 
+    def test_send_wrong_mode(self, driver,
+                             alice_privkey, unsigned_transaction):
+        from bigchaindb_driver.exceptions import BadRequest
+        fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
+                                                   private_keys=alice_privkey)
+        with raises(BadRequest) as error:
+            driver.transactions.send(fulfilled_tx, mode='mode')
+            assert error.exception.message == \
+                'Mode must be "async", "sync" or "commit"'
+
+    @mark.parametrize('mode_params', (
+        'sync', 'commit'
+    ))
+    def test_send_with_mode(self, driver, alice_privkey,
+                            unsigned_transaction, mode_params):
+        fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
+                                                   private_keys=alice_privkey)
+        sent_tx = driver.transactions.send(fulfilled_tx, mode=mode_params)
+        assert sent_tx == fulfilled_tx
+
     def test_get_raises_type_error(self, driver):
         """This test is somewhat important as it ensures that the
         signature of the method requires the ``asset_id`` argument.
@@ -138,9 +144,9 @@ class TestTransactionsEndpoint:
         response = driver.transactions.get(asset_id='a' * 64)
         assert response == []
 
-    @mark.parametrize('operation,tx_qty', (
+    @mark.parametrize('operation,tx_qty', [
         (None, 3), ('CREATE', 1), ('TRANSFER', 2)
-    ))
+    ])
     @mark.usefixtures('persisted_transfer_dimi_car_to_ewy')
     def test_get(self, driver,
                  signed_carol_car_transaction, operation, tx_qty):
@@ -207,17 +213,15 @@ class TestOutputsEndpoint:
 class TestBlocksEndppoint:
 
     def test_get(self, driver, persisted_alice_transaction):
-        blocks = driver.blocks.get(txid=persisted_alice_transaction['id'])
-        assert isinstance(blocks, list)
-        assert len(blocks) == 1
+        block_id = driver.blocks.get(txid=persisted_alice_transaction['id'])
+        assert block_id
 
     def test_retrieve(self, driver, block_with_alice_transaction):
-        block = driver.blocks.retrieve(block_id=block_with_alice_transaction)
+        block = driver.blocks.retrieve(
+            block_height=str(block_with_alice_transaction))
         assert block
 
 
-@mark.skipif(bigchaindb.config['database']['backend'] != 'mongodb',
-             reason='Requires MongoDB as the backend')
 class TestAssetsMetadataEndpoint:
 
     def test_assets_get_search_no_results(self, driver):

@@ -252,7 +252,7 @@ def prepare_transfer_transaction(*,
                                                         'type': 'ed25519-sha-256'},
                                             'uri': 'ni:///sha-256;7ApQLsLLQgj5WOUipJg1txojmge68pctwFxvc3iOl54?fpt=ed25519-sha-256&cost=131072'},
                               'public_keys': ['3Cxh1eKZk3Wp9KGBWFS7iVde465UvqUKnEqTg2MW4wNf']}],
-                 'version': '1.0'}
+                 'version': '2.0'}
 
         Then, the input may be constructed in this way::
 

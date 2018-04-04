@@ -172,11 +172,6 @@ def bdb_port():
 
 
 @fixture
-def bdb_node_pubkey():
-    return environ['BIGCHAINDB_KEYPAIR_PUBLIC']
-
-
-@fixture
 def bdb_node(bdb_host, bdb_port):
     return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
 
@@ -194,7 +189,7 @@ def api_root(bdb_node):
 
 @fixture
 def transactions_api_full_url(api_root):
-    return api_root + '/transactions'
+    return api_root + '/transactions?mode=commit'
 
 
 @fixture
@@ -239,7 +234,6 @@ def signed_alice_transaction(alice_privkey, alice_transaction_obj):
 
 
 @fixture
-@await_transaction
 def persisted_alice_transaction(signed_alice_transaction,
                                 transactions_api_full_url):
     response = requests.post(transactions_api_full_url,
@@ -288,7 +282,7 @@ def prepared_carol_bicycle_transaction(carol_keypair, bicycle_data):
         'operation': 'CREATE',
         'outputs': (condition,),
         'inputs': (fulfillment,),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     return tx
@@ -310,7 +304,6 @@ def signed_carol_bicycle_transaction(request, carol_keypair,
 
 
 @fixture
-@await_transaction
 def persisted_carol_bicycle_transaction(transactions_api_full_url,
                                         signed_carol_bicycle_transaction):
     response = requests.post(
@@ -330,7 +323,7 @@ def prepared_carol_car_transaction(carol_keypair, car_data):
         'operation': 'CREATE',
         'outputs': (condition,),
         'inputs': (fulfillment,),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     return tx
@@ -387,7 +380,7 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
             },
             'owners_before': (carol_keypair.public_key,),
         },),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     serialized_transaction = json.dumps(
@@ -440,7 +433,7 @@ def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
             },
             'owners_before': (dimi_keypair.public_key,),
         },),
-        'version': '1.0',
+        'version': '2.0',
         'id': None,
     }
     serialized_transaction = json.dumps(
@@ -474,7 +467,7 @@ def unsigned_transaction():
                 'serial_number': 'NNP43x-DaYoSWg=='
             }
         },
-        'version': '1.0',
+        'version': '2.0',
         'outputs': [
             {
                 'condition': {
