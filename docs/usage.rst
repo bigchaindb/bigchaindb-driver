@@ -495,6 +495,7 @@ The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
     >>> sent_transfer_tx == fulfilled_transfer_tx
     True
 
+.. _query-for-assets:
 
 Querying for Assets
 -------------------
@@ -519,6 +520,9 @@ Let's create 3 assets:
     hello_1 = {'data': {'msg': 'Hello BigchainDB 1!'},}
     hello_2 = {'data': {'msg': 'Hello BigchainDB 2!'},}
     hello_3 = {'data': {'msg': 'Hello BigchainDB 3!'},}
+
+    # set the metadata to query for it in an example below
+    metadata={'planet': 'earth'}
 
     prepared_creation_tx = bdb.transactions.prepare(
         operation='CREATE',
@@ -668,3 +672,56 @@ So let's limit the results and just see the ``CREATE`` transaction.
                              'uri': 'ni:///sha-256;PN3UO9GztlEBitIZf5m4iYNgyexvOk6Sdjq3PANsxko?fpt=ed25519-sha-256&cost=131072'},
                'public_keys': ['8sKzvruHPhH3LKoGZDJE9MRzpgfFQJGZhzHTghebbFne']}],
     'version': '2.0'}]
+
+
+Querying for Metadata
+---------------------
+
+This query is similar to the asset query. The search is applied to all the strings inside
+the metadata and returns all the metadata that match a given text search string.
+The only difference is the returned ``id``.
+The ``id`` of the asset query is the same ``id`` of the transaction that created the asset.
+Whereas the ``id`` of the metadata is the same ``id`` of the transaction where it was defined.
+
+In the :ref:`query-for-assets` example we already set the metadata for the three transactions.
+Let's perform a text search for all metadata that contain the word ``earth``:
+
+.. code-block:: python
+
+    >> bdb.metadata.get(search='earth')
+    [
+        {
+            'id': '3677de9c637e8e7848dd415058525306693d44cc3578d0ae4812e3570e9e6f9b',
+            'metadata': {'planet': 'earth'}
+        },
+        {
+            'id': 'd818741e0b9550dfe4b9ff0745c036664ab2b2e6e7d82a7508f2e79d587595ff',
+            'metadata': {'planet': 'earth'}
+        },
+        {
+            'id': '85a82b6fbceb08f79796cb0c286156aac25e92729d377220d65b14be90334c25',
+            'metadata': {'planet': 'earth'}
+        }
+    ]
+
+This call returns all the metadata that match the string ``earth``, sorted
+by `text score
+<https://docs.mongodb.com/manual/reference/operator/query/text/#text-operator-text-score>`_,
+as well as the transaction ``id``.
+
+It's also possible to limit the amount of returned results using the ``limit``
+argument:
+
+.. code-block:: python
+
+    >> bdb.metadata.get(search='earth', limit=2)
+    [
+        {
+            'id': '3677de9c637e8e7848dd415058525306693d44cc3578d0ae4812e3570e9e6f9b',
+            'metadata': {'planet': 'earth'}
+        },
+        {
+            'id': 'd818741e0b9550dfe4b9ff0745c036664ab2b2e6e7d82a7508f2e79d587595ff',
+            'metadata': {'planet': 'earth'}
+        }
+    ]

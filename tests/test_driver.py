@@ -222,14 +222,14 @@ class TestBlocksEndppoint:
         assert block
 
 
-class TestAssetsEndpoint:
+class TestAssetsMetadataEndpoint:
 
-    def test_get_search_no_results(self, driver):
+    def test_assets_get_search_no_results(self, driver):
         # no asset matches the search string
         response = driver.assets.get(search='abcdef')
         assert response == []
 
-    def test_get_search(self, driver, text_search_assets):
+    def test_assets_get_search(self, driver, text_search_assets):
         # we have 3 assets that match 'bigchaindb' in text_search_assets
         response = driver.assets.get(search='bigchaindb')
         assert len(response) == 3
@@ -237,8 +237,24 @@ class TestAssetsEndpoint:
         for asset in response:
             assert text_search_assets[asset['id']] == asset['data']
 
-    def test_get_search_limit(self, driver, text_search_assets):
+    def test_assets_get_search_limit(self, driver, text_search_assets):
         # we have 3 assets that match 'bigchaindb' in text_search_assets but
         # we are limiting the number of returned results to 2
         response = driver.assets.get(search='bigchaindb', limit=2)
+        assert len(response) == 2
+
+    def test_metadata_get_search_no_results(self, driver):
+        # no metadata matches the search string
+        response = driver.metadata.get(search='abcdef')
+        assert response == []
+
+    def test_metadata_get_search(self, driver, text_search_assets):
+        # we have 3 transactions that match 'call me maybe' in our block
+        response = driver.metadata.get(search='call me maybe')
+        assert len(response) == 3
+
+    def test_metadata_get_search_limit(self, driver, text_search_assets):
+        # we have 3 transactions that match 'call me maybe' in our block
+        # we are limiting the number of returned results to 2
+        response = driver.metadata.get(search='call me maybe', limit=2)
         assert len(response) == 2
