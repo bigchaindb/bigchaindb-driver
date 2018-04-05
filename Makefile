@@ -22,7 +22,7 @@ define PRINT_HELP_PYSCRIPT
 import re, sys
 
 print("BigchainDB Driver 0.5 developer toolbox")
-print("--------------------------------")
+print("---------------------------------------")
 print("Usage:  make COMMAND")
 print("")
 print("Commands:")
