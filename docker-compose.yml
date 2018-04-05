@@ -13,6 +13,7 @@ services:
       - ./bigchaindb_driver:/usr/src/app/bigchaindb_driver
       - ./setup.py:/usr/src/app/setup.py
       - ./tox.ini:/usr/src/app/tox.ini
+      - ./htmlcov:/usr/src/app/htmlcov
     environment:
       BDB_HOST: bigchaindb
       BIGCHAINDB_DATABASE_BACKEND: mongodb
