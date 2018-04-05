@@ -657,8 +657,8 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -1116,8 +1116,8 @@ In a nutshell
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -1240,8 +1240,8 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -1371,8 +1371,8 @@ to Bob:
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -1441,8 +1441,8 @@ Say ``alice`` and ``bob`` own a car together:
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -1874,8 +1874,8 @@ Handcrafting the ``'CREATE'`` transaction
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -1981,8 +1981,8 @@ Handcrafting the ``'TRANSFER'`` transaction
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -2127,8 +2127,8 @@ Handcrafting the ``'CREATE'`` transaction
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
@@ -2232,8 +2232,8 @@ Handcrafting the ``'TRANSFER'`` transaction
 To send it over to BigchainDB we have different options. A `mode` parameter can be used to change the broadcasting API
 used in `Tendermint <http://tendermint.readthedocs.io/projects/tools/en/master/using-tendermint.html#broadcast-api>`_.
 By setting the mode, a new transaction can be pushed with a different mode than the default. The default mode is
-``async``, which will return immediately and not wait to see if the transaction is valid. The ``sync`` mode will return
-after the transaction is validated, while ``commit`` returns after the transaction is committed to a block.
+``commit``, which will wait until the transaction is committed to a block or a timeout is reached. The ``sync`` mode
+will return after the transaction is validated, while ``async`` will return right away.
 
 .. code-block:: python
 
