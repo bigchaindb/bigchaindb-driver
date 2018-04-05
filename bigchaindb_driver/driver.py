@@ -304,7 +304,7 @@ class TransactionsEndpoint(NamespacedDriver):
             headers=headers,
         )
 
-    def send(self, transaction, mode='async', headers=None):
+    def send(self, transaction, mode='commit', headers=None):
         """Submit a transaction to the Federation.
 
         Args:
