@@ -53,7 +53,6 @@ class TestBigchainDB:
 class TestTransactionsEndpoint:
 
     def test_retrieve(self, driver, persisted_random_transaction):
-        # import pdb; pdb.set_trace()
         txid = persisted_random_transaction['id']
         tx = driver.transactions.retrieve(txid)
         assert tx['id'] == txid
