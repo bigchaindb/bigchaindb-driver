@@ -39,12 +39,19 @@ We recommend you use a virtual environment for running `bigchaindb-driver`, to i
 .. code-block:: text
 
     pip install -U bigchaindb-driver
-    
+
 If this fails, ensure you have python 3 installed, if you have both versions of python installed, to install and update using `pip`:
 
 .. code-block:: text
 
     pip3 install -U bigchaindb-driver
+
+Get Started with BigchainDB Server
+------------------------------------
+* `Set Up & Run a Dev/Test Node`_
+* `Run BigchainDB Server with Docker`_
+* `Run BigchainDB Server with Vagrant`_
+* `Run BigchainDB Server with Ansible`_
 
 Compatibility Matrix
 --------------------
@@ -77,3 +84,7 @@ This package was initially created using Cookiecutter_ and the `audreyr/cookiecu
 .. _cryptoconditions: https://github.com/bigchaindb/cryptoconditions
 .. _pynacl: https://github.com/pyca/pynacl/
 .. _Networking and Cryptography library: https://nacl.cr.yp.to/
+.. _Set Up & Run a Dev/Test Node: https://docs.bigchaindb.com/projects/server/en/latest/dev-and-test/index.html
+.. _Run BigchainDB Server with Docker: https://docs.bigchaindb.com/projects/server/en/latest/appendices/run-with-docker.html
+.. _Run BigchainDB Server with Vagrant: https://docs.bigchaindb.com/projects/server/en/latest/appendices/run-with-vagrant.html
+.. _Run BigchainDB Server with Ansible: https://docs.bigchaindb.com/projects/server/en/latest/appendices/run-with-ansible.html
