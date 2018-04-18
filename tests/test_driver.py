@@ -116,6 +116,7 @@ class TestTransactionsEndpoint:
             assert error.exception.message == \
                 'Mode must be "async", "sync" or "commit"'
 
+    @mark.skip(reason='transactions are not yet unique')
     @mark.parametrize('mode_params', (
         'sync', 'commit'
     ))
