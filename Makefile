@@ -52,7 +52,7 @@ install: clean ## Install the package to the active Python's site-packages
 	python setup.py install
 
 start: check-deps ## Run BigchainDB driver from source and daemonize it (stop with `make stop`)
-	@$(DC) up -d bigchaindb-driver
+	@$(DC) up -d bigchaindb
 
 stop: check-deps ## Stop BigchainDB driver
 	@$(DC) stop
