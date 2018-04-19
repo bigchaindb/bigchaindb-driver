@@ -52,8 +52,8 @@ class TestBigchainDB:
 
 class TestTransactionsEndpoint:
 
-    def test_retrieve(self, driver, persisted_alice_transaction):
-        txid = persisted_alice_transaction['id']
+    def test_retrieve(self, driver, persisted_random_transaction):
+        txid = persisted_random_transaction['id']
         tx = driver.transactions.retrieve(txid)
         assert tx['id'] == txid
 
@@ -213,8 +213,8 @@ class TestOutputsEndpoint:
 
 class TestBlocksEndppoint:
 
-    def test_get(self, driver, persisted_alice_transaction):
-        block_id = driver.blocks.get(txid=persisted_alice_transaction['id'])
+    def test_get(self, driver, persisted_random_transaction):
+        block_id = driver.blocks.get(txid=persisted_random_transaction['id'])
         assert block_id
 
     def test_retrieve(self, driver, block_with_alice_transaction):

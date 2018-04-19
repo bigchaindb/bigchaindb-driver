@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.0a2 (2018-04-18)
+---------------------
+* `The default mode for sending a transaction is now commit <https://github.com/bigchaindb/bigchaindb-driver/issues/386>`_.
+* `The metadata endpoint was added <https://github.com/bigchaindb/bigchaindb-driver/issues/347>`_.
+* Support for BigchainDB server v2.0.0a2.
+
+
 0.5.0a1 (2018-04-03)
 --------------------
 There were **many** changes between BigchainDB 1.3 and BigchainDB 2.0 Alpha, too many to list here. We wrote a series of blog posts to summarize most changes, especially those that affect end users and application developers:

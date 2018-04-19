@@ -39,7 +39,7 @@ We recommend you use a virtual environment for running `bigchaindb-driver`, to i
 .. code-block:: text
 
     pip install -U bigchaindb-driver
-    
+
 If this fails, ensure you have python 3 installed, if you have both versions of python installed, to install and update using `pip`:
 
 .. code-block:: text
@@ -52,7 +52,9 @@ Compatibility Matrix
 +-----------------------+---------------------------+
 | **BigchainDB Server** | **BigchainDB Driver**     |
 +=======================+===========================+
-| ``>= 2.0.0``          | ``0.5.x``                 |
+| ``>= 2.0.0a2``        | ``0.5.0a2``               |
++-----------------------+---------------------------+
+| ``>= 2.0.0a1``        | ``0.5.0a1``               |
 +-----------------------+---------------------------+
 | ``>= 1.0.0``          | ``0.4.x``                 |
 +-----------------------+---------------------------+
