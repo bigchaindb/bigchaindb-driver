@@ -68,6 +68,9 @@ Compatibility Matrix
 `Although we do our best to keep the master branches in sync, there may be
 occasional delays.`
 
+License
+--------
+* `licenses`_ - open source & open content
 
 Credits
 -------
@@ -79,3 +82,4 @@ This package was initially created using Cookiecutter_ and the `audreyr/cookiecu
 .. _cryptoconditions: https://github.com/bigchaindb/cryptoconditions
 .. _pynacl: https://github.com/pyca/pynacl/
 .. _Networking and Cryptography library: https://nacl.cr.yp.to/
+.. _licenses: https://github.com/bigchaindb/bigchaindb-driver/blob/master/LICENSES.md
