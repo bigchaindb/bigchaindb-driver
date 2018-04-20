@@ -6,6 +6,7 @@ Contributing
 
 Contributions are welcome, and they are greatly appreciated! Every
 little bit helps, and credit will always be given.
+If you want to read about our guidelines for contributing, we are using C4 and you can't find it here: `C4`_
 
 You can contribute in many ways:
 
@@ -34,6 +35,12 @@ Implement Features
 
 Look through the GitHub issues for features. Anything tagged with "enhancement"
 and "help wanted" is open to whoever wants to implement it.
+
+Make a Feature Request or Proposal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To make a feature request or proposal, write a `BigchaindB Enhancement Proposal (BEP)`_:
+
+We use `COSS` to handle BEPs, you can read about it here: `COSS`_
 
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
@@ -121,3 +128,7 @@ against BigchainDB's API.
 
 
 .. _docker-compose.yml: https://github.com/bigchaindb/bigchaindb-driver/blob/master/docker-compose.yml
+.. _BigchaindB Enhancement Proposal (BEP): https://github.com/bigchaindb/BEPs
+.. _C4: https://github.com/bigchaindb/BEPs/tree/master/1
+.. _COSS: https://github.com/bigchaindb/BEPs/tree/master/2
+
