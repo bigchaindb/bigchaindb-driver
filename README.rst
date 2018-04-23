@@ -38,7 +38,7 @@ Features
 Install
 ----------
 
-We recommend you use a virtual environment for running `bigchaindb-driver`, to install and update using `pip`:
+We recommend you use a virtual environment to install and update to the latest stable version using `pip`:
 
 .. code-block:: text
 
@@ -49,6 +49,8 @@ If this fails, ensure you have python 3 installed, if you have both versions of 
 .. code-block:: text
 
     pip3 install -U bigchaindb-driver
+
+If you want to install a non-stable version, i.e. a pre-release, check out the `pypi history`_ and choose your version to install.
 
 Compatibility Matrix
 --------------------
@@ -87,3 +89,4 @@ This package was initially created using Cookiecutter_ and the `audreyr/cookiecu
 .. _pynacl: https://github.com/pyca/pynacl/
 .. _Networking and Cryptography library: https://nacl.cr.yp.to/
 .. _licenses: https://github.com/bigchaindb/bigchaindb-driver/blob/master/LICENSES.md
+.. _pypi history: https://pypi.org/project/bigchaindb-driver/#history
