@@ -59,6 +59,11 @@ services:
       - "46656"
       - "46657"
     command: bash -c "tendermint init && tendermint node"
+  bdb:
+    image: busybox
+    depends_on:
+      bigchaindb:
+        condition: service_healthy
   # Build docs only
   # docker-compose build bdocs
   # docker-compose up -d bdocs
