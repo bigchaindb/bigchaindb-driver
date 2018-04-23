@@ -56,6 +56,7 @@ setup(
                  'bigchaindb_driver'},
     include_package_data=True,
     install_requires=install_requires,
+    python_requires='>=3.5',
     license="Apache Software License 2.0",
     zip_safe=False,
     keywords='bigchaindb_driver',
