@@ -11,7 +11,10 @@ with open('CHANGELOG.rst') as changelog_file:
 
 install_requires = [
     'requests>=2.11.0',
-    'bigchaindb~=2.0.0a2',
+    'cryptoconditions~=0.6.0.dev',
+    'pysha3~=1.0.2',
+    'python-rapidjson==0.0.11',
+    'python-rapidjson-schema==0.1.1',
 ]
 
 tests_require = [

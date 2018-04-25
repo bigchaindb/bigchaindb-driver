@@ -5,13 +5,13 @@ a connection to one or more  BigchainDB federation nodes.
 import logging
 from functools import singledispatch
 
-from bigchaindb.common.transaction import (
+from .common.transaction import (
     Input,
     Transaction,
     TransactionLink,
     _fulfillment_from_details
 )
-from bigchaindb.common.exceptions import KeypairMismatchException
+from .common.exceptions import KeypairMismatchException
 
 from .exceptions import BigchaindbException, MissingPrivateKeyError
 from .utils import (
