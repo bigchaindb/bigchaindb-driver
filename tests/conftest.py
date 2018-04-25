@@ -11,7 +11,7 @@ from cryptoconditions import Ed25519Sha256
 from pytest import fixture
 from sha3 import sha3_256
 
-from bigchaindb.common.transaction import Transaction, _fulfillment_to_details
+from bigchaindb_driver.common.transaction import Transaction, _fulfillment_to_details
 
 
 # FIXME The sleep, or some other approach is required to wait for the
@@ -246,7 +246,7 @@ def persisted_random_transaction(alice_pubkey,
                                  alice_privkey,
                                  transactions_api_full_url):
     from uuid import uuid4
-    from bigchaindb.common.transaction import Transaction
+    from bigchaindb_driver.common.transaction import Transaction
     asset = {'data': {'x': str(uuid4())}}
     tx = Transaction.create(
         tx_signers=[alice_pubkey],
