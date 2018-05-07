@@ -65,7 +65,6 @@ test: check-deps ## Run all tests once or specify a file/test with TEST=tests/fi
 
 test-watch: check-deps ## Run all, or only one with TEST=tests/file.py::Class::test, tests and wait. Every time you change code, test/s will be run again.
 	@$(DC) run --rm bigchaindb-driver pytest ${TEST} -f -v
-	@$(DC) run --rm bigchaindb-driver pytest ${TEST} -f -v
 
 docs: ## Generate Sphinx HTML documentation, including API docs
 	@$(DC) run --rm --no-deps bdocs make -C docs html
@@ -80,7 +79,6 @@ cov: check-deps ## Check code coverage and open the result in the browser
 
 clean: clean-build clean-pyc clean-test ## Remove all build, test, coverage and Python artifacts
 	@$(ECHO) "Cleaning was successful."
-
 
 release: clean ## Package and upload a release
 	python setup.py sdist upload
