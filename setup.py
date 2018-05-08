@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -52,9 +52,7 @@ setup(
     author="BigchainDB",
     author_email='dev@bigchaindb.com',
     url='https://github.com/bigchaindb/bigchaindb-driver',
-    packages=[
-        'bigchaindb_driver',
-    ],
+    packages=find_packages(exclude=['tests*']),
     package_dir={'bigchaindb_driver':
                  'bigchaindb_driver'},
     include_package_data=True,
