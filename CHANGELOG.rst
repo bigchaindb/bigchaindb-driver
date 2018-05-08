@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.5.0a3 (2018-05-07)
+---------------------
+* `Removed dependencies from BigchainDB Server package <https://github.com/bigchaindb/bigchaindb-driver/pull/411>`_.
+
 0.5.0a2 (2018-04-18)
 ---------------------
 * `The default mode for sending a transaction is now commit <https://github.com/bigchaindb/bigchaindb-driver/issues/386>`_.

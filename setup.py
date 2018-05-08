@@ -46,7 +46,7 @@ docs_require = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.5.0a2',
+    version='0.5.0a3',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
@@ -78,7 +78,4 @@ setup(
         'dev': dev_require + tests_require + docs_require,
         'docs': docs_require,
     },
-    dependency_links=[
-        'git+https://github.com/bigchaindb/bigchaindb.git@master#egg=bigchaindb-2.0.0a2',
-    ],
 )
