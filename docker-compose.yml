@@ -52,8 +52,6 @@ services:
     command: bigchaindb -l DEBUG start
   tendermint:
     image: tendermint/tendermint:0.19.2
-    volumes:
-      - ./compose/tendermint/tmdata/config.toml:/tendermint/config.toml
     entrypoint: ''
     ports:
       - "46656"
