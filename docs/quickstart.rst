@@ -9,11 +9,24 @@ The BigchainDB Python Driver depends on:
 3. A recent Python 3 version of ``setuptools``
 4. cryptography and cryptoconditions
 
-If you're missing one of those, then see below. Otherwise, you can install the BigchainDB Python Driver (``bigchaindb_driver``) using:
+If you're missing one of those, then see "How to Install the Dependencies" below before proceeding.
+
+Next, to install the latest *stable* BigchainDB Python Driver (``bigchaindb_driver``) use:
 
 .. code-block:: bash
 
     $ pip3 install bigchaindb_driver
+
+If you want to install an Alpha, Beta or RC version of the Python Driver, use something like:
+
+.. code-block:: bash
+
+    $ pip3 install bigchaindb_driver==0.5.0a4
+
+The above command will install version 0.5.0a4 (Alpha 4).
+You can find a list of all versions in
+`the release history page on PyPI <https://pypi.org/project/bigchaindb-driver/#history>`_.
+
 
 Next: :doc:`determine the BigchainDB Root URL of the BigchainDB node or cluster you want to connect to <connect>`.
 
