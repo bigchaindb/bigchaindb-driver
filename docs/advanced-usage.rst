@@ -347,7 +347,8 @@ Fulfill the transaction
        ...:     private_keys=alice.private_key,
        ...: )
 
-Send the transaction over to the node
+Send the transaction over to the node and an error will occur, informing the user of the double spend and
+specifying the matching `asset_id`.
 
 .. code-block:: python
 
@@ -357,10 +358,7 @@ Send the transaction over to the node
     ... except BigchaindbException as e:
     ...     print(e.info)
 
-    {'message': 'Invalid transaction', 'status': 400}
-
-.. todo:: Update the above output once
-    https://github.com/bigchaindb/bigchaindb/issues/664 is taken care of.
+    {'message': 'Invalid transaction (DoubleSpend): input `20401005e1ad1745cdb3716715749475dce3c8358189af37d1a6676a52733e16` was already spent', 'status': 400}
 
 .. _car-multiple-owners:
 
