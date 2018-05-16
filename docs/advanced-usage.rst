@@ -115,23 +115,27 @@ Recap: Asset Creation
     sent_tx = bdb.transactions.send(signed_tx)
     sent_tx == signed_tx
 
-Read the Creation Transaction from the DB
------------------------------------------
+Check if the Transaction was sent successfully
+-----------------------------------------------
 
-After a couple of seconds, we can check if the transaction was validated in a
+After a couple of seconds, we can check if the transaction was included in a
 block.
 
 .. code-block:: python
 
-    # Retrieve a block height
+    # Retrieve the block height
     >>> block_height = bdb.blocks.get(txid=signed_tx['id'])
 
-This will return the block height containing the transaction. If the transaction is not in any block then ``None`` is returned. If we want some more data we can use the block height to retrieve the block itself.
+This will return the block height containing the transaction. If the transaction is not in any block then ``None`` is
+returned. If it is ``None`` it can have different reasons for example the transaction was not valid or is
+still in the queue and you can try again later. If the transaction was invalid or could not be sent an exception is raised.
+
+If we want to see the whole block we can use the block height to retrieve the block itself.
 
 .. code-block:: python
 
-    # Retrieve a block
-    >>> block = bdb.blocks.retrieve(block_height)
+    # Retrieve the block that contains the transaction
+    >>> block = bdb.blocks.retrieve(str(block_height))
 
 The new owner of the digital asset is now Alice (or more correctly, her *public
 key*):
