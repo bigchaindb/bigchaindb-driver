@@ -127,8 +127,8 @@ block.
     >>> block_height = bdb.blocks.get(txid=signed_tx['id'])
 
 This will return the block height containing the transaction. If the transaction is not in any block then ``None`` is
-returned. If it is ``None`` it can have different reasons for example the transaction was not valid or is
-still in the queue and you can try again later. If the transaction was invalid or could not be sent an exception is raised.
+returned. If it is ``None`` it can have different reasons for example the transaction was invalid or is still in the
+queue and you can try again later. If the transaction was invalid or could not be sent an exception is raised.
 
 If we want to see the whole block we can use the block height to retrieve the block itself.
 
