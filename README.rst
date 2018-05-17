@@ -52,6 +52,10 @@ If this fails, ensure you have python 3 installed, if you have both versions of 
 
 If you want to install a non-stable version, i.e. a pre-release, check out the `pypi history`_ and choose your version to install.
 
+Get Started with BigchainDB Server
+------------------------------------
+* `BigchainDB Server Quickstart`_
+
 Compatibility Matrix
 --------------------
 
@@ -90,5 +94,6 @@ This package was initially created using Cookiecutter_ and the `audreyr/cookiecu
 .. _cryptoconditions: https://github.com/bigchaindb/cryptoconditions
 .. _pynacl: https://github.com/pyca/pynacl/
 .. _Networking and Cryptography library: https://nacl.cr.yp.to/
+.. _BigchainDB Server Quickstart: https://docs.bigchaindb.com/projects/server/en/latest/quickstart.html
 .. _licenses: https://github.com/bigchaindb/bigchaindb-driver/blob/master/LICENSES.md
 .. _pypi history: https://pypi.org/project/bigchaindb-driver/#history
