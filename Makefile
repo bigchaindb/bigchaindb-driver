@@ -85,7 +85,7 @@ release: dist ## package and upload a release
 	twine upload dist/*
 
 root-url:
-	@docker-compose port bigchaindb 9984
+	@$(DC) port bigchaindb 9984
 
 ###############
 # Sub targets #

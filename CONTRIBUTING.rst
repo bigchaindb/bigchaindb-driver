@@ -103,10 +103,13 @@ You can monitor the logs::
 
     $ docker-compose logs -f
 
-Additionally, we have a nice Makefile to make things easier for everyone. Some helpful commands are::
+Additionally, we have a nice Makefile to make things easier for everyone. Some helpful commands are
 
+.. code-block:: python
+
+    >>> make
     install          Install the package to the active Python's site-packages
-    start            Run BigchainDB driver from source and daemonize it (stop with `make stop`)
+    start            Run BigchainDB driver from source and daemonize it (stop with make stop)
     stop             Stop BigchainDB driver
     reset            Stop and REMOVE all containers. WARNING: you will LOSE all data stored in BigchainDB server.
     test             Run all tests once or specify a file/test with TEST=tests/file.py::Class::test
@@ -116,8 +119,10 @@ Additionally, we have a nice Makefile to make things easier for everyone. Some h
     cov              Check code coverage and open the result in the browser
     clean            Remove all build, test, coverage and Python artifacts
     release          package and upload a release
-
-To view all commands available, run `make`.
+    dist             builds source (and not for now, wheel package)
+    clean-build      Remove build artifacts
+    clean-pyc        Remove Python file artifacts
+    clean-test       Remove test and coverage artifacts
 
 Tests
 ~~~~~
