@@ -1,4 +1,4 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help
+.PHONY: help install start stop reset test test-watch docs lint cov clean release dist check-deps clean-build clean-pyc clean-test
 .DEFAULT_GOAL := help
 
 #############################
