@@ -81,17 +81,16 @@ cov: check-deps ## Check code coverage and open the result in the browser
 clean: clean-build clean-pyc clean-test ## Remove all build, test, coverage and Python artifacts
 	@$(ECHO) "Cleaning was successful."
 
-release: clean ## Package and upload a release
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
-
-dist: clean ## Builds source and wheel package
-	python setup.py sdist
-	ls -l dist
+release: dist ## package and upload a release
+	twine upload dist/*
 
 ###############
 # Sub targets #
 ###############
+
+dist: clean ## builds source (and not for now, wheel package)
+	python setup.py sdist
+	ls -l dist
 
 check-deps:
 ifndef IS_DOCKER_COMPOSE_INSTALLED
