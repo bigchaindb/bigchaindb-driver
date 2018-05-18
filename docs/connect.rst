@@ -50,7 +50,7 @@ Case 3: Docker Container on localhost
 
 If you are running the Docker-based dev setup that comes along with the
 `bigchaindb_driver`_ repository (see :ref:`devenv-docker` for more
-information), and wish to connect to it from the ``bdb-driver`` linked
+information), and wish to connect to it from the ``bigchaindb-driver`` linked
 (container) service, use:
 
 .. code-block:: python
@@ -63,6 +63,11 @@ Alternatively, you may connect to the containerized BigchainDB node from
 .. code-block:: bash
 
     $ docker-compose port bigchaindb 9984
+    0.0.0.0:32780
+
+or you can use the command specified in the Makefile::
+
+    $ make root-url
     0.0.0.0:32780
 
 .. code-block:: python
