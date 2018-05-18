@@ -1,4 +1,4 @@
-.PHONY: help install start stop reset test test-watch docs lint cov clean release dist check-deps clean-build clean-pyc clean-test
+.PHONY: help install start stop reset test test-watch docs lint cov clean release root-url dist check-deps clean-build clean-pyc clean-test
 .DEFAULT_GOAL := help
 
 #############################
@@ -83,6 +83,9 @@ clean: clean-build clean-pyc clean-test ## Remove all build, test, coverage and 
 
 release: dist ## package and upload a release
 	twine upload dist/*
+
+root-url:
+	@docker-compose port bigchaindb 9984
 
 ###############
 # Sub targets #
