@@ -22,7 +22,7 @@ class Transport:
     def init_pool(self, nodes, headers=None):
         """Initializes the pool of connections."""
         connections = [
-            Connection(node_url=node, headers=headers) for node in nodes]
+                {"conn": Connection(node_url=node, headers=headers), "time": 0} for node in nodes]
         self.pool = Pool(connections)
 
     def get_connection(self):
@@ -50,11 +50,16 @@ class Transport:
 
         """
         connection = self.get_connection()
-        response = connection.request(
-            method=method,
-            path=path,
-            params=params,
-            json=json,
-            headers=headers,
-        )
+        try: 
+            response = connection.request(
+                method=method,
+                path=path,
+                params=params,
+                json=json,
+                headers=headers,
+            )
+        except TransportError :
+            #raise error? 
+            self.pool.fail_node()
+
         return response.data
