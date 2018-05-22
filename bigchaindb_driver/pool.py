@@ -91,7 +91,7 @@ class Pool:
         """
         if len(self.connections) > 1:
             return self.picker.pick(self.connections)["conn"]
-        #if self.tries >= self.max_tries:
+        if self.tries >= self.max_tries:
         #    TODO: raise an error, this is thee exit 
-        #    return None   
+            return None   
         return self.connections[0]["conn"]
