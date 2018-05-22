@@ -1,6 +1,5 @@
 from .connection import Connection
 from .pool import Pool
-from .exceptions import HTTP_EXCEPTIONS, TransportError
 
 
 class Transport:
