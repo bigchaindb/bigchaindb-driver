@@ -53,7 +53,7 @@ class RoundRobinPicker(AbstractPicker):
 
         """
         self.current_time_ms = datetime.now()
-        if self.current_time_ms <= connections[self.picked].time:
+        if self.current_time_ms <= connections[self.picked]["time"]:
             self.next_node(connections) 
             #TODO: missing to return error raise error here for that node and posibly update tries
         return connections[self.picked].conn
@@ -78,7 +78,7 @@ class Pool:
     def fail_node(self):
         failing_node = self.picker.picked;
         self.tries += 1
-        self.connections[failing_node].time = datetime.now() + timedelta(seconds= self.DELAY) 
+        self.connections[failing_node]["time"] = datetime.now() + timedelta(seconds= self.DELAY) 
         self.picker.next_node(self.connections)
 
     def get_connection(self):
@@ -90,8 +90,8 @@ class Pool:
 
         """
         if len(self.connections) > 1:
-            return self.picker.pick(self.connections)
-        if self.tries >= self.max_tries:
-            #TODO: raise an error, this is thee exit 
-            return None   
-        return self.connections[0]
+            return self.picker.pick(self.connections)["conn"]
+        #if self.tries >= self.max_tries:
+        #    TODO: raise an error, this is thee exit 
+        #    return None   
+        return self.connections[0]["conn"]

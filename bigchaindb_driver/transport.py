@@ -1,6 +1,6 @@
 from .connection import Connection
 from .pool import Pool
-
+from .exceptions import HTTP_EXCEPTIONS, TransportError
 
 class Transport:
     """Transport class."""
@@ -58,8 +58,8 @@ class Transport:
                 json=json,
                 headers=headers,
             )
-        except TransportError :
-            #raise error? 
+            return response.data
+        except:
             self.pool.fail_node()
+            raise
 
-        return response.data

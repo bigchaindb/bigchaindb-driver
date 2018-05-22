@@ -7,5 +7,5 @@ def test_init_with_headers():
     transport = Transport('node1', 'node2', headers=headers)
     expected_headers = default_headers()
     expected_headers.update(headers)
-    assert transport.pool.connections[0].session.headers == expected_headers
-    assert transport.pool.connections[1].session.headers == expected_headers
+    assert transport.pool.connections[0]["conn"].session.headers == expected_headers
+    assert transport.pool.connections[1]["conn"].session.headers == expected_headers

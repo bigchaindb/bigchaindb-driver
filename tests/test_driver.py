@@ -30,7 +30,7 @@ class TestBigchainDB:
         expected_headers = default_headers()
         expected_headers.update(headers)
         for conn in driver.transport.pool.connections:
-            conn.session.headers == expected_headers
+            conn["conn"].session.headers == expected_headers
         assert driver.transactions
         assert driver.outputs
 
