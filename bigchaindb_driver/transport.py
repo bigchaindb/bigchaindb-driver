@@ -2,6 +2,7 @@ from .connection import Connection
 from .pool import Pool
 from .exceptions import HTTP_EXCEPTIONS, TransportError
 
+
 class Transport:
     """Transport class."""
 
@@ -21,8 +22,8 @@ class Transport:
 
     def init_pool(self, nodes, headers=None):
         """Initializes the pool of connections."""
-        connections = [
-                {"conn": Connection(node_url=node, headers=headers), "time": 0} for node in nodes]
+        connections = [{"conn": Connection(
+            node_url=node, headers=headers), "time": 0} for node in nodes]
         self.pool = Pool(connections)
 
     def get_connection(self):
@@ -50,7 +51,7 @@ class Transport:
 
         """
         connection = self.get_connection()
-        try: 
+        try:
             response = connection.request(
                 method=method,
                 path=path,
@@ -59,7 +60,6 @@ class Transport:
                 headers=headers,
             )
             return response.data
-        except:
+        except BaseException:
             self.pool.fail_node()
             raise
-

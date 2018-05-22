@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
 
+
 class AbstractPicker(metaclass=ABCMeta):
     """Abstract class for picker classes that pick connections from a pool."""
 
@@ -35,12 +36,11 @@ class RoundRobinPicker(AbstractPicker):
 
         """
         self.picked = -1
-        self.current_time_ms = 0 ;
+        self.current_time_ms = 0
 
     def next_node(self, connections):
         self.picked += 1
         self.picked = self.picked % len(connections)
-
 
     def pick(self, connections):
         """Picks a :class:`~bigchaindb_driver.connection.Connection`
@@ -54,9 +54,11 @@ class RoundRobinPicker(AbstractPicker):
         """
         self.current_time_ms = datetime.now()
         if self.current_time_ms <= connections[self.picked]["time"]:
-            self.next_node(connections) 
-            #TODO: missing to return error raise error here for that node and posibly update tries
+            self.next_node(connections)
+            # TODO: missing to return error raise error here for that node and
+            # posibly update tries
         return connections[self.picked].conn
+
 
 class Pool:
     """Pool of connections."""
@@ -73,12 +75,13 @@ class Pool:
         self.tries = 0
         self.max_tries = len(self.connections) * 3
         self.picker = picker_class()
-        self.DELAY = 30 
+        self.DELAY = 30
 
     def fail_node(self):
-        failing_node = self.picker.picked;
+        failing_node = self.picker.picked
         self.tries += 1
-        self.connections[failing_node]["time"] = datetime.now() + timedelta(seconds= self.DELAY) 
+        self.connections[failing_node]["time"] = datetime.now(
+        ) + timedelta(seconds=self.DELAY)
         self.picker.next_node(self.connections)
 
     def get_connection(self):
@@ -92,6 +95,6 @@ class Pool:
         if len(self.connections) > 1:
             return self.picker.pick(self.connections)["conn"]
         if self.tries >= self.max_tries:
-        #    TODO: raise an error, this is thee exit 
-            return None   
+            #    TODO: raise an error, this is thee exit
+            return None
         return self.connections[0]["conn"]
