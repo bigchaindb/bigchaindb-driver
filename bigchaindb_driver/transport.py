@@ -21,9 +21,23 @@ class Transport:
 
     def init_pool(self, nodes, headers=None):
         """Initializes the pool of connections."""
+        if isinstance(nodes[0], dict):
+            self.init_nodes_dict(nodes)
+        else:
+            self.init_nodes_array(nodes, headers)
+
+
+    def init_nodes_array(self, nodes, headers):
         connections = [{"conn": Connection(
             node_url=node, headers=headers), "time": 0} for node in nodes]
         self.pool = Pool(connections)
+
+
+    def init_nodes_dict(self, nodes):
+        connections = [{"conn": Connection(
+            node_url=node["endpoint"], headers=node["headers"]), "time": 0} for node in nodes]
+        self.pool = Pool(connections)
+
 
     def get_connection(self):
         """Gets a connection from the pool.

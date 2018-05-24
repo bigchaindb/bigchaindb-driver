@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 
 try:
     from urllib import urlopen
-except:
+except BaseException:
     from urllib.request import urlopen
 
 
