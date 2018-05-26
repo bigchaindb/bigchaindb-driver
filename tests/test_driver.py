@@ -19,6 +19,15 @@ class TestBigchainDB:
                                       'http://node-2:9984')),
         (('node-1', 'node-2'), {'app_id': 'id'}, ('http://node-1:9984',
                                                   'http://node-2:9984')),
+        (({'endpoint': 'node-1',
+           'headers': {'app_id': 'id'}},
+          {'endpoint': 'node-2',
+           'headers': {'app_id': 'id'}}),
+            None,
+            ({'endpoint': 'http://node-1:9984',
+              'headers': {'app_id': 'id'}},
+             {'endpoint': 'http://node-2:9984',
+              'headers': {'app_id': 'id'}})),
     ))
     def test_driver_init(self, nodes, headers, normalized_nodes):
         from bigchaindb_driver.driver import BigchainDB
