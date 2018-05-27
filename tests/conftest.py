@@ -173,8 +173,7 @@ def bdb_port():
 
 @fixture
 def bdb_node(bdb_host, bdb_port):
-    return 'http://{host}:{port}'.format(
-        host='bigchaindb-driver_bigchaindb_1', port=bdb_port)
+    return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
 
 
 """Fixture to test with docker-compose up -d --scale bigchaindb=5"""

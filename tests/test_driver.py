@@ -109,9 +109,6 @@ class TestTransactionsEndpoint:
         assert signed_transaction['inputs'][0]['fulfillment'] == fulfillment_uri   # noqa
 
     def test_send(self, driver, alice_privkey, unsigned_transaction):
-        # pprint(vars(driver),driver.__dict__)
-        # pprint(driver.__dict__)
-        # pprint(inspect.getmembers(driver))
         fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
                                                    private_keys=alice_privkey)
         sent_tx = driver.transactions.send(fulfilled_tx)

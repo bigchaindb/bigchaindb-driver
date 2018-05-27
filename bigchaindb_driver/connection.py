@@ -39,7 +39,6 @@ class Connection:
 
         """
         url = self.node_url + path if path else self.node_url
-        print('current node', url)
         response = self.session.request(
             method=method,
             url=url,
