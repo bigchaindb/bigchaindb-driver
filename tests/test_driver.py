@@ -6,7 +6,6 @@ import base58
 from pytest import mark, raises
 from requests.utils import default_headers
 from sha3 import sha3_256
-
 from cryptoconditions import Ed25519Sha256
 
 
@@ -39,7 +38,7 @@ class TestBigchainDB:
         expected_headers = default_headers()
         expected_headers.update(headers)
         for conn in driver.transport.pool.connections:
-            conn["conn"].session.headers == expected_headers
+            conn["node"].session.headers == expected_headers
         assert driver.transactions
         assert driver.outputs
 
@@ -110,6 +109,9 @@ class TestTransactionsEndpoint:
         assert signed_transaction['inputs'][0]['fulfillment'] == fulfillment_uri   # noqa
 
     def test_send(self, driver, alice_privkey, unsigned_transaction):
+        # pprint(vars(driver),driver.__dict__)
+        # pprint(driver.__dict__)
+        # pprint(inspect.getmembers(driver))
         fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
                                                    private_keys=alice_privkey)
         sent_tx = driver.transactions.send(fulfilled_tx)
@@ -230,6 +232,22 @@ class TestBlocksEndppoint:
         block = driver.blocks.retrieve(
             block_height=str(block_with_alice_transaction))
         assert block
+
+
+class TestBlocksEndppointMultiple:
+
+    def test_get_loop(self, driver_multiple_headers,
+                      persisted_random_transaction):
+        for test in range(0, 10):
+            block_id = driver_multiple_headers.blocks.get(
+                txid=persisted_random_transaction['id'])
+            assert block_id
+
+    def test_retrieve_loop(self, driver, block_with_alice_transaction):
+        for test in range(0, 10):
+            block = driver.blocks.retrieve(
+                block_height=str(block_with_alice_transaction))
+            assert block
 
 
 class TestAssetsMetadataEndpoint:

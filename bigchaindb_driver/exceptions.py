@@ -59,7 +59,12 @@ class NotFoundError(TransportError):
     """Exception for HTTP 404 errors."""
 
 
+class ServiceUnavailable(TransportError):
+    """Exception for HTTP 503 errors."""
+
+
 HTTP_EXCEPTIONS = {
     400: BadRequest,
     404: NotFoundError,
+    503: ServiceUnavailable,
 }

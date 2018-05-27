@@ -1,5 +1,7 @@
 from .connection import Connection
 from .pool import Pool
+from .exceptions import HTTP_EXCEPTIONS, TransportError
+from datetime import datetime
 
 
 class Transport:
@@ -26,18 +28,19 @@ class Transport:
         else:
             self.init_nodes_array(nodes, headers)
 
-
     def init_nodes_array(self, nodes, headers):
-        connections = [{"conn": Connection(
-            node_url=node, headers=headers), "time": 0} for node in nodes]
+        connections = [{"node": Connection(
+            node_url=node, headers=headers), "time": datetime.now()} for node in nodes]
         self.pool = Pool(connections)
-
 
     def init_nodes_dict(self, nodes):
-        connections = [{"conn": Connection(
-            node_url=node["endpoint"], headers=node["headers"]), "time": 0} for node in nodes]
+        connections = [
+            {
+                "node": Connection(
+                    node_url=node["endpoint"],
+                    headers=node["headers"]),
+                "time":datetime.now()} for node in nodes]
         self.pool = Pool(connections)
-
 
     def get_connection(self):
         """Gets a connection from the pool.
@@ -64,15 +67,19 @@ class Transport:
 
         """
         connection = self.get_connection()
-        try:
-            response = connection.request(
-                method=method,
-                path=path,
-                params=params,
-                json=json,
-                headers=headers,
-            )
-            return response.data
-        except BaseException:
-            self.pool.fail_node()
-            raise
+        if connection is not None:
+            try:
+                response = connection.request(
+                    method=method,
+                    path=path,
+                    params=params,
+                    json=json,
+                    headers=headers,
+                )
+                return response.data
+            except BaseException:
+                self.pool.fail_node()
+                raise
+        else:
+            exc_cls = HTTP_EXCEPTIONS.get(503, TransportError)
+            raise exc_cls(503, "Insufficient capacity", {})

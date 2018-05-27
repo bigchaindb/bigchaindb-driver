@@ -173,7 +173,46 @@ def bdb_port():
 
 @fixture
 def bdb_node(bdb_host, bdb_port):
-    return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
+    return 'http://{host}:{port}'.format(
+        host='bigchaindb-driver_bigchaindb_1', port=bdb_port)
+
+
+"""Fixture to test with docker-compose up -d --scale bigchaindb=5"""
+
+
+@fixture
+def bdb_nodes():
+    return ['bigchaindb-driver_bigchaindb_1:9984',
+            'bigchaindb-driver_bigchaindb_2:9984',
+            'bigchaindb-driver_bigchaindb_3:9984',
+            ]
+
+
+@fixture
+def bdb_nodes_headers():
+    return [{'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
+             'headers': {'app_id': 'id'}},
+            {'endpoint': 'bigchaindb-driver_bigchaindb_2:9984',
+             'headers': {'app_id': 'id'}},
+            {'endpoint': 'bigchaindb-driver_bigchaindb_3:9984',
+             'headers': {'app_id': 'id'}},
+            {'endpoint': 'bigchaindb-driver_bigchaindb_4:9984',
+             'headers': {'app_id': 'id'}},
+            {'endpoint': 'bigchaindb-driver_bigchaindb_5:9984',
+             'headers': {'app_id': 'id'}},
+            ]
+
+
+@fixture
+def driver_multiple(bdb_nodes):
+    from bigchaindb_driver import BigchainDB
+    return BigchainDB(*bdb_nodes)
+
+
+@fixture
+def driver_multiple_headers(bdb_nodes_headers):
+    from bigchaindb_driver import BigchainDB
+    return BigchainDB(*bdb_nodes_headers)
 
 
 @fixture
