@@ -51,7 +51,7 @@ class Transport:
         return self.pool.get_connection()
 
     def forward_request(self, method, path=None,
-                        json=None, params=None, headers=None):
+                        json=None, params=None, headers=None, error=None):
         """Forwards an http request to a connection.
 
         Args:
@@ -78,9 +78,11 @@ class Transport:
                 )
                 self.pool.success_node()
                 return response.data
-            except BaseException:
+            except BaseException as err:
                 self.pool.fail_node()
-                return self.forward_request(method, path, params, json, headers)
+                return self.forward_request(method=method, path=path, params=params, json=json, headers=headers,error=err)
+        elif error is not None:
+            raise error
         else:
             exc_cls = HTTP_EXCEPTIONS.get(503, TransportError)
             raise exc_cls(503, "Insufficient capacity", {})

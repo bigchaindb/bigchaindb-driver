@@ -59,10 +59,8 @@ class RoundRobinPicker(AbstractPicker):
             node = connections[self.picked]["node"]
             return node
         else:
-            skipped = self.picked
             self.next_node(connections)
             node = connections[self.picked]["node"]
-            print("SKIPPED NODE", connections[skipped]["node"].node_url)
             return node
 
 
@@ -79,29 +77,17 @@ class Pool:
         """
         self.connections = connections
         self.tries = 0
-        self.max_tries = len(self.connections) * 5
+        self.max_tries = len(self.connections) * 1
         self.picker = picker_class()
         self.DELAY = 60
 
-    def debug(self, failed=False):
-        current_node = self.picker.picked
-        t = self.connections[current_node]["time"].strftime("%S.%f")
-        node = self.connections[current_node]["node"].node_url
-        if failed:
-            print("ERROR::::", node, "time", t, "::::ERROR")
-        else:
-            print("NODE::::", node, "time", t, "::::NODE")
-
-
     def fail_node(self):
-        self.debug(failed= True)
         failing_node = self.picker.picked
         self.tries += 1
         self.connections[failing_node]["time"] = datetime.now() + timedelta(seconds=self.DELAY)
         self.picker.next_node(self.connections)
     
     def success_node(self):
-        self.debug(failed= False)
         success_node = self.picker.picked
         self.picker.next_node(self.connections)
 
