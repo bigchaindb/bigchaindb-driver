@@ -77,20 +77,19 @@ class Pool:
         """
         self.connections = connections
         self.tries = 0
-        self.max_tries = len(self.connections) * 1
+        self.max_tries = len(self.connections) * 4
         self.picker = picker_class()
         self.DELAY = 60
 
     def fail_node(self):
         failing_node = self.picker.picked
         self.tries += 1
-        self.connections[failing_node]["time"] = datetime.now() + timedelta(seconds=self.DELAY)
-        self.picker.next_node(self.connections)
-    
-    def success_node(self):
-        success_node = self.picker.picked
+        self.connections[failing_node]["time"] = datetime.now(
+        ) + timedelta(seconds=self.DELAY)
         self.picker.next_node(self.connections)
 
+    def success_node(self):
+        self.picker.next_node(self.connections)
 
     def get_connection(self):
         """Gets a :class:`~bigchaindb_driver.connection.Connection`

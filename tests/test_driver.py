@@ -8,7 +8,7 @@ from requests.utils import default_headers
 from sha3 import sha3_256
 from cryptoconditions import Ed25519Sha256
 import asyncio
-import time
+
 
 class TestBigchainDB:
 
@@ -175,9 +175,10 @@ class TestOutputsEndpointMultiple:
 
     @mark.asyncio
     @mark.parametrize("timeout", [0.5])
-    async def test_get_outputs_timeout(self, timeout ,event_loop, driver_multiple_headers, carol_pubkey,
-                         persisted_carol_bicycle_transaction,
-                         persisted_carol_car_transaction):
+    async def test_get_outputs_timeout(self, timeout, event_loop,
+                                       driver_multiple_headers, carol_pubkey,
+                                       persisted_carol_bicycle_transaction,
+                                       persisted_carol_car_transaction):
         for test in range(0, 5):
             out = driver_multiple_headers.outputs.get(carol_pubkey)
             outputs = await asyncio.sleep(timeout, result=out, loop=event_loop)
@@ -192,24 +193,26 @@ class TestOutputsEndpointMultiple:
             } in outputs
 
     @mark.asyncio
-    @mark.parametrize('spent,outputs_qty,timeout', ((False, 1, 0.2), (True, 1, 0.5), (None, 2, 0.1)))
+    @mark.parametrize('spent,outputs_qty,timeout',
+                      ((False, 1, 0.2), (True, 1, 0.5), (None, 2, 0.1)))
     async def test_get_outputs_with_spent_query_param_timeout(
-            self, spent, outputs_qty, timeout ,event_loop, driver_multiple_headers, carol_pubkey,
+            self, spent, outputs_qty, timeout, event_loop,
+            driver_multiple_headers, carol_pubkey,
             persisted_carol_bicycle_transaction,
             persisted_carol_car_transaction,
             persisted_transfer_carol_car_to_dimi):
 
         for test in range(0, 5):
-            out = driver_multiple_headers.outputs.get(carol_pubkey, spent=spent)
+            out = driver_multiple_headers.outputs.get(
+                carol_pubkey, spent=spent)
             outputs = await asyncio.sleep(timeout, result=out, loop=event_loop)
             assert len(outputs) == outputs_qty
 
             # Return only unspent outputs
             if spent is False:
                 assert {
-                    'transaction_id': persisted_carol_bicycle_transaction['id'],
-                    'output_index': 0
-                } in outputs
+                   'transaction_id': persisted_carol_bicycle_transaction['id'],
+                   'output_index': 0} in outputs
             # Return only spent outputs
             elif spent is True:
                 assert {
@@ -219,15 +222,12 @@ class TestOutputsEndpointMultiple:
             # Return all outputs for carol
             elif spent is None:
                 assert {
-                    'transaction_id': persisted_carol_bicycle_transaction['id'],
-                    'output_index': 0
-                } in outputs
+                   'transaction_id': persisted_carol_bicycle_transaction['id'],
+                   'output_index': 0} in outputs
                 assert {
                     'transaction_id': persisted_carol_car_transaction['id'],
                     'output_index': 0
                 } in outputs
-
-
 
 
 class TestOutputsEndpoint:
@@ -295,23 +295,26 @@ class TestBlocksEndppointMultiple:
 
     @mark.asyncio
     @mark.parametrize("timeout", [0.5])
-    async def test_get_timeout(self, timeout, event_loop, driver_multiple_headers,
-                      persisted_random_transaction):
+    async def test_get_timeout(self, timeout, event_loop,
+                               driver_multiple_headers,
+                               persisted_random_transaction):
         for test in range(0, 5):
             block_id = driver_multiple_headers.blocks.get(
                 txid=persisted_random_transaction['id'])
-            result = await asyncio.sleep(timeout, result=block_id, loop=event_loop)
+            result = await asyncio.sleep(timeout, result=block_id,
+                                         loop=event_loop)
             assert result
-
 
     @mark.asyncio
     @mark.parametrize("timeout", [0.5])
-    async def test_retrieve_timeout(self, timeout, event_loop, driver_multiple_headers,
-                      block_with_alice_transaction):
-         for test in range(0, 5):
+    async def test_retrieve_timeout(self, timeout, event_loop,
+                                    driver_multiple_headers,
+                                    block_with_alice_transaction):
+        for test in range(0, 5):
             block = driver_multiple_headers.blocks.retrieve(
                 block_height=str(block_with_alice_transaction))
-            result = await asyncio.sleep(timeout, result=block, loop=event_loop)
+            result = await asyncio.sleep(timeout, result=block,
+                                         loop=event_loop)
             assert result
 
     def test_get_loop(self, driver_multiple_headers,
@@ -321,7 +324,8 @@ class TestBlocksEndppointMultiple:
                 txid=persisted_random_transaction['id'])
             assert block_id
 
-    def test_retrieve_loop(self, driver_multiple_headers, block_with_alice_transaction):
+    def test_retrieve_loop(self, driver_multiple_headers,
+                           block_with_alice_transaction):
         for test in range(0, 10):
             block = driver_multiple_headers.blocks.retrieve(
                 block_height=str(block_with_alice_transaction))

@@ -30,7 +30,8 @@ class Transport:
 
     def init_nodes_array(self, nodes, headers):
         connections = [{"node": Connection(
-            node_url=node, headers=headers), "time": datetime.now()} for node in nodes]
+            node_url=node, headers=headers), "time": datetime.now()}
+            for node in nodes]
         self.pool = Pool(connections)
 
     def init_nodes_dict(self, nodes):
@@ -80,7 +81,13 @@ class Transport:
                 return response.data
             except BaseException as err:
                 self.pool.fail_node()
-                return self.forward_request(method=method, path=path, params=params, json=json, headers=headers,error=err)
+                return self.forward_request(
+                    method=method,
+                    path=path,
+                    params=params,
+                    json=json,
+                    headers=headers,
+                    error=err)
         elif error is not None:
             raise error
         else:

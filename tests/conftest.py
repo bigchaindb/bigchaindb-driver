@@ -11,12 +11,14 @@ from cryptoconditions import Ed25519Sha256
 from pytest import fixture
 from sha3 import sha3_256
 
-from bigchaindb_driver.common.transaction import Transaction, _fulfillment_to_details
-
+from bigchaindb_driver.common.transaction import _fulfillment_to_details
+from bigchaindb_driver.common.transaction import Transaction
 
 # FIXME The sleep, or some other approach is required to wait for the
 # transaction to be available as some processing is being done by the
 # server.
+
+
 def await_transaction(fixture_func, waiting_time=1.5):
     @wraps(fixture_func)
     def wrapper(*args, **kwargs):
