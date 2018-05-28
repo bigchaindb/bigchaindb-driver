@@ -35,7 +35,7 @@ class RoundRobinPicker(AbstractPicker):
         instance. Sets :attr:`picked` to ``-1``.
 
         """
-        self.picked = -1
+        self.picked = 0
         self.current_time_ms = 0
 
     def next_node(self, connections):
