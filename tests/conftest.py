@@ -182,16 +182,20 @@ def bdb_node(bdb_host, bdb_port):
 
 
 @fixture
-def bdb_nodes():
-    return ['bigchaindb-driver_bigchaindb_1:9984',
+def bdb_nodes(bdb_node):
+    return [bdb_node,
+            'bigchaindb-driver_bigchaindb_1:9984',
             'bigchaindb-driver_bigchaindb_2:9984',
             'bigchaindb-driver_bigchaindb_3:9984',
             ]
 
 
 @fixture
-def bdb_nodes_headers():
-    return [{'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
+def bdb_nodes_headers(bdb_node):
+    return [
+            {'endpoint': bdb_node,
+             'headers': {'app_id': 'id'}},
+            {'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
              'headers': {'app_id': 'id'}},
             {'endpoint': 'bigchaindb-driver_bigchaindb_2:9984',
              'headers': {'app_id': 'id'}},
