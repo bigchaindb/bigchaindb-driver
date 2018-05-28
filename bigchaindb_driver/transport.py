@@ -76,10 +76,11 @@ class Transport:
                     json=json,
                     headers=headers,
                 )
+                self.pool.success_node()
                 return response.data
             except BaseException:
                 self.pool.fail_node()
-                raise
+                return self.forward_request(method, path, params, json, headers)
         else:
             exc_cls = HTTP_EXCEPTIONS.get(503, TransportError)
             raise exc_cls(503, "Insufficient capacity", {})

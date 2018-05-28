@@ -7,7 +7,8 @@ from pytest import mark, raises
 from requests.utils import default_headers
 from sha3 import sha3_256
 from cryptoconditions import Ed25519Sha256
-
+import asyncio
+import time
 
 class TestBigchainDB:
 
@@ -232,6 +233,16 @@ class TestBlocksEndppoint:
 
 
 class TestBlocksEndppointMultiple:
+
+    @mark.asyncio
+    @mark.parametrize("timeout", [0.5, 1])
+    async def test_get(self, timeout, event_loop, driver_multiple_headers,
+                      persisted_random_transaction):
+        for test in range(0, 225):
+            block_id = driver_multiple_headers.blocks.get(
+                txid=persisted_random_transaction['id'])
+            result = await asyncio.sleep(timeout, result=block_id, loop=event_loop)
+            assert result
 
     def test_get_loop(self, driver_multiple_headers,
                       persisted_random_transaction):
