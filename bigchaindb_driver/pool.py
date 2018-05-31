@@ -36,11 +36,9 @@ class RoundRobinPicker(AbstractPicker):
 
         """
         self.picked = 0
-        self.current_time_ms = 0
 
     def next_node(self, connections):
-        self.picked = self.picked + 1
-        self.picked = self.picked % len(connections)
+        self.picked = (self.picked + 1) % len(connections)
 
     def pick(self, connections):
         """Picks a :class:`~bigchaindb_driver.connection.Connection`
@@ -53,9 +51,9 @@ class RoundRobinPicker(AbstractPicker):
 
         """
 
-        self.current_time_ms = datetime.now()
+        current_time_ms = datetime.now()
         picked_time = connections[self.picked]["time"]
-        if self.current_time_ms > picked_time:
+        if current_time_ms > picked_time:
             node = connections[self.picked]["node"]
             return node
         else:

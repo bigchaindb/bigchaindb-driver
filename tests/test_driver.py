@@ -279,7 +279,7 @@ class TestOutputsEndpoint:
             } in outputs
 
 
-class TestBlocksEndppoint:
+class TestBlocksEndpoint:
 
     def test_get(self, driver, persisted_random_transaction):
         block_id = driver.blocks.get(txid=persisted_random_transaction['id'])
@@ -291,14 +291,14 @@ class TestBlocksEndppoint:
         assert block
 
 
-class TestBlocksEndppointMultiple:
+class TestBlocksEndpointMultiple:
 
     @mark.asyncio
-    @mark.parametrize("timeout", [0.5])
-    async def test_get_timeout(self, timeout, event_loop,
+    @mark.parametrize('timeout,nodes', ((0.5, 2), (0.5, 3)))
+    async def test_n_nodes_wait_get(self, timeout, nodes, event_loop,
                                driver_multiple_headers,
                                persisted_random_transaction):
-        for test in range(0, 5):
+        for test in range(nodes):
             block_id = driver_multiple_headers.blocks.get(
                 txid=persisted_random_transaction['id'])
             result = await asyncio.sleep(timeout, result=block_id,
@@ -306,27 +306,29 @@ class TestBlocksEndppointMultiple:
             assert result
 
     @mark.asyncio
-    @mark.parametrize("timeout", [0.5])
-    async def test_retrieve_timeout(self, timeout, event_loop,
+    @mark.parametrize('timeout,nodes', ((0.5, 3), (0.5, 2)))
+    async def test_n_nodes_wait_retrieve(self, timeout, nodes, event_loop,
                                     driver_multiple_headers,
                                     block_with_alice_transaction):
-        for test in range(0, 5):
+        for test in range(nodes):
             block = driver_multiple_headers.blocks.retrieve(
                 block_height=str(block_with_alice_transaction))
             result = await asyncio.sleep(timeout, result=block,
                                          loop=event_loop)
             assert result
 
-    def test_get_loop(self, driver_multiple_headers,
+    @mark.parametrize("nodes", [5])
+    def test_get_n_nodes(self, nodes, driver_multiple_headers,
                       persisted_random_transaction):
-        for test in range(0, 10):
+        for test in range(nodes):
             block_id = driver_multiple_headers.blocks.get(
                 txid=persisted_random_transaction['id'])
             assert block_id
 
-    def test_retrieve_loop(self, driver_multiple_headers,
+    @mark.parametrize("nodes", [5])
+    def test_retrieve_n_nodes(self, nodes,driver_multiple_headers,
                            block_with_alice_transaction):
-        for test in range(0, 10):
+        for test in range(nodes):
             block = driver_multiple_headers.blocks.retrieve(
                 block_height=str(block_with_alice_transaction))
             assert block

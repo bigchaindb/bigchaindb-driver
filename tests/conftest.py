@@ -178,9 +178,6 @@ def bdb_node(bdb_host, bdb_port):
     return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
 
 
-"""Fixture to test with docker-compose up -d --scale bigchaindb=5"""
-
-
 @fixture
 def bdb_nodes(bdb_node):
     return [bdb_node,

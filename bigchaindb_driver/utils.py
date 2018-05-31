@@ -66,7 +66,7 @@ def _normalize_url(node):
     return urlunparse((parts.scheme, netloc, parts.path, '', '', ''))
 
 
-def _normalize_dict(*nodes):
+def _normalize_dict(nodes):
     norm_nodes = []
     for node in nodes:
         if not node:
@@ -80,7 +80,7 @@ def _normalize_dict(*nodes):
     return tuple(norm_nodes,)
 
 
-def _normalize_array(*nodes):
+def _normalize_array(nodes):
     norm_nodes = []
     for node in nodes:
         if not node:
@@ -96,7 +96,7 @@ def _normalize_array(*nodes):
 def _normalize_nodes(*nodes):
     if not nodes:
         return (DEFAULT_NODE,)
-    if isinstance(nodes[0], dict):
-        return _normalize_dict(*nodes)
+    if issubclass(nodes[0].__class__, dict):
+        return _normalize_dict(nodes)
     else:
-        return _normalize_array(*nodes)
+        return _normalize_array(nodes)
