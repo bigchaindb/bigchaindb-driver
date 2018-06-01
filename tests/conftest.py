@@ -204,12 +204,6 @@ def bdb_nodes_headers(bdb_node, bdb_node_header):
 
 
 @fixture
-def driver_multiple(bdb_nodes):
-    from bigchaindb_driver import BigchainDB
-    return BigchainDB(*bdb_nodes)
-
-
-@fixture
 def driver_multiple_headers(bdb_nodes_headers):
     from bigchaindb_driver import BigchainDB
     return BigchainDB(*bdb_nodes_headers)
