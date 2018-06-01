@@ -209,19 +209,19 @@ class TestOutputsEndpointMultiple:
             # Return only unspent outputs
             if spent is False:
                 assert {
-                    'transaction_id': persisted_carol_bicycle_transaction['id'],
-                    'output_index': 0} in outputs
+                   'transaction_id': persisted_carol_bicycle_transaction['id'],
+                   'output_index': 0} in outputs
             # Return only spent outputs
             elif spent is True:
                 assert {
-                    'transaction_id': persisted_carol_car_transaction['id'],
-                    'output_index': 0
+                   'transaction_id': persisted_carol_car_transaction['id'],
+                   'output_index': 0
                 } in outputs
             # Return all outputs for carol
             elif spent is None:
                 assert {
-                    'transaction_id': persisted_carol_bicycle_transaction['id'],
-                    'output_index': 0} in outputs
+                   'transaction_id': persisted_carol_bicycle_transaction['id'],
+                   'output_index': 0} in outputs
                 assert {
                     'transaction_id': persisted_carol_car_transaction['id'],
                     'output_index': 0
