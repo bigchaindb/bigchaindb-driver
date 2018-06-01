@@ -38,6 +38,7 @@ class RoundRobinPicker(AbstractPicker):
         self.picked = 0
 
     def next_node(self, connections):
+        """Update index of the current active node in the pool"""
         self.picked = (self.picked + 1) % len(connections)
 
     def pick(self, connections):
@@ -80,6 +81,8 @@ class Pool:
         self.DELAY = 60
 
     def fail_node(self):
+        """Send a message to the pool indicating the connection to the current node is failing
+        and needs to try another one"""
         failing_node = self.picker.picked
         self.tries += 1
         self.connections[failing_node]["time"] = datetime.now(
@@ -87,6 +90,8 @@ class Pool:
         self.picker.next_node(self.connections)
 
     def success_node(self):
+        """Send a message to the pool indicating the connection to the current
+        node is succesful"""
         self.picker.next_node(self.connections)
 
     def get_connection(self):

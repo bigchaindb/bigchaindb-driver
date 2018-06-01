@@ -11,8 +11,7 @@ from cryptoconditions import Ed25519Sha256
 from pytest import fixture
 from sha3 import sha3_256
 
-from bigchaindb_driver.common.transaction import _fulfillment_to_details
-from bigchaindb_driver.common.transaction import Transaction
+from bigchaindb_driver.common.transaction import Transaction, _fulfillment_to_details
 
 # FIXME The sleep, or some other approach is required to wait for the
 # transaction to be available as some processing is being done by the
@@ -174,35 +173,31 @@ def bdb_port():
 
 
 @fixture
+def bdb_node_header():
+    return {'app_id': 'id'}
+
+
+@fixture
 def bdb_node(bdb_host, bdb_port):
     return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
 
 
 @fixture
-def bdb_nodes(bdb_node):
-    return [bdb_node,
-            'bigchaindb-driver_bigchaindb_1:9984',
-            'bigchaindb-driver_bigchaindb_2:9984',
-            'bigchaindb-driver_bigchaindb_3:9984',
-            ]
-
-
-@fixture
-def bdb_nodes_headers(bdb_node):
+def bdb_nodes_headers(bdb_node, bdb_node_header):
     return [
-            {'endpoint': bdb_node,
-             'headers': {'app_id': 'id'}},
-            {'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
-             'headers': {'app_id': 'id'}},
-            {'endpoint': 'bigchaindb-driver_bigchaindb_2:9984',
-             'headers': {'app_id': 'id'}},
-            {'endpoint': 'bigchaindb-driver_bigchaindb_3:9984',
-             'headers': {'app_id': 'id'}},
-            {'endpoint': 'bigchaindb-driver_bigchaindb_4:9984',
-             'headers': {'app_id': 'id'}},
-            {'endpoint': 'bigchaindb-driver_bigchaindb_5:9984',
-             'headers': {'app_id': 'id'}},
-            ]
+        {'endpoint': bdb_node,
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_2:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_3:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_4:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_5:9984',
+         'headers': bdb_node_header},
+    ]
 
 
 @fixture

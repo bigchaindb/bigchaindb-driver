@@ -15,8 +15,6 @@ class TestBigchainDB:
     @mark.parametrize('nodes,headers, normalized_nodes', (
         ((), None, ('http://localhost:9984',)),
         (('node-1',), None, ('http://node-1:9984',)),
-        (('node-1', 'node-2'), None, ('http://node-1:9984',
-                                      'http://node-2:9984')),
         (('node-1', 'node-2'), {'app_id': 'id'}, ('http://node-1:9984',
                                                   'http://node-2:9984')),
         (({'endpoint': 'node-1',
@@ -211,8 +209,8 @@ class TestOutputsEndpointMultiple:
             # Return only unspent outputs
             if spent is False:
                 assert {
-                   'transaction_id': persisted_carol_bicycle_transaction['id'],
-                   'output_index': 0} in outputs
+                    'transaction_id': persisted_carol_bicycle_transaction['id'],
+                    'output_index': 0} in outputs
             # Return only spent outputs
             elif spent is True:
                 assert {
@@ -222,8 +220,8 @@ class TestOutputsEndpointMultiple:
             # Return all outputs for carol
             elif spent is None:
                 assert {
-                   'transaction_id': persisted_carol_bicycle_transaction['id'],
-                   'output_index': 0} in outputs
+                    'transaction_id': persisted_carol_bicycle_transaction['id'],
+                    'output_index': 0} in outputs
                 assert {
                     'transaction_id': persisted_carol_car_transaction['id'],
                     'output_index': 0
@@ -296,8 +294,8 @@ class TestBlocksEndpointMultiple:
     @mark.asyncio
     @mark.parametrize('timeout,nodes', ((0.5, 2), (0.5, 3)))
     async def test_n_nodes_wait_get(self, timeout, nodes, event_loop,
-                               driver_multiple_headers,
-                               persisted_random_transaction):
+                                    driver_multiple_headers,
+                                    persisted_random_transaction):
         for test in range(nodes):
             block_id = driver_multiple_headers.blocks.get(
                 txid=persisted_random_transaction['id'])
@@ -308,8 +306,8 @@ class TestBlocksEndpointMultiple:
     @mark.asyncio
     @mark.parametrize('timeout,nodes', ((0.5, 3), (0.5, 2)))
     async def test_n_nodes_wait_retrieve(self, timeout, nodes, event_loop,
-                                    driver_multiple_headers,
-                                    block_with_alice_transaction):
+                                         driver_multiple_headers,
+                                         block_with_alice_transaction):
         for test in range(nodes):
             block = driver_multiple_headers.blocks.retrieve(
                 block_height=str(block_with_alice_transaction))
@@ -319,15 +317,15 @@ class TestBlocksEndpointMultiple:
 
     @mark.parametrize("nodes", [5])
     def test_get_n_nodes(self, nodes, driver_multiple_headers,
-                      persisted_random_transaction):
+                         persisted_random_transaction):
         for test in range(nodes):
             block_id = driver_multiple_headers.blocks.get(
                 txid=persisted_random_transaction['id'])
             assert block_id
 
     @mark.parametrize("nodes", [5])
-    def test_retrieve_n_nodes(self, nodes,driver_multiple_headers,
-                           block_with_alice_transaction):
+    def test_retrieve_n_nodes(self, nodes, driver_multiple_headers,
+                              block_with_alice_transaction):
         for test in range(nodes):
             block = driver_multiple_headers.blocks.retrieve(
                 block_height=str(block_with_alice_transaction))

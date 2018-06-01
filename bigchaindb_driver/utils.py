@@ -60,6 +60,7 @@ def _get_default_port(scheme):
 
 
 def _normalize_url(node):
+    """Normalizes the given node url"""
     parts = urlparse(node, scheme='http', allow_fragments=False)
     port = parts.port if parts.port else _get_default_port(parts.scheme)
     netloc = '{}:{}'.format(parts.hostname, port)
@@ -67,6 +68,7 @@ def _normalize_url(node):
 
 
 def _normalize_dict(nodes):
+    """Normalizes url values of nodes in dictionary"""
     norm_nodes = []
     for node in nodes:
         if not node:
@@ -81,6 +83,7 @@ def _normalize_dict(nodes):
 
 
 def _normalize_array(nodes):
+    """Normalizes url values of nodes in array"""
     norm_nodes = []
     for node in nodes:
         if not node:
@@ -94,6 +97,7 @@ def _normalize_array(nodes):
 
 
 def _normalize_nodes(*nodes):
+    """Normalizes given dict or array of driver nodes"""
     if not nodes:
         return (DEFAULT_NODE,)
     if issubclass(nodes[0].__class__, dict):
