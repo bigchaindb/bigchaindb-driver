@@ -38,19 +38,19 @@ Features
 Install
 ----------
 
-We recommend you use a virtual environment to install and update to the latest stable version using `pip`:
+We recommend you use a virtual environment to install and update to the latest stable version using `pip` (or `pip3`):
 
 .. code-block:: text
 
     pip install -U bigchaindb-driver
 
-If this fails, ensure you have python 3 installed, if you have both versions of python installed, to install and update using `pip`:
+That will install the latest *stable* BigchainDB Python Driver. If you want to install an Alpha, Beta or RC version of the Python Driver, use something like:
 
 .. code-block:: text
 
-    pip3 install -U bigchaindb-driver
+    pip install -U bigchaindb_driver==0.5.0a4
 
-If you want to install a non-stable version, i.e. a pre-release, check out the `pypi history`_ and choose your version to install.
+The above command will install version 0.5.0a4 (Alpha 4). You can find a list of all versions in `the release history page on PyPI <https://pypi.org/project/bigchaindb-driver/#history>`_.
 
 Get Started with BigchainDB Server
 ------------------------------------
