@@ -19,13 +19,11 @@ BigchainDB Python Driver
         :target: http://bigchaindb.readthedocs.io/projects/py-driver/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/bigchaindb/bigchaindb-driver/shield.svg
-     :target: https://pyup.io/repos/github/bigchaindb/bigchaindb-driver/
-     :alt: Updates
-
 
 * Free software: Apache Software License 2.0
-* Documentation: https://docs.bigchaindb.com/projects/py-driver/
+* Check our `Documentation`_
+
+.. contents:: Table of Contents
 
 
 Features
@@ -52,9 +50,80 @@ That will install the latest *stable* BigchainDB Python Driver. If you want to i
 
 The above command will install version 0.5.0a4 (Alpha 4). You can find a list of all versions in `the release history page on PyPI <https://pypi.org/project/bigchaindb-driver/#history>`_.
 
-Get Started with BigchainDB Server
+More information on how to install the driver can be found in the `Quickstart`_
+
+BigchainDB Documentation
 ------------------------------------
 * `BigchainDB Server Quickstart`_
+* `The Hitchhiker's Guide to BigchainDB`_
+* `HTTP API Reference`_
+* `All BigchainDB Documentation`_
+
+Usage
+----------
+Example: Create a divisible asset for Alice who issues 10 token to Bob so that he can use her Game Boy.
+Afterwards Bob spends 3 of these tokens.
+
+.. code-block:: python
+
+    # import BigchainDB and create an object
+    from bigchaindb_driver import BigchainDB
+    bdb_root_url = 'https://example.com:9984'
+    bdb = BigchainDB(bdb_root_url)
+
+    # generate a keypair
+    from bigchaindb_driver.crypto import generate_keypair
+    alice, bob = generate_keypair(), generate_keypair()
+
+    # create a digital asset for Alice
+    bike_token = {
+        'data': {
+            'token_for': {
+                'game_boy': {
+                    'serial_number': 'LR35902'
+                }
+            },
+            'description': 'Time share token. Each token equals one hour of usage.',
+        },
+    }
+
+    # prepare the transaction with the digital asset and issue 10 tokens for Bob
+    prepared_token_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=alice.public_key,
+        recipients=[([bob.public_key], 10)],
+        asset=bike_token)
+
+    # fulfill and send the transaction
+    fulfilled_token_tx = bdb.transactions.fulfill(
+        prepared_token_tx,
+        private_keys=alice.private_key)
+    bdb.transactions.send(fulfilled_token_tx, mode='commit')
+
+    # Use the tokens
+    # create the output and inout for the transaction
+    transfer_asset = {'id': bike_token_id}
+    output_index = 0
+    output = fulfilled_token_tx['outputs'][output_index]
+    transfer_input = {'fulfillment': output['condition']['details'],
+                      'fulfills': {'output_index': output_index,
+                                   'transaction_id': fulfilled_token_tx[
+                                       'id']},
+                      'owners_before': output['public_keys']}
+
+    # prepare the transaction and use 3 tokens
+    prepared_transfer_tx = bdb.transactions.prepare(
+        operation='TRANSFER',
+        asset=transfer_asset,
+        inputs=transfer_input,
+        recipients=[([alice.public_key], 3), ([bob.public_key], 7)])
+
+    # fulfill and send the transaction
+    fulfilled_transfer_tx = bdb.transactions.fulfill(
+        prepared_transfer_tx,
+        private_keys=bob.private_key)
+    sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx,
+                                             mode='commit')
 
 Compatibility Matrix
 --------------------
@@ -89,11 +158,13 @@ Credits
 
 This package was initially created using Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template. Many BigchainDB developers have contributed since then.
 
+.. _Documentation: https://docs.bigchaindb.com/projects/py-driver/
+.. _pypi history: https://pypi.org/project/bigchaindb-driver/#history
+.. _Quickstart: https://docs.bigchaindb.com/projects/py-driver/en/latest/quickstart.html
+.. _BigchainDB Server Quickstart: https://docs.bigchaindb.com/projects/server/en/latest/quickstart.html
+.. _The Hitchhiker's Guide to BigchainDB: https://www.bigchaindb.com/developers/guide/
+.. _HTTP API Reference: https://docs.bigchaindb.com/projects/server/en/latest/http-client-server-api.html
+.. _All BigchainDB Documentation: https://docs.bigchaindb.com/
+.. _licenses: https://github.com/bigchaindb/bigchaindb-driver/blob/master/LICENSES.md
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
-.. _cryptoconditions: https://github.com/bigchaindb/cryptoconditions
-.. _pynacl: https://github.com/pyca/pynacl/
-.. _Networking and Cryptography library: https://nacl.cr.yp.to/
-.. _BigchainDB Server Quickstart: https://docs.bigchaindb.com/projects/server/en/latest/quickstart.html
-.. _licenses: https://github.com/bigchaindb/bigchaindb-driver/blob/master/LICENSES.md
-.. _pypi history: https://pypi.org/project/bigchaindb-driver/#history
