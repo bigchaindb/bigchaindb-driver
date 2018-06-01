@@ -173,10 +173,12 @@ class TestOutputsEndpointMultiple:
 
     @mark.asyncio
     @mark.parametrize("timeout", [0.5])
-    async def test_get_outputs_timeout(self, timeout, event_loop,
-                                       driver_multiple_headers, carol_pubkey,
-                                       persisted_carol_bicycle_transaction,
-                                       persisted_carol_car_transaction):
+    async def test_wait_n_nodes_get_outputs(
+                self, timeout, event_loop,
+                driver_multiple_headers, carol_pubkey,
+                persisted_carol_bicycle_transaction,
+                persisted_carol_car_transaction
+            ):
         for test in range(0, 5):
             out = driver_multiple_headers.outputs.get(carol_pubkey)
             outputs = await asyncio.sleep(timeout, result=out, loop=event_loop)
@@ -193,7 +195,7 @@ class TestOutputsEndpointMultiple:
     @mark.asyncio
     @mark.parametrize('spent,outputs_qty,timeout',
                       ((False, 1, 0.2), (True, 1, 0.5), (None, 2, 0.1)))
-    async def test_get_outputs_with_spent_query_param_timeout(
+    async def test_wait_n_nodes_get_outputs_with_spent_query_param(
             self, spent, outputs_qty, timeout, event_loop,
             driver_multiple_headers, carol_pubkey,
             persisted_carol_bicycle_transaction,

@@ -476,6 +476,7 @@ class MetadataEndpoint(NamespacedDriver):
         path (str): The path of the endpoint.
 
     """
+
     PATH = '/metadata/'
 
     def get(self, *, search, limit=0, headers=None):

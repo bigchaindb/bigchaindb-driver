@@ -82,7 +82,8 @@ class Pool:
 
     def fail_node(self):
         """Send a message to the pool indicating the connection
-        to the current node is failing and needs to try another one"""
+        to the current node is failing and needs to try another one
+        """
         failing_node = self.picker.picked
         self.tries += 1
         self.connections[failing_node]["time"] = datetime.now(
@@ -91,7 +92,8 @@ class Pool:
 
     def success_node(self):
         """Send a message to the pool indicating the connection to the current
-        node is succesful"""
+        node is succesful
+        """
         self.picker.next_node(self.connections)
 
     def get_connection(self):

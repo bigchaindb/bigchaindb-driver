@@ -30,7 +30,8 @@ class Transport:
 
     def init_nodes_array(self, nodes, headers):
         """Initializes an array of nodes with
-        :class:`~bigchaindb_driver.connection.Connection` instances."""
+        :class:`~bigchaindb_driver.connection.Connection` instances.
+        """
         connections = [{"node": Connection(
             node_url=node, headers=headers), "time": datetime.now()}
             for node in nodes]
@@ -38,7 +39,8 @@ class Transport:
 
     def init_nodes_dict(self, nodes):
         """Initializes a dictionary of nodes with
-        :class:`~bigchaindb_driver.connection.Connection` instances"""
+        :class:`~bigchaindb_driver.connection.Connection` instances
+        """
         connections = [
             {
                 "node": Connection(
