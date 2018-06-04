@@ -1,4 +1,4 @@
-.. image:: ../media/repo-banner@2x.png
+.. image:: media/repo-banner@2x.png
 
 .. image:: https://badges.gitter.im/bigchaindb/bigchaindb-driver.svg
    :alt: Join the chat at https://gitter.im/bigchaindb/bigchaindb-driver
