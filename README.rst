@@ -1,5 +1,4 @@
-BigchainDB Python Driver
-========================
+.. image:: ../media/repo-banner@2x.png
 
 .. image:: https://badges.gitter.im/bigchaindb/bigchaindb-driver.svg
    :alt: Join the chat at https://gitter.im/bigchaindb/bigchaindb-driver
@@ -19,6 +18,8 @@ BigchainDB Python Driver
         :target: http://bigchaindb.readthedocs.io/projects/py-driver/en/latest/?badge=latest
         :alt: Documentation Status
 
+BigchainDB Python Driver
+==========================
 
 * Free software: Apache Software License 2.0
 * Check our `Documentation`_
