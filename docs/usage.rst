@@ -498,10 +498,6 @@ ensures that the amount being consumed in each transaction (with divisible
 assets) is the same as the amount being output. This ensures that no amounts
 are lost.
 
-Also note how, because we were consuming a ``TRANSFER`` transaction, we were
-able to directly use the ``TRANSFER`` transaction's ``asset`` as the new
-transaction's ``asset`` because it already contained the asset's id.
-
 The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
 ``amount='2'`` and the other with ``amount='8'``:
 
