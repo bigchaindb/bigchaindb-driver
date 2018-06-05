@@ -99,7 +99,7 @@ Afterwards Bob spends 3 of these tokens.
     fulfilled_token_tx = bdb.transactions.fulfill(
         prepared_token_tx,
         private_keys=alice.private_key)
-    bdb.transactions.send(fulfilled_token_tx, mode='commit')
+    bdb.transactions.send_commit(fulfilled_token_tx)
 
     # Use the tokens
     # create the output and inout for the transaction
@@ -123,8 +123,7 @@ Afterwards Bob spends 3 of these tokens.
     fulfilled_transfer_tx = bdb.transactions.fulfill(
         prepared_transfer_tx,
         private_keys=bob.private_key)
-    sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx,
-                                             mode='commit')
+    sent_transfer_tx = bdb.transactions.send_commit(fulfilled_transfer_tx)
 
 Compatibility Matrix
 --------------------
