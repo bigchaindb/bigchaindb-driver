@@ -85,7 +85,7 @@ class Transport:
                 )
                 self.pool.success_node()
                 return response.data
-            except BaseException as err:
+            except TransportError as err:
                 self.pool.fail_node()
                 return self.forward_request(
                     method=method,
@@ -98,4 +98,4 @@ class Transport:
             raise error
         else:
             exc_cls = HTTP_EXCEPTIONS.get(503, TransportError)
-            raise exc_cls(503, "Insufficient capacity", {})
+            raise exc_cls(503, "ServiceUnavailable", None)

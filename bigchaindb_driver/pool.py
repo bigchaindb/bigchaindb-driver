@@ -32,7 +32,7 @@ class RoundRobinPicker(AbstractPicker):
 
     def __init__(self):
         """Initializes a :class:`~bigchaindb_driver.pool.RoundRobinPicker`
-        instance. Sets :attr:`picked` to ``-1``.
+        instance. Sets :attr:`picked` to ``0``.
 
         """
         self.picked = 0
@@ -75,25 +75,44 @@ class Pool:
 
         """
         self.connections = connections
-        self.tries = 0
-        self.max_tries = len(self.connections) * 4
+        self.node_count = len(self.connections)
+        self.retries = {
+            key: self.max_retries for key in range(
+                self.node_count)}
+        self.max_retries = self.node_count * 4
         self.picker = picker_class()
         self.DELAY = 60
+
+    def retries_left(self, success):
+        """Update retries left of the current node"""
+        if success:
+            self.retries[self.picked] = max(self.retries[self.picked] - 1, 0)
+        else:
+            self.retries[self.picked] = min(
+                self.retries[self.picked] + 1, self.max_retries)
 
     def fail_node(self):
         """Send a message to the pool indicating the connection
         to the current node is failing and needs to try another one
         """
         failing_node = self.picker.picked
-        self.tries += 1
+        self.retries_left(False)
         self.connections[failing_node]["time"] = datetime.now(
         ) + timedelta(seconds=self.DELAY)
         self.picker.next_node(self.connections)
+
+    def nodes_available(self):
+        """Check if there are retries left in every node"""
+        for node in self.retries:
+            if self.retries[node] > 0:
+                return True
+        return False
 
     def success_node(self):
         """Send a message to the pool indicating the connection to the current
         node is succesful
         """
+        self.tries_left(True)
         self.picker.next_node(self.connections)
 
     def get_connection(self):
@@ -105,7 +124,7 @@ class Pool:
 
         """
 
-        if self.tries >= self.max_tries:
+        if not self.nodes_available():
             return None
         elif len(self.connections) > 1:
             return self.picker.pick(self.connections)
