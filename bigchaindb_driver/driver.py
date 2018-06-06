@@ -1,6 +1,7 @@
 from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
 from .utils import _normalize_nodes
+from warnings import warn
 
 
 class BigchainDB:
@@ -26,8 +27,8 @@ class BigchainDB:
             headers (dict): Optional headers that will be passed with
                 each request. To pass headers only on a per-request
                 basis, you can pass the headers to the method of choice
-                (e.g. :meth:`BigchainDB().transactions.send()
-                <.TransactionsEndpoint.send>`).
+                (e.g. :meth:`BigchainDB().transactions.send_commit()
+                <.TransactionsEndpoint.send_commit>`).
 
         """
         self._nodes = _normalize_nodes(*nodes)
@@ -318,6 +319,41 @@ class TransactionsEndpoint(NamespacedDriver):
         Args:
             transaction (dict): the transaction to be sent
                 to the Federation node(s).
+            mode (str): the mode the transaction is sent to the Federation
+                node(s).
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            dict: The transaction sent to the Federation node(s).
+
+        .. warning::
+
+            The method .send will be deprecated in the next release
+            of the driver, please use ``.send_commit``, ``.send_sync``, or
+            ``.send_async`` instead. More info:
+            https://docs.bigchaindb.com/projects/py-driver/en/latest/handcraft.html#send-the-transaction
+        """
+
+        warn('The method .send will be deprecated in the next release of the '
+             'driver, please use .send_commit, .send_sync, or .send_async '
+             'instead. More info: '
+             'https://docs.bigchaindb.com/projects/py-driver/en/latest/'
+             'handcraft.html#send-the-transaction',
+             PendingDeprecationWarning, stacklevel=2)
+
+        return self.transport.forward_request(
+            method='POST',
+            path=self.path,
+            json=transaction,
+            params={'mode': mode},
+            headers=headers)
+
+    def send_async(self, transaction, headers=None):
+        """Submit a transaction to the Federation with the mode `async`.
+
+        Args:
+            transaction (dict): the transaction to be sent
+                to the Federation node(s).
             headers (dict): Optional headers to pass to the request.
 
         Returns:
@@ -328,7 +364,45 @@ class TransactionsEndpoint(NamespacedDriver):
             method='POST',
             path=self.path,
             json=transaction,
-            params={'mode': mode},
+            params={'mode': 'async'},
+            headers=headers)
+
+    def send_sync(self, transaction, headers=None):
+        """Submit a transaction to the Federation with the mode `sync`.
+
+        Args:
+            transaction (dict): the transaction to be sent
+                to the Federation node(s).
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            dict: The transaction sent to the Federation node(s).
+
+        """
+        return self.transport.forward_request(
+            method='POST',
+            path=self.path,
+            json=transaction,
+            params={'mode': 'sync'},
+            headers=headers)
+
+    def send_commit(self, transaction, headers=None):
+        """Submit a transaction to the Federation with the mode `commit`.
+
+        Args:
+            transaction (dict): the transaction to be sent
+                to the Federation node(s).
+            headers (dict): Optional headers to pass to the request.
+
+        Returns:
+            dict: The transaction sent to the Federation node(s).
+
+        """
+        return self.transport.forward_request(
+            method='POST',
+            path=self.path,
+            json=transaction,
+            params={'mode': 'commit'},
             headers=headers)
 
     def retrieve(self, txid, headers=None):

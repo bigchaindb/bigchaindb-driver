@@ -59,8 +59,8 @@ class TestBigchainDB:
 
 class TestTransactionsEndpoint:
 
-    def test_retrieve(self, driver, persisted_random_transaction):
-        txid = persisted_random_transaction['id']
+    def test_retrieve(self, driver, sent_persisted_random_transaction):
+        txid = sent_persisted_random_transaction['id']
         tx = driver.transactions.retrieve(txid)
         assert tx['id'] == txid
 
@@ -107,32 +107,21 @@ class TestTransactionsEndpoint:
         fulfillment_uri = ed25519.serialize_uri()
         assert signed_transaction['inputs'][0]['fulfillment'] == fulfillment_uri   # noqa
 
-    def test_send(self, driver, alice_privkey, unsigned_transaction):
-        fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
-                                                   private_keys=alice_privkey)
-        sent_tx = driver.transactions.send(fulfilled_tx)
-        assert sent_tx == fulfilled_tx
+    def test_send(self, driver, persisted_random_transaction):
+        sent_tx = driver.transactions.send(persisted_random_transaction)
+        assert sent_tx == persisted_random_transaction
 
-    def test_send_wrong_mode(self, driver,
-                             alice_privkey, unsigned_transaction):
-        from bigchaindb_driver.exceptions import BadRequest
-        fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
-                                                   private_keys=alice_privkey)
-        with raises(BadRequest) as error:
-            driver.transactions.send(fulfilled_tx, mode='mode')
-            assert error.exception.message == \
-                'Mode must be "async", "sync" or "commit"'
+    def test_send_commit(self, driver, persisted_random_transaction):
+        sent_tx = driver.transactions.send_commit(persisted_random_transaction)
+        assert sent_tx == persisted_random_transaction
 
-    @mark.skip(reason='transactions are not yet unique')
-    @mark.parametrize('mode_params', (
-        'sync', 'commit'
-    ))
-    def test_send_with_mode(self, driver, alice_privkey,
-                            unsigned_transaction, mode_params):
-        fulfilled_tx = driver.transactions.fulfill(unsigned_transaction,
-                                                   private_keys=alice_privkey)
-        sent_tx = driver.transactions.send(fulfilled_tx, mode=mode_params)
-        assert sent_tx == fulfilled_tx
+    def test_send_async(self, driver, persisted_random_transaction):
+        sent_tx = driver.transactions.send_async(persisted_random_transaction)
+        assert sent_tx == persisted_random_transaction
+
+    def test_send_sync(self, driver, persisted_random_transaction):
+        sent_tx = driver.transactions.send_sync(persisted_random_transaction)
+        assert sent_tx == persisted_random_transaction
 
     def test_get_raises_type_error(self, driver):
         """This test is somewhat important as it ensures that the
@@ -281,8 +270,9 @@ class TestOutputsEndpoint:
 
 class TestBlocksEndpoint:
 
-    def test_get(self, driver, persisted_random_transaction):
-        block_id = driver.blocks.get(txid=persisted_random_transaction['id'])
+    def test_get(self, driver, sent_persisted_random_transaction):
+        block_id = driver.blocks.\
+            get(txid=sent_persisted_random_transaction['id'])
         assert block_id
 
     def test_retrieve(self, driver, block_with_alice_transaction):
