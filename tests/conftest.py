@@ -275,8 +275,22 @@ def persisted_alice_transaction(signed_alice_transaction,
 
 @fixture
 def persisted_random_transaction(alice_pubkey,
-                                 alice_privkey,
-                                 transactions_api_full_url):
+                                 alice_privkey):
+    from uuid import uuid4
+    from bigchaindb_driver.common.transaction import Transaction
+    asset = {'data': {'x': str(uuid4())}}
+    tx = Transaction.create(
+        tx_signers=[alice_pubkey],
+        recipients=[([alice_pubkey], 1)],
+        asset=asset,
+    )
+    return tx.sign([alice_privkey]).to_dict()
+
+
+@fixture
+def sent_persisted_random_transaction(alice_pubkey,
+                                      alice_privkey,
+                                      transactions_api_full_url):
     from uuid import uuid4
     from bigchaindb_driver.common.transaction import Transaction
     asset = {'data': {'x': str(uuid4())}}
@@ -292,11 +306,11 @@ def persisted_random_transaction(alice_pubkey,
 
 
 @fixture
-def block_with_alice_transaction(persisted_random_transaction,
+def block_with_alice_transaction(sent_persisted_random_transaction,
                                  blocks_api_full_url):
     return requests.get(
         blocks_api_full_url,
-        params={'transaction_id': persisted_random_transaction['id']}
+        params={'transaction_id': sent_persisted_random_transaction['id']}
     ).json()[0]
 
 

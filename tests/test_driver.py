@@ -287,10 +287,10 @@ class TestBlocksEndpointMultiple:
     @mark.parametrize('timeout,nodes', ((0.5, 2), (0.5, 3)))
     async def test_n_nodes_wait_get(self, timeout, nodes, event_loop,
                                     driver_multiple_headers,
-                                    persisted_random_transaction):
+                                    sent_persisted_random_transaction):
         for test in range(nodes):
             block_id = driver_multiple_headers.blocks.get(
-                txid=persisted_random_transaction['id'])
+                txid=sent_persisted_random_transaction['id'])
             result = await asyncio.sleep(timeout, result=block_id,
                                          loop=event_loop)
             assert result
@@ -309,10 +309,10 @@ class TestBlocksEndpointMultiple:
 
     @mark.parametrize("nodes", [5])
     def test_get_n_nodes(self, nodes, driver_multiple_headers,
-                         persisted_random_transaction):
+                         sent_persisted_random_transaction):
         for test in range(nodes):
             block_id = driver_multiple_headers.blocks.get(
-                txid=persisted_random_transaction['id'])
+                txid=sent_persisted_random_transaction['id'])
             assert block_id
 
     @mark.parametrize("nodes", [5])
