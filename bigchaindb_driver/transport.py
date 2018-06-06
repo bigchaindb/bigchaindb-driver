@@ -98,4 +98,4 @@ class Transport:
             raise error
         else:
             exc_cls = HTTP_EXCEPTIONS.get(503, TransportError)
-            raise exc_cls(503, "ServiceUnavailable", None)
+            raise exc_cls(503, "Service Unavailable", None)
