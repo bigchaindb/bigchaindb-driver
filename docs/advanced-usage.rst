@@ -83,7 +83,9 @@ backlog where it will be validated before being included in a block.
 
 .. code-block:: python
 
-    >>> sent_tx = bdb.transactions.send(signed_tx)
+    >>> sent_tx = bdb.transactions.send_commit(signed_tx)
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 Note that the transaction payload returned by the BigchainDB node is equivalent
 to the signed transaction payload.
@@ -112,7 +114,7 @@ Recap: Asset Creation
                               asset=digital_asset_payload)
 
     signed_tx = bdb.transactions.fulfill(tx, private_keys=alice.private_key)
-    sent_tx = bdb.transactions.send(signed_tx)
+    sent_tx = bdb.transactions.send_commit(signed_tx)
     sent_tx == signed_tx
 
 Check if the Transaction was sent successfully
@@ -272,7 +274,9 @@ the need to have a connection to a BigchainDB federation.
 
 .. code-block:: python
 
-    >>> sent_tx_transfer = bdb.transactions.send(signed_tx_transfer)
+    >>> sent_tx_transfer = bdb.transactions.send_commit(signed_tx_transfer)
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 Again, as with the ``'CREATE'`` transaction, notice how the payload returned
 by the server is equal to the signed one.
@@ -312,7 +316,7 @@ Recap: Asset Transfer
         tx_transfer,
         private_keys=alice.private_key,
     )
-    sent_tx_transfer = bdb.transactions.send(signed_tx_transfer)
+    sent_tx_transfer = bdb.transactions.send_commit(signed_tx_transfer)
 
 Double Spends
 -------------
@@ -358,7 +362,7 @@ specifying the matching `asset_id`.
 
     >>> from bigchaindb_driver.exceptions import BigchaindbException
     >>> try:
-    ...     bdb.transactions.send(fulfilled_tx_transfer_2)
+    ...     bdb.transactions.send_commit(fulfilled_tx_transfer_2)
     ... except BigchaindbException as e:
     ...     print(e.info)
 
@@ -411,10 +415,12 @@ list or tuple of ``recipients``:
 
 .. code-block:: python
 
-    >>> sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
+    >>> sent_car_tx = bdb.transactions.send_commit(signed_car_creation_tx)
 
     >>> sent_car_tx == signed_car_creation_tx
     True
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 Let's see how the example looks like when ``alice`` and ``bob`` are the issuers:
 
@@ -445,7 +451,7 @@ Let's see how the example looks like when ``alice`` and ``bob`` are the issuers:
         car_creation_tx,
         private_keys=[alice.private_key, bob.private_key],
     )
-    sent_car_tx = bdb.transactions.send(signed_car_creation_tx)
+    sent_car_tx = bdb.transactions.send_commit(signed_car_creation_tx)
 
 
 One day, ``alice`` and ``bob``, having figured out how to teleport themselves,
@@ -542,7 +548,9 @@ Sending the transaction over to a BigchainDB node:
 
 .. code-block:: python
 
-    sent_car_transfer_tx = bdb.transactions.send(signed_car_transfer_tx)
+    sent_car_transfer_tx = bdb.transactions.send_commit(signed_car_transfer_tx)
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 Done!
 
@@ -1198,3 +1206,5 @@ If you execute in a timely fashion, you should see the following:
 Of course, when the ``execute`` transaction was accepted in-time by bigchaindb,
 then writing the ``abort`` transaction after expiry will yield a
 ``Doublespend`` error.
+
+.. _More info: https://docs.bigchaindb.com/projects/py-driver/en/latest/handcraft.html#send-the-transaction

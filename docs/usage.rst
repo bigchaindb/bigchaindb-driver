@@ -123,7 +123,9 @@ And sent over to a BigchainDB node:
 
 .. code-block:: python
 
-    >>> sent_creation_tx = bdb.transactions.send(fulfilled_creation_tx)
+    >>> sent_creation_tx = bdb.transactions.send_commit(fulfilled_creation_tx)
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 Note that the response from the node should be the same as that which was sent:
 
@@ -242,10 +244,12 @@ and finally send it to the connected BigchainDB node:
 
 .. code-block:: python
 
-    >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+    >>> sent_transfer_tx = bdb.transactions.send_commit(fulfilled_transfer_tx)
 
     >>> sent_transfer_tx == fulfilled_transfer_tx
     True
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 Bob is the new owner:
 
@@ -317,7 +321,7 @@ Recap: Asset Creation & Transfer
         private_keys=alice.private_key
     )
 
-    sent_creation_tx = bdb.transactions.send(fulfilled_creation_tx)
+    sent_creation_tx = bdb.transactions.send_commit(fulfilled_creation_tx)
 
     txid = fulfilled_creation_tx['id']
 
@@ -351,7 +355,7 @@ Recap: Asset Creation & Transfer
         private_keys=alice.private_key,
     )
 
-    sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+    sent_transfer_tx = bdb.transactions.send_commit(fulfilled_transfer_tx)
 
     print("Is Bob the owner?",
         sent_transfer_tx['outputs'][0]['public_keys'][0] == bob.public_key)
@@ -416,10 +420,12 @@ Sending the transaction:
 
 .. code-block:: python
 
-    >>> sent_token_tx = bdb.transactions.send(fulfilled_token_tx)
+    >>> sent_token_tx = bdb.transactions.send_commit(fulfilled_token_tx)
 
     >>> sent_token_tx == fulfilled_token_tx
     True
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 .. note:: Defining ``recipients``:
 
@@ -507,10 +513,12 @@ The ``fulfilled_transfer_tx`` dictionary should have two outputs, one with
 
 .. code-block:: python
 
-    >>> sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+    >>> sent_transfer_tx = bdb.transactions.send_commit(fulfilled_transfer_tx)
 
     >>> sent_transfer_tx == fulfilled_transfer_tx
     True
+
+.. warning:: The method .send will be deprecated in the next release of the driver, please use ``.send_commit``, ``.send_sync``, or ``.send_async`` instead. `More info`_
 
 .. _query-for-assets:
 
@@ -548,7 +556,7 @@ Let's create 3 assets:
     )
     fulfilled_creation_tx = bdb.transactions.fulfill(
         prepared_creation_tx, private_keys=alice.private_key)
-    bdb.transactions.send(fulfilled_creation_tx)
+    bdb.transactions.send_commit(fulfilled_creation_tx)
 
     prepared_creation_tx = bdb.transactions.prepare(
         operation='CREATE',
@@ -557,7 +565,7 @@ Let's create 3 assets:
     )
     fulfilled_creation_tx = bdb.transactions.fulfill(
         prepared_creation_tx, private_keys=alice.private_key)
-    bdb.transactions.send(fulfilled_creation_tx)
+    bdb.transactions.send_commit(fulfilled_creation_tx)
 
     prepared_creation_tx = bdb.transactions.prepare(
         operation='CREATE',
@@ -566,7 +574,7 @@ Let's create 3 assets:
     )
     fulfilled_creation_tx = bdb.transactions.fulfill(
         prepared_creation_tx, private_keys=alice.private_key)
-    bdb.transactions.send(fulfilled_creation_tx)
+    bdb.transactions.send_commit(fulfilled_creation_tx)
 
 Let's perform a text search for all assets that contain the word ``bigchaindb``:
 
@@ -742,3 +750,5 @@ argument:
             'metadata': {'planet': 'earth'}
         }
     ]
+
+.. _More info: https://docs.bigchaindb.com/projects/py-driver/en/latest/handcraft.html#send-the-transaction
