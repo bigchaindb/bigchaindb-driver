@@ -85,7 +85,7 @@ class Transport:
                 )
                 self.pool.success_node()
                 return response.data
-            except TransportError as err:
+            except BaseException as err:
                 self.pool.fail_node()
                 return self.forward_request(
                     method=method,

@@ -76,27 +76,26 @@ class Pool:
         """
         self.connections = connections
         self.node_count = len(self.connections)
-        self.retries = {
-            key: self.max_retries for key in range(
-                self.node_count)}
         self.max_retries = self.node_count * 4
+        self.retries = {
+            key: self.max_retries for key in range(self.node_count)
+        }
         self.picker = picker_class()
         self.DELAY = 60
 
-    def retries_left(self, success):
+    def retries_left(self, node, success=True):
         """Update retries left of the current node"""
         if success:
-            self.retries[self.picked] = max(self.retries[self.picked] - 1, 0)
+            self.retries[node] = min(self.retries[node] + 1, self.max_retries)
         else:
-            self.retries[self.picked] = min(
-                self.retries[self.picked] + 1, self.max_retries)
+            self.retries[node] = max(self.retries[node] - 1, 0)
 
     def fail_node(self):
         """Send a message to the pool indicating the connection
         to the current node is failing and needs to try another one
         """
         failing_node = self.picker.picked
-        self.retries_left(False)
+        self.retries_left(failing_node, success=False)
         self.connections[failing_node]["time"] = datetime.now(
         ) + timedelta(seconds=self.DELAY)
         self.picker.next_node(self.connections)
@@ -112,7 +111,8 @@ class Pool:
         """Send a message to the pool indicating the connection to the current
         node is succesful
         """
-        self.tries_left(True)
+        success_node = self.picker.picked
+        self.retries_left(success_node, success=True)
         self.picker.next_node(self.connections)
 
     def get_connection(self):
