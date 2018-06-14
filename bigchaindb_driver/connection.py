@@ -25,7 +25,7 @@ class Connection:
         if headers:
             self.session.headers.update(headers)
 
-    def request(self, method, *, path=None, json=None,
+    def request(self, method, timeout=None, *, path=None, json=None,
                 params=None, headers=None, **kwargs):
         """Performs an HTTP requests for the specified arguments.
 
@@ -41,6 +41,7 @@ class Connection:
         url = self.node_url + path if path else self.node_url
         response = self.session.request(
             method=method,
+            timeout=timeout,
             url=url,
             json=json,
             params=params,

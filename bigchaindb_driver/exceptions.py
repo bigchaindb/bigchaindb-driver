@@ -63,8 +63,13 @@ class ServiceUnavailable(TransportError):
     """Exception for HTTP 503 errors."""
 
 
+class GatewayTimeout(TransportError):
+    """Exception for HTTP 503 errors."""
+
+
 HTTP_EXCEPTIONS = {
     400: BadRequest,
     404: NotFoundError,
     503: ServiceUnavailable,
+    504: GatewayTimeout,
 }

@@ -187,10 +187,6 @@ def bdb_node(bdb_host, bdb_port):
 @fixture
 def bdb_nodes_headers(bdb_node, bdb_node_header):
     return [
-        {'endpoint': bdb_node,
-         'headers': bdb_node_header},
-        {'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
-         'headers': bdb_node_header},
         {'endpoint': 'bigchaindb-driver_bigchaindb_2:9984',
          'headers': bdb_node_header},
         {'endpoint': 'bigchaindb-driver_bigchaindb_3:9984',
@@ -199,6 +195,11 @@ def bdb_nodes_headers(bdb_node, bdb_node_header):
          'headers': bdb_node_header},
         {'endpoint': 'bigchaindb-driver_bigchaindb_5:9984',
          'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
+         'headers': bdb_node_header},
+        {'endpoint': bdb_node,
+         'headers': bdb_node_header},
+
     ]
 
 

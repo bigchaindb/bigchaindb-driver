@@ -6,9 +6,9 @@ def test_get_connection():
     pool = Pool(connections)
     connection = pool.get_connection()
     assert connection == 0
-    pool.success_node()
+    pool.picker.next_node(connections)
     connection = pool.get_connection()
     assert connection == 1
-    pool.success_node()
+    pool.picker.next_node(connections)
     connection = pool.get_connection()
     assert connection == 0

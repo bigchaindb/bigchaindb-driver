@@ -52,15 +52,13 @@ class RoundRobinPicker(AbstractPicker):
 
         """
 
-        current_time_ms = datetime.now()
-        picked_time = connections[self.picked]["time"]
-        if current_time_ms > picked_time:
-            node = connections[self.picked]["node"]
-            return node
-        else:
+        current_time_ms = datetime.utcnow()
+
+        while current_time_ms <= connections[self.picked]['time']:
             self.next_node(connections)
-            node = connections[self.picked]["node"]
-            return node
+            current_time_ms = datetime.utcnow()
+
+        return connections[self.picked]
 
 
 class Pool:
@@ -76,43 +74,26 @@ class Pool:
         """
         self.connections = connections
         self.node_count = len(self.connections)
-        self.max_retries = self.node_count * 4
+        self.max_retries = 10
         self.retries = {
-            key: self.max_retries for key in range(self.node_count)
+            key: 0 for key in range(self.node_count)
         }
         self.picker = picker_class()
-        self.DELAY = 60
+        self.initial_delay = 1
 
-    def retries_left(self, node, success=True):
+    def update_retries(self, node):
         """Update retries left of the current node"""
-        if success:
-            self.retries[node] = min(self.retries[node] + 1, self.max_retries)
-        else:
-            self.retries[node] = max(self.retries[node] - 1, 0)
+        self.retries[node] = min(self.retries[node] + 1, self.max_retries)
 
     def fail_node(self):
         """Send a message to the pool indicating the connection
         to the current node is failing and needs to try another one
         """
         failing_node = self.picker.picked
-        self.retries_left(failing_node, success=False)
-        self.connections[failing_node]["time"] = datetime.now(
-        ) + timedelta(seconds=self.DELAY)
-        self.picker.next_node(self.connections)
-
-    def nodes_available(self):
-        """Check if there are retries left in every node"""
-        for node in self.retries:
-            if self.retries[node] > 0:
-                return True
-        return False
-
-    def success_node(self):
-        """Send a message to the pool indicating the connection to the current
-        node is succesful
-        """
-        success_node = self.picker.picked
-        self.retries_left(success_node, success=True)
+        self.update_retries(failing_node)
+        delta = timedelta(
+            seconds=self.initial_delay * 2 ** self.retries[failing_node])
+        self.connections[failing_node]["time"] = datetime.utcnow() + delta
         self.picker.next_node(self.connections)
 
     def get_connection(self):
@@ -123,9 +104,5 @@ class Pool:
             A :class:`~bigchaindb_driver.connection.Connection` instance.
 
         """
-
-        if not self.nodes_available():
-            return None
-        elif len(self.connections) > 1:
-            return self.picker.pick(self.connections)
-        return self.connections[0]["node"]
+        connection = self.picker.pick(self.connections)
+        return connection["node"]
