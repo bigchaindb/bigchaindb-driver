@@ -101,8 +101,6 @@ class BigchainDB:
 
                 * the server version,
                 * the public key of the node, and
-                * its key ring (list of public keys of the nodes this
-                  node is connected to).
 
         Note:
             Currently limited to one node, and will be expanded to
