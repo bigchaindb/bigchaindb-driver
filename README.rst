@@ -103,7 +103,7 @@ Afterwards Bob spends 3 of these tokens.
 
     # Use the tokens
     # create the output and inout for the transaction
-    transfer_asset = {'id': bike_token_id}
+    transfer_asset = {'id': fulfilled_token_tx['id']}
     output_index = 0
     output = fulfilled_token_tx['outputs'][output_index]
     transfer_input = {'fulfillment': output['condition']['details'],
