@@ -46,7 +46,7 @@ docs_require = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.5.0a4',
+    version='0.5.0',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
@@ -62,7 +62,7 @@ setup(
     zip_safe=False,
     keywords='bigchaindb_driver',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',

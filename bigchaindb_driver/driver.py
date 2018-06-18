@@ -102,10 +102,8 @@ class BigchainDB:
             dict: Details of the node that this instance is connected
             to. Some information that may be interesting:
 
-                * the server version,
-                * the public key of the node, and
-                * its key ring (list of public keys of the nodes this
-                  node is connected to).
+                * the server version and
+                * an overview of all the endpoints
 
         Note:
             Currently limited to one node, and will be expanded to

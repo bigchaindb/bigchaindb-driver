@@ -53,7 +53,6 @@ class TestBigchainDB:
         response = driver.info()
         assert 'api' in response
         assert 'docs' in response
-        assert response['keyring'] == []
         assert response['software'] == 'BigchainDB'
         assert 'version' in response
 

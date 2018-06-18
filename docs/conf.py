@@ -1,5 +1,6 @@
 import sys
 import os
+import datetime
 
 import sphinx_rtd_theme
 
@@ -32,7 +33,8 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 project = 'BigchainDB Python Driver'
-copyright = '2016, BigchainDB Contributors'
+now = datetime.datetime.now()
+copyright = str(now.year) + ', BigchainDB Contributors'
 version = bigchaindb_driver.__version__
 release = bigchaindb_driver.__version__
 exclude_patterns = ['_build']

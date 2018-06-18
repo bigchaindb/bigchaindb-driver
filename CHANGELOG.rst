@@ -1,6 +1,23 @@
 Changelog
 =========
 
+0.5.0 (2018-06-14)
+---------------------
+Added
+^^^^^
+* Added three new methods to send/post a transaction as discussed `here <https://github.com/bigchaindb/bigchaindb/issues/2307>`_:
+
+    * ``send_commit``
+    * ``send_async``
+    * ``send_sync``
+
+Deprecated
+^^^^^^^^^^
+* ``send()`` under ``TransactionEndpoint``, and available
+  via ``BigchainDB.transactions``. Replaced by the above three methods:
+  ``send_commit()``, ``send_async()``, and ``send_sync()``.
+
+
 0.5.0a4 (2018-05-07)
 ---------------------
 * `Removed dependencies from BigchainDB Server package <https://github.com/bigchaindb/bigchaindb-driver/pull/411>`_.
