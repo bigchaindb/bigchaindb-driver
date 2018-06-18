@@ -75,7 +75,7 @@ lint: check-deps ## Check style with flake8
 	@$(DC) run --rm bigchaindb-driver flake8 bigchaindb_driver tests
 
 cov: check-deps ## Check code coverage and open the result in the browser
-	@$(DC) run --rm bigchaindb-driver pytest -v --cov=bigchaindb_driver --cov-report xml:htmlcov/coverage.xml
+	@$(DC) run --rm bigchaindb-driver pytest -v --cov=bigchaindb_driver --cov-report xml:./coverage.xml
 	# $(BROWSER) htmlcov/index.html
 
 clean: clean-build clean-pyc clean-test ## Remove all build, test, coverage and Python artifacts
