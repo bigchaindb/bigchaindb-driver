@@ -25,7 +25,6 @@ tests_require = [
     'pytest-cov',
     'pytest-env',
     'pytest-sugar',
-    'pytest-asyncio',
     'pytest-xdist',
     'responses~=0.5.1',
 ]

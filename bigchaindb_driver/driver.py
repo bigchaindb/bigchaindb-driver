@@ -24,7 +24,7 @@ class BigchainDB:
                 URL must be given. In the absence of any node, the default
                 (``'http://localhost:9984'``) will be used.
             timeout (int): timeout in seconds, specify how long to wait for
-                the response.
+                the response. default value is 20 secs.
             transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
             headers (dict): Optional headers that will be passed with
@@ -34,9 +34,8 @@ class BigchainDB:
                 <.TransactionsEndpoint.send_commit>`).
 
         """
-        self._nodes = _normalize_nodes(*nodes)
-        self._transport = transport_class(
-            *self._nodes, timeout=timeout, headers=headers)
+        self._nodes = _normalize_nodes(*nodes, headers=headers)
+        self._transport = transport_class(*self._nodes, timeout=timeout)
         self._transactions = TransactionsEndpoint(self)
         self._outputs = OutputsEndpoint(self)
         self._blocks = BlocksEndpoint(self)

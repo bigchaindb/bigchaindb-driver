@@ -41,7 +41,7 @@ class RoundRobinPicker(AbstractPicker):
         """Update index of the current active node in the pool"""
         self.picked = (self.picked + 1) % len(connections)
 
-    def pick(self, connections):
+    def pick(self, connections, time_left):
         """Picks a :class:`~bigchaindb_driver.connection.Connection`
         instance from the given list of
         :class:`~bigchaindb_driver.connection.Connection` instances.
@@ -49,12 +49,14 @@ class RoundRobinPicker(AbstractPicker):
         Args:
             connections (List): List of
                 :class:`~bigchaindb_driver.connection.Connection` instances.
+            time_left: user specified timeout
 
         """
 
         current_time_ms = datetime.utcnow()
 
-        while current_time_ms <= connections[self.picked]['time']:
+        while (current_time_ms <= time_left
+                and current_time_ms <= connections[self.picked]['time']):
             self.next_node(connections)
             current_time_ms = datetime.utcnow()
 
@@ -96,13 +98,16 @@ class Pool:
         self.connections[failing_node]["time"] = datetime.utcnow() + delta
         self.picker.next_node(self.connections)
 
-    def get_connection(self):
+    def get_connection(self, time_left):
         """Gets a :class:`~bigchaindb_driver.connection.Connection`
         instance from the pool.
+        Args:
+            time_left: user specified timeout
 
         Returns:
             A :class:`~bigchaindb_driver.connection.Connection` instance.
 
         """
-        connection = self.picker.pick(self.connections)
+        connection = self.picker.pick(self.connections,
+                                      datetime.utcnow() + time_left)
         return connection["node"]

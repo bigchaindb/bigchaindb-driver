@@ -22,28 +22,10 @@ class Transport:
         """
         self.nodes = nodes
         self.timeout = timeout
-        self.init_pool(nodes, headers=headers)
+        self.init_pool(nodes)
 
-    def init_pool(self, nodes, headers=None):
+    def init_pool(self, nodes):
         """Initializes the pool of connections."""
-        if isinstance(nodes[0], dict):
-            self.init_nodes_dict(nodes)
-        else:
-            self.init_nodes_array(nodes, headers)
-
-    def init_nodes_array(self, nodes, headers):
-        """Initializes an array of nodes with
-        :class:`~bigchaindb_driver.connection.Connection` instances.
-        """
-        connections = [{"node": Connection(
-            node_url=node, headers=headers), "time": datetime.now()}
-            for node in nodes]
-        self.pool = Pool(connections)
-
-    def init_nodes_dict(self, nodes):
-        """Initializes a dictionary of nodes with
-        :class:`~bigchaindb_driver.connection.Connection` instances
-        """
         connections = [
             {
                 "node": Connection(
@@ -52,13 +34,13 @@ class Transport:
                 "time":datetime.utcnow()} for node in nodes]
         self.pool = Pool(connections)
 
-    def get_connection(self):
+    def get_connection(self, time_left):
         """Gets a connection from the pool.
 
         Returns:
             A :class:`~bigchaindb_driver.connection.Connection` instance.
         """
-        return self.pool.get_connection()
+        return self.pool.get_connection(time_left)
 
     def forward_request(self, method, path=None,
                         json=None, params=None, headers=None):
@@ -82,7 +64,7 @@ class Transport:
         error = None
         while time_left.total_seconds() > 0:
             try:
-                connection = self.get_connection()
+                connection = self.get_connection(time_left)
                 response = connection.request(
                     method=method,
                     timeout=time_left.seconds,

@@ -7,25 +7,33 @@ from pytest import mark, raises
 from requests.utils import default_headers
 from sha3 import sha3_256
 from cryptoconditions import Ed25519Sha256
-import asyncio
 
 
 class TestBigchainDB:
 
     @mark.parametrize('nodes,headers, normalized_nodes', (
-        ((), None, ('http://localhost:9984',)),
-        (('node-1',), None, ('http://node-1:9984',)),
-        (('node-1', 'node-2'), {'app_id': 'id'}, ('http://node-1:9984',
-                                                  'http://node-2:9984')),
-        (({'endpoint': 'node-1',
-           'headers': {'app_id': 'id'}},
-          {'endpoint': 'node-2',
-           'headers': {'app_id': 'id'}}),
-            None,
+        ((), None, (({'endpoint': 'http://localhost:9984', 'headers': {}},))),
+        (('node-1',), None,
+         ({'endpoint': 'http://node-1:9984', 'headers': {}},)),
+        (('node-1',
+          'node-2',
+          ),
+         {'app_id': 'id'},
             ({'endpoint': 'http://node-1:9984',
               'headers': {'app_id': 'id'}},
              {'endpoint': 'http://node-2:9984',
-              'headers': {'app_id': 'id'}})),
+              'headers': {'app_id': 'id'}},
+             )),
+        (({'endpoint': 'node-1',
+           'headers': {'app_id': 'id'}},
+          {'endpoint': 'node-2',
+           'headers': {'app_id': 'id'}},),
+         None,
+         ({'endpoint': 'http://node-1:9984',
+           'headers': {'app_id': 'id'}},
+          {'endpoint': 'http://node-2:9984',
+           'headers': {'app_id': 'id'}},)),
+
     ))
     def test_driver_init(self, nodes, headers, normalized_nodes):
         from bigchaindb_driver.driver import BigchainDB
@@ -158,67 +166,6 @@ class TestTransactionsEndpoint:
                        for tx in response if 'id' in tx['asset'])
 
 
-class TestOutputsEndpointMultiple:
-
-    @mark.asyncio
-    @mark.parametrize("timeout", [0.5])
-    async def test_wait_n_nodes_get_outputs(
-                self, timeout, event_loop,
-                driver_multiple_headers, carol_pubkey,
-                persisted_carol_bicycle_transaction,
-                persisted_carol_car_transaction
-            ):
-        for test in range(0, 5):
-            out = driver_multiple_headers.outputs.get(carol_pubkey)
-            outputs = await asyncio.sleep(timeout, result=out, loop=event_loop)
-            assert len(outputs) == 2
-            assert {
-                'transaction_id': persisted_carol_bicycle_transaction['id'],
-                'output_index': 0
-            } in outputs
-            assert {
-                'transaction_id': persisted_carol_car_transaction['id'],
-                'output_index': 0
-            } in outputs
-
-    @mark.asyncio
-    @mark.parametrize('spent,outputs_qty,timeout',
-                      ((False, 1, 0.2), (True, 1, 0.5), (None, 2, 0.1)))
-    async def test_wait_n_nodes_get_outputs_with_spent_query_param(
-            self, spent, outputs_qty, timeout, event_loop,
-            driver_multiple_headers, carol_pubkey,
-            persisted_carol_bicycle_transaction,
-            persisted_carol_car_transaction,
-            persisted_transfer_carol_car_to_dimi):
-
-        for test in range(0, 5):
-            out = driver_multiple_headers.outputs.get(
-                carol_pubkey, spent=spent)
-            outputs = await asyncio.sleep(timeout, result=out, loop=event_loop)
-            assert len(outputs) == outputs_qty
-
-            # Return only unspent outputs
-            if spent is False:
-                assert {
-                   'transaction_id': persisted_carol_bicycle_transaction['id'],
-                   'output_index': 0} in outputs
-            # Return only spent outputs
-            elif spent is True:
-                assert {
-                   'transaction_id': persisted_carol_car_transaction['id'],
-                   'output_index': 0
-                } in outputs
-            # Return all outputs for carol
-            elif spent is None:
-                assert {
-                   'transaction_id': persisted_carol_bicycle_transaction['id'],
-                   'output_index': 0} in outputs
-                assert {
-                    'transaction_id': persisted_carol_car_transaction['id'],
-                    'output_index': 0
-                } in outputs
-
-
 class TestOutputsEndpoint:
 
     def test_get_outputs(self, driver, carol_pubkey,
@@ -280,45 +227,10 @@ class TestBlocksEndpoint:
             block_height=str(block_with_alice_transaction))
         assert block
 
-
-class TestBlocksEndpointMultiple:
-
-    @mark.asyncio
-    @mark.parametrize('timeout,nodes', ((0.5, 2), (0.5, 3)))
-    async def test_n_nodes_wait_get(self, timeout, nodes, event_loop,
-                                    driver_multiple_headers,
-                                    sent_persisted_random_transaction):
-        for test in range(nodes):
-            block_id = driver_multiple_headers.blocks.get(
-                txid=sent_persisted_random_transaction['id'])
-            result = await asyncio.sleep(timeout, result=block_id,
-                                         loop=event_loop)
-            assert result
-
-    @mark.asyncio
-    @mark.parametrize('timeout,nodes', ((0.5, 3), (0.5, 2)))
-    async def test_n_nodes_wait_retrieve(self, timeout, nodes, event_loop,
-                                         driver_multiple_headers,
-                                         block_with_alice_transaction):
-        for test in range(nodes):
-            block = driver_multiple_headers.blocks.retrieve(
-                block_height=str(block_with_alice_transaction))
-            result = await asyncio.sleep(timeout, result=block,
-                                         loop=event_loop)
-            assert result
-
-    @mark.parametrize("nodes", [5])
-    def test_get_n_nodes(self, nodes, driver_multiple_headers,
-                         sent_persisted_random_transaction):
-        for test in range(nodes):
-            block_id = driver_multiple_headers.blocks.get(
-                txid=sent_persisted_random_transaction['id'])
-            assert block_id
-
     @mark.parametrize("nodes", [5])
     def test_retrieve_n_nodes(self, nodes, driver_multiple_headers,
                               block_with_alice_transaction):
-        for test in range(nodes):
+        for _try in range(nodes):
             block = driver_multiple_headers.blocks.retrieve(
                 block_height=str(block_with_alice_transaction))
             assert block
