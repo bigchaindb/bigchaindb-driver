@@ -14,6 +14,7 @@ services:
       - ./setup.py:/usr/src/app/setup.py
       - ./tox.ini:/usr/src/app/tox.ini
       - ./htmlcov:/usr/src/app/htmlcov
+      - ./coverage.xml:/usr/src/app/coverage.xml
     environment:
       BDB_HOST: bigchaindb
       BIGCHAINDB_DATABASE_BACKEND: mongodb
