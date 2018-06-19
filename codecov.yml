@@ -4,9 +4,10 @@ codecov:
 coverage:
   range: "95...100"
 
-  ignore:
-    - "docs/*"
-    - "tests/*"
+ignore:
+  - "docs/*"
+  - "tests/*"
+  - "bigchaindb_driver/common/*"
 
 comment:
   layout: "header, diff, changes, sunburst, uncovered"
