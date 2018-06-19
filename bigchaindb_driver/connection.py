@@ -55,6 +55,6 @@ class Connection:
             json = None
         if not (200 <= response.status_code < 300):
             exc_cls = HTTP_EXCEPTIONS.get(response.status_code, TransportError)
-            raise exc_cls(response.status_code, text, json)
+            raise exc_cls(response.status_code, text, json, url)
         data = json if json is not None else text
         return HttpResponse(response.status_code, response.headers, data)

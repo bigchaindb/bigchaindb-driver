@@ -61,7 +61,7 @@ class Transport:
 
         time_left = timedelta(seconds=self.timeout)
         start = time()
-        error = None
+        exceptions = {}
         while time_left.total_seconds() > 0:
             try:
                 connection = self.get_connection(time_left)
@@ -74,14 +74,23 @@ class Transport:
                     headers=headers
                 )
                 return response.data
+            except TransportError as err:
+                end = time()
+                time_left -= timedelta(seconds=end - start)
+                self.pool.fail_node()
+                start = time()
+                code = None if err.status_code is None else err.status_code
+                info = None if err.info is None else err.info
+                exceptions[err.url] = {"code": code, "info": info}
             except BaseException as err:
                 end = time()
                 time_left -= timedelta(seconds=end - start)
                 self.pool.fail_node()
                 start = time()
-                error = err
-        if error is not None:
-            raise error
+                node = self.pool.picker.picked
+                exceptions[node] = err
+        exc_cls = HTTP_EXCEPTIONS.get(504, TransportError)
+        if len(exceptions):
+            raise exc_cls(504, "Gateway Timeout", exceptions)
         else:
-            exc_cls = HTTP_EXCEPTIONS.get(504, TransportError)
             raise exc_cls(504, "Gateway Timeout", None)

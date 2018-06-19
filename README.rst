@@ -65,6 +65,8 @@ Usage
 Example: Create a divisible asset for Alice who issues 10 token to Bob so that he can use her Game Boy.
 Afterwards Bob spends 3 of these tokens.
 
+If you want to send a transaction you need to `Determine the BigchainDB Root URL`_.
+
 .. code-block:: python
 
     # import BigchainDB and create an object
@@ -77,7 +79,7 @@ Afterwards Bob spends 3 of these tokens.
     alice, bob = generate_keypair(), generate_keypair()
 
     # create a digital asset for Alice
-    bike_token = {
+    game_boy_token = {
         'data': {
             'token_for': {
                 'game_boy': {
@@ -93,7 +95,7 @@ Afterwards Bob spends 3 of these tokens.
         operation='CREATE',
         signers=alice.public_key,
         recipients=[([bob.public_key], 10)],
-        asset=bike_token)
+        asset=game_boy_token)
 
     # fulfill and send the transaction
     fulfilled_token_tx = bdb.transactions.fulfill(
@@ -103,13 +105,12 @@ Afterwards Bob spends 3 of these tokens.
 
     # Use the tokens
     # create the output and inout for the transaction
-    transfer_asset = {'id': bike_token_id}
+    transfer_asset = {'id': fulfilled_token_tx['id']}
     output_index = 0
     output = fulfilled_token_tx['outputs'][output_index]
     transfer_input = {'fulfillment': output['condition']['details'],
                       'fulfills': {'output_index': output_index,
-                                   'transaction_id': fulfilled_token_tx[
-                                       'id']},
+                                   'transaction_id': transfer_asset['id']},
                       'owners_before': output['public_keys']}
 
     # prepare the transaction and use 3 tokens
@@ -167,6 +168,7 @@ This package was initially created using Cookiecutter_ and the `audreyr/cookiecu
 .. _The Hitchhiker's Guide to BigchainDB: https://www.bigchaindb.com/developers/guide/
 .. _HTTP API Reference: https://docs.bigchaindb.com/projects/server/en/latest/http-client-server-api.html
 .. _All BigchainDB Documentation: https://docs.bigchaindb.com/
+.. _Determine the BigchainDB Root URL: https://docs.bigchaindb.com/projects/py-driver/en/latest/connect.html
 .. _licenses: https://github.com/bigchaindb/bigchaindb-driver/blob/master/LICENSES.md
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage

@@ -43,6 +43,10 @@ class TransportError(BigchaindbException):
     def info(self):
         return self.args[2]
 
+    @property
+    def url(self):
+        return self.args[3]
+
 
 class ConnectionError(TransportError):
     """Exception for errors occurring when connecting, and/or making a request
