@@ -23,6 +23,18 @@ class MissingPrivateKeyError(BigchaindbException):
     """Raised if a private key is missing."""
 
 
+class TimeoutException(BigchaindbException):
+    """Raised if round robin strategy failed with timeout"""
+
+    @property
+    def info(self):
+        return self.args[0]
+
+    @property
+    def errors(self):
+        return self.args[1]
+
+
 class TransportError(BigchaindbException):
     """Base exception for transport related errors.
 

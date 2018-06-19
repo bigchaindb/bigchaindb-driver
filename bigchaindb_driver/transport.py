@@ -1,6 +1,6 @@
 from .connection import Connection
 from .pool import Pool
-from .exceptions import HTTP_EXCEPTIONS, TransportError
+from .exceptions import TimeoutException, TransportError
 from datetime import datetime, timedelta
 from time import time
 
@@ -79,9 +79,7 @@ class Transport:
                 time_left -= timedelta(seconds=end - start)
                 self.pool.fail_node()
                 start = time()
-                code = None if err.status_code is None else err.status_code
-                info = None if err.info is None else err.info
-                exceptions[err.url] = {"code": code, "info": info}
+                exceptions[err.url] = (err.status_code, err.info)
             except BaseException as err:
                 end = time()
                 time_left -= timedelta(seconds=end - start)
@@ -89,8 +87,7 @@ class Transport:
                 start = time()
                 node = self.pool.picker.picked
                 exceptions[node] = err
-        exc_cls = HTTP_EXCEPTIONS.get(504, TransportError)
         if len(exceptions):
-            raise exc_cls(504, "Gateway Timeout", exceptions)
+            raise TimeoutException("Request timed out", exceptions)
         else:
-            raise exc_cls(504, "Gateway Timeout", None)
+            raise TimeoutException("Request timed out", None)

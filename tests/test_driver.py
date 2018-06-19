@@ -72,14 +72,14 @@ class TestTransactionsEndpoint:
         assert tx['id'] == txid
 
     def test_retrieve_not_found(self, driver):
-        from bigchaindb_driver.exceptions import TransportError
+        from bigchaindb_driver.exceptions import TimeoutException
         txid = 'dummy_id'
-        with raises(TransportError):
+        with raises(TimeoutException):
             try:
                 driver.transactions.retrieve(txid)
             except BaseException as err:
-                for node in err.info:
-                    code = err.info[node]["code"]
+                for node in err.errors:
+                    code = err.errors[node][0]
                     assert code == 404
                 raise err
 
@@ -232,7 +232,7 @@ class TestBlocksEndpoint:
             block_height=str(block_with_alice_transaction))
         assert block
 
-    @mark.parametrize("nodes", [25])
+    @mark.parametrize("nodes", [10])
     def test_retrieve_n_nodes(self, nodes, driver_multiple_headers,
                               block_with_alice_transaction):
         for _try in range(nodes):
