@@ -179,7 +179,7 @@ def prepare_create_transaction(*,
     if not recipients:
         recipients = [(signers, 1)]
     elif not isinstance(recipients, (list, tuple)):
-            recipients = [([recipients], 1)]
+        recipients = [([recipients], 1)]
     # NOTE: Needed for the time being. See
     # https://github.com/bigchaindb/bigchaindb/issues/797
     elif isinstance(recipients, tuple):

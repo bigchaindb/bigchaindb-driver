@@ -584,7 +584,7 @@ class Transaction(object):
 
     @property
     def spent_outputs(self):
-        """tuple of :obj:`dict`: Inputs of this transaction. Each input
+        """Tuple of :obj:`dict`: Inputs of this transaction. Each input
         is represented as a dictionary containing a transaction id and
         output index.
         """

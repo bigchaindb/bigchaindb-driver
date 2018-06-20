@@ -6,19 +6,34 @@ import base58
 from pytest import mark, raises
 from requests.utils import default_headers
 from sha3 import sha3_256
-
 from cryptoconditions import Ed25519Sha256
 
 
 class TestBigchainDB:
 
     @mark.parametrize('nodes,headers, normalized_nodes', (
-        ((), None, ('http://localhost:9984',)),
-        (('node-1',), None, ('http://node-1:9984',)),
-        (('node-1', 'node-2'), None, ('http://node-1:9984',
-                                      'http://node-2:9984')),
-        (('node-1', 'node-2'), {'app_id': 'id'}, ('http://node-1:9984',
-                                                  'http://node-2:9984')),
+        ((), None, (({'endpoint': 'http://localhost:9984', 'headers': {}},))),
+        (('node-1',), None,
+         ({'endpoint': 'http://node-1:9984', 'headers': {}},)),
+        (('node-1',
+          'node-2',
+          ),
+         {'app_id': 'id'},
+            ({'endpoint': 'http://node-1:9984',
+              'headers': {'app_id': 'id'}},
+             {'endpoint': 'http://node-2:9984',
+              'headers': {'app_id': 'id'}},
+             )),
+        (({'endpoint': 'node-1',
+           'headers': {'app_id': 'id'}},
+          {'endpoint': 'node-2',
+           'headers': {'app_id': 'id'}},),
+         None,
+         ({'endpoint': 'http://node-1:9984',
+           'headers': {'app_id': 'id'}},
+          {'endpoint': 'http://node-2:9984',
+           'headers': {'app_id': 'id'}},)),
+
     ))
     def test_driver_init(self, nodes, headers, normalized_nodes):
         from bigchaindb_driver.driver import BigchainDB
@@ -30,7 +45,7 @@ class TestBigchainDB:
         expected_headers = default_headers()
         expected_headers.update(headers)
         for conn in driver.transport.pool.connections:
-            conn.session.headers == expected_headers
+            conn["node"].session.headers == expected_headers
         assert driver.transactions
         assert driver.outputs
 
@@ -57,10 +72,16 @@ class TestTransactionsEndpoint:
         assert tx['id'] == txid
 
     def test_retrieve_not_found(self, driver):
-        from bigchaindb_driver.exceptions import NotFoundError
+        from bigchaindb_driver.exceptions import TimeoutException
         txid = 'dummy_id'
-        with raises(NotFoundError):
-            driver.transactions.retrieve(txid)
+        with raises(TimeoutException):
+            try:
+                driver.transactions.retrieve(txid)
+            except BaseException as err:
+                for node in err.errors:
+                    code = err.errors[node][0]
+                    assert code == 404
+                raise err
 
     def test_prepare(self, driver, alice_pubkey):
         transaction = driver.transactions.prepare(signers=[alice_pubkey])
@@ -199,7 +220,7 @@ class TestOutputsEndpoint:
             } in outputs
 
 
-class TestBlocksEndppoint:
+class TestBlocksEndpoint:
 
     def test_get(self, driver, sent_persisted_random_transaction):
         block_id = driver.blocks.\
@@ -210,6 +231,14 @@ class TestBlocksEndppoint:
         block = driver.blocks.retrieve(
             block_height=str(block_with_alice_transaction))
         assert block
+
+    @mark.parametrize("nodes", [10])
+    def test_retrieve_n_nodes(self, nodes, driver_multiple_headers,
+                              block_with_alice_transaction):
+        for _try in range(nodes):
+            block = driver_multiple_headers.blocks.retrieve(
+                block_height=str(block_with_alice_transaction))
+            assert block
 
 
 class TestAssetsMetadataEndpoint:

@@ -18,6 +18,8 @@ from bigchaindb_driver.common.transaction import Transaction, \
 # FIXME The sleep, or some other approach is required to wait for the
 # transaction to be available as some processing is being done by the
 # server.
+
+
 def await_transaction(fixture_func, waiting_time=1.5):
     @wraps(fixture_func)
     def wrapper(*args, **kwargs):
@@ -173,8 +175,38 @@ def bdb_port():
 
 
 @fixture
+def bdb_node_header():
+    return {'app_id': 'id'}
+
+
+@fixture
 def bdb_node(bdb_host, bdb_port):
     return 'http://{host}:{port}'.format(host=bdb_host, port=bdb_port)
+
+
+@fixture
+def bdb_nodes_headers(bdb_node, bdb_node_header):
+    return [
+        {'endpoint': 'bigchaindb-driver_bigchaindb_2:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_3:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_4:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_5:9984',
+         'headers': bdb_node_header},
+        {'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
+         'headers': bdb_node_header},
+        {'endpoint': bdb_node,
+         'headers': bdb_node_header},
+
+    ]
+
+
+@fixture
+def driver_multiple_headers(bdb_nodes_headers):
+    from bigchaindb_driver import BigchainDB
+    return BigchainDB(*bdb_nodes_headers)
 
 
 @fixture

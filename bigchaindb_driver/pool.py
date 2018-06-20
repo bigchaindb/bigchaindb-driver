@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from datetime import datetime, timedelta
 
 
 class AbstractPicker(metaclass=ABCMeta):
@@ -31,12 +32,16 @@ class RoundRobinPicker(AbstractPicker):
 
     def __init__(self):
         """Initializes a :class:`~bigchaindb_driver.pool.RoundRobinPicker`
-        instance. Sets :attr:`picked` to ``-1``.
+        instance. Sets :attr:`picked` to ``0``.
 
         """
-        self.picked = -1
+        self.picked = 0
 
-    def pick(self, connections):
+    def next_node(self, connections):
+        """Update index of the current active node in the pool"""
+        self.picked = (self.picked + 1) % len(connections)
+
+    def pick(self, connections, time_left):
         """Picks a :class:`~bigchaindb_driver.connection.Connection`
         instance from the given list of
         :class:`~bigchaindb_driver.connection.Connection` instances.
@@ -44,10 +49,17 @@ class RoundRobinPicker(AbstractPicker):
         Args:
             connections (List): List of
                 :class:`~bigchaindb_driver.connection.Connection` instances.
+            time_left: user specified timeout
 
         """
-        self.picked += 1
-        self.picked = self.picked % len(connections)
+
+        current_time_ms = datetime.utcnow()
+
+        while (current_time_ms <= time_left
+                and current_time_ms <= connections[self.picked]['time']):
+            self.next_node(connections)
+            current_time_ms = datetime.utcnow()
+
         return connections[self.picked]
 
 
@@ -63,17 +75,39 @@ class Pool:
 
         """
         self.connections = connections
+        self.node_count = len(self.connections)
+        self.max_retries = 10
+        self.retries = {
+            key: 0 for key in range(self.node_count)
+        }
         self.picker = picker_class()
+        self.initial_delay = 1
 
-    def get_connection(self):
+    def update_retries(self, node):
+        """Update retries left of the current node"""
+        self.retries[node] = min(self.retries[node] + 1, self.max_retries)
+
+    def fail_node(self):
+        """Send a message to the pool indicating the connection
+        to the current node is failing and needs to try another one
+        """
+        failing_node = self.picker.picked
+        self.update_retries(failing_node)
+        delta = timedelta(
+            seconds=self.initial_delay * 2 ** self.retries[failing_node])
+        self.connections[failing_node]["time"] = datetime.utcnow() + delta
+        self.picker.next_node(self.connections)
+
+    def get_connection(self, time_left):
         """Gets a :class:`~bigchaindb_driver.connection.Connection`
         instance from the pool.
+        Args:
+            time_left: user specified timeout
 
         Returns:
             A :class:`~bigchaindb_driver.connection.Connection` instance.
 
         """
-        if len(self.connections) > 1:
-            return self.picker.pick(self.connections)
-
-        return self.connections[0]
+        connection = self.picker.pick(self.connections,
+                                      datetime.utcnow() + time_left)
+        return connection["node"]

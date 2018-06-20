@@ -7,7 +7,6 @@ Attributes:
 """
 from urllib.parse import urlparse, urlunparse
 
-
 DEFAULT_NODE = 'http://localhost:9984'
 
 
@@ -60,20 +59,42 @@ def _get_default_port(scheme):
     return 443 if scheme == 'https' else 9984
 
 
-def _normalize_nodes(*nodes):
-    if not nodes:
-        return (DEFAULT_NODE,)
-    norm_nodes = []
-    for node in nodes:
-        if not node:
-            norm_nodes.append(DEFAULT_NODE)
-            continue
-        elif '://' not in node:
-            node = '//{}'.format(node)
-        parts = urlparse(node, scheme='http', allow_fragments=False)
-        port = parts.port if parts.port else _get_default_port(parts.scheme)
-        netloc = '{}:{}'.format(parts.hostname, port)
-        norm_nodes.append(
-            urlunparse((parts.scheme, netloc, parts.path, '', '', '')))
+def _normalize_url(node):
+    """Normalizes the given node url"""
+    if not node:
+        node = DEFAULT_NODE
+    elif '://' not in node:
+        node = '//{}'.format(node)
+    parts = urlparse(node, scheme='http', allow_fragments=False)
+    port = parts.port if parts.port else _get_default_port(parts.scheme)
+    netloc = '{}:{}'.format(parts.hostname, port)
+    return urlunparse((parts.scheme, netloc, parts.path, '', '', ''))
 
-    return tuple(norm_nodes,)
+
+def _merge_headers(headers_a, headers_b):
+    """Merge 2 headers dictionaries"""
+    return {**headers_a, **headers_b}
+
+
+def _normalize_node(node, headers):
+    """Normalizes given node as str or dict with headers"""
+    _headers = {} if headers is None else headers
+    if issubclass(node.__class__, str):
+        url = _normalize_url(node)
+        return {'endpoint': url, 'headers': _headers}
+    else:
+        url = _normalize_url(node['endpoint'])
+        node_headers = _merge_headers(node['headers'], _headers)
+        return {'endpoint': url, 'headers': node_headers}
+
+
+def _normalize_nodes(*nodes, headers=None):
+    """Normalizes given dict or array of driver nodes"""
+    if not nodes:
+        return (_normalize_node(DEFAULT_NODE, headers),)
+    else:
+        nodes_normalized = []
+        for node in nodes:
+            _node = _normalize_node(node, headers)
+            nodes_normalized.append(_node)
+        return tuple(nodes_normalized,)

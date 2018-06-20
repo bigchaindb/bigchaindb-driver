@@ -23,6 +23,18 @@ class MissingPrivateKeyError(BigchaindbException):
     """Raised if a private key is missing."""
 
 
+class TimeoutException(BigchaindbException):
+    """Raised if round robin strategy failed with timeout"""
+
+    @property
+    def info(self):
+        return self.args[0]
+
+    @property
+    def errors(self):
+        return self.args[1]
+
+
 class TransportError(BigchaindbException):
     """Base exception for transport related errors.
 
@@ -43,6 +55,10 @@ class TransportError(BigchaindbException):
     def info(self):
         return self.args[2]
 
+    @property
+    def url(self):
+        return self.args[3]
+
 
 class ConnectionError(TransportError):
     """Exception for errors occurring when connecting, and/or making a request
@@ -59,7 +75,17 @@ class NotFoundError(TransportError):
     """Exception for HTTP 404 errors."""
 
 
+class ServiceUnavailable(TransportError):
+    """Exception for HTTP 503 errors."""
+
+
+class GatewayTimeout(TransportError):
+    """Exception for HTTP 503 errors."""
+
+
 HTTP_EXCEPTIONS = {
     400: BadRequest,
     404: NotFoundError,
+    503: ServiceUnavailable,
+    504: GatewayTimeout,
 }

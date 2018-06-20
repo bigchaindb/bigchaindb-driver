@@ -25,7 +25,7 @@ class Connection:
         if headers:
             self.session.headers.update(headers)
 
-    def request(self, method, *, path=None, json=None,
+    def request(self, method, timeout=None, *, path=None, json=None,
                 params=None, headers=None, **kwargs):
         """Performs an HTTP requests for the specified arguments.
 
@@ -41,6 +41,7 @@ class Connection:
         url = self.node_url + path if path else self.node_url
         response = self.session.request(
             method=method,
+            timeout=timeout,
             url=url,
             json=json,
             params=params,
@@ -54,6 +55,6 @@ class Connection:
             json = None
         if not (200 <= response.status_code < 300):
             exc_cls = HTTP_EXCEPTIONS.get(response.status_code, TransportError)
-            raise exc_cls(response.status_code, text, json)
+            raise exc_cls(response.status_code, text, json, url)
         data = json if json is not None else text
         return HttpResponse(response.status_code, response.headers, data)
