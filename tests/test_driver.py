@@ -44,8 +44,8 @@ class TestBigchainDB:
         assert driver.transport.nodes == normalized_nodes
         expected_headers = default_headers()
         expected_headers.update(headers)
-        for conn in driver.transport.pool.connections:
-            conn["node"].session.headers == expected_headers
+        for conn in driver.transport.connection_pool.connections:
+            conn.session.headers == expected_headers
         assert driver.transactions
         assert driver.outputs
 
@@ -72,16 +72,10 @@ class TestTransactionsEndpoint:
         assert tx['id'] == txid
 
     def test_retrieve_not_found(self, driver):
-        from bigchaindb_driver.exceptions import TimeoutException
+        from bigchaindb_driver.exceptions import NotFoundError
         txid = 'dummy_id'
-        with raises(TimeoutException):
-            try:
-                driver.transactions.retrieve(txid)
-            except BaseException as err:
-                for node in err.errors:
-                    code = err.errors[node][0]
-                    assert code == 404
-                raise err
+        with raises(NotFoundError):
+            driver.transactions.retrieve(txid)
 
     def test_prepare(self, driver, alice_pubkey):
         transaction = driver.transactions.prepare(signers=[alice_pubkey])
@@ -232,13 +226,10 @@ class TestBlocksEndpoint:
             block_height=str(block_with_alice_transaction))
         assert block
 
-    @mark.parametrize("nodes", [10])
-    def test_retrieve_n_nodes(self, nodes, driver_multiple_headers,
-                              block_with_alice_transaction):
-        for _try in range(nodes):
-            block = driver_multiple_headers.blocks.retrieve(
-                block_height=str(block_with_alice_transaction))
-            assert block
+    def test_retrieve_skips_unavailable_node(self, driver_multiple_nodes,
+                                             block_with_alice_transaction):
+        block_height = str(block_with_alice_transaction)
+        assert driver_multiple_nodes.blocks.retrieve(block_height=block_height)
 
 
 class TestAssetsMetadataEndpoint:

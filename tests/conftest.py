@@ -1,9 +1,7 @@
 import json
 from base64 import b64encode
 from collections import namedtuple
-from functools import wraps
 from os import environ, urandom
-from time import sleep
 
 import requests
 import base58
@@ -13,20 +11,6 @@ from sha3 import sha3_256
 
 from bigchaindb_driver.common.transaction import Transaction, \
     _fulfillment_to_details
-
-
-# FIXME The sleep, or some other approach is required to wait for the
-# transaction to be available as some processing is being done by the
-# server.
-
-
-def await_transaction(fixture_func, waiting_time=1.5):
-    @wraps(fixture_func)
-    def wrapper(*args, **kwargs):
-        transaction = fixture_func(*args, **kwargs)
-        sleep(waiting_time)
-        return transaction
-    return wrapper
 
 
 def make_ed25519_condition(public_key, *, amount=1):
@@ -175,7 +159,7 @@ def bdb_port():
 
 
 @fixture
-def bdb_node_header():
+def custom_headers():
     return {'app_id': 'id'}
 
 
@@ -185,28 +169,17 @@ def bdb_node(bdb_host, bdb_port):
 
 
 @fixture
-def bdb_nodes_headers(bdb_node, bdb_node_header):
+def bdb_nodes(bdb_node, custom_headers):
     return [
-        {'endpoint': 'bigchaindb-driver_bigchaindb_2:9984',
-         'headers': bdb_node_header},
-        {'endpoint': 'bigchaindb-driver_bigchaindb_3:9984',
-         'headers': bdb_node_header},
-        {'endpoint': 'bigchaindb-driver_bigchaindb_4:9984',
-         'headers': bdb_node_header},
-        {'endpoint': 'bigchaindb-driver_bigchaindb_5:9984',
-         'headers': bdb_node_header},
-        {'endpoint': 'bigchaindb-driver_bigchaindb_1:9984',
-         'headers': bdb_node_header},
-        {'endpoint': bdb_node,
-         'headers': bdb_node_header},
-
+        {'endpoint': 'http://unavailable'},  # unavailable node
+        {'endpoint': bdb_node, 'headers': custom_headers},
     ]
 
 
 @fixture
-def driver_multiple_headers(bdb_nodes_headers):
+def driver_multiple_nodes(bdb_nodes):
     from bigchaindb_driver import BigchainDB
-    return BigchainDB(*bdb_nodes_headers)
+    return BigchainDB(*bdb_nodes)
 
 
 @fixture
@@ -410,7 +383,6 @@ def signed_carol_car_transaction(request, carol_keypair,
 
 
 @fixture
-@await_transaction
 def persisted_carol_car_transaction(transactions_api_full_url,
                                     signed_carol_car_transaction):
     response = requests.post(
@@ -419,7 +391,6 @@ def persisted_carol_car_transaction(transactions_api_full_url,
 
 
 @fixture
-@await_transaction
 def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
                                          transactions_api_full_url,
                                          persisted_carol_car_transaction):
@@ -472,7 +443,6 @@ def persisted_transfer_carol_car_to_dimi(carol_keypair, dimi_pubkey,
 
 
 @fixture
-@await_transaction
 def persisted_transfer_dimi_car_to_ewy(dimi_keypair, ewy_pubkey,
                                        transactions_api_full_url,
                                        persisted_transfer_carol_car_to_dimi):
@@ -566,7 +536,6 @@ def unsigned_transaction():
 
 
 @fixture
-@await_transaction
 def text_search_assets(api_root, transactions_api_full_url, alice_pubkey,
                        alice_privkey):
     # check if the fixture was already executed

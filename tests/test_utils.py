@@ -14,8 +14,8 @@ from pytest import mark
      ({'endpoint': 'https://node.xyz:443/path', 'headers': {}},)),
 ))
 def test_single_node_normalization(node, normalized_node):
-    from bigchaindb_driver.utils import _normalize_nodes, _normalize_url
-    assert _normalize_nodes(_normalize_url(node)) == normalized_node
+    from bigchaindb_driver.utils import normalize_nodes, normalize_url
+    assert normalize_nodes(normalize_url(node)) == normalized_node
 
 
 @mark.parametrize('nodes,normalized_nodes', (
@@ -29,5 +29,5 @@ def test_single_node_normalization(node, normalized_node):
        'headers': {}})),
 ))
 def test_iterable_of_nodes_normalization(nodes, normalized_nodes):
-    from bigchaindb_driver.utils import _normalize_nodes
-    assert _normalize_nodes(*nodes) == normalized_nodes
+    from bigchaindb_driver.utils import normalize_nodes
+    assert normalize_nodes(*nodes) == normalized_nodes
