@@ -12,15 +12,13 @@ class Transport:
 
     """
 
-    def __init__(self, *nodes, headers=None, timeout=None):
+    def __init__(self, *nodes, timeout=None):
         """Initializes an instance of
         :class:`~bigchaindb_driver.transport.Transport`.
 
         Args:
-            nodes: nodes
-            headers (dict): Optional headers to pass to the
-                :class:`~.connection.Connection` instances, which will
-                add it to the headers to be sent with each request.
+            nodes: each node is a dictionaty with the keys `endpoint` and
+                   `headers`
             timeout (int): Optional timeout in seconds.
 
         """

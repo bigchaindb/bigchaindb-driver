@@ -79,7 +79,7 @@ class Connection:
             self.update_backoff_time(success=connExc is None)
         return response
 
-    def get_backoff_timedelta(self, timeout=None):
+    def get_backoff_timedelta(self):
         if self.backoff_time is None:
             return 0
 

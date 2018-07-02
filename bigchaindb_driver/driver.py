@@ -23,7 +23,7 @@ class BigchainDB:
                Currently, the full URL must be given. In the absence of any
                node, the default(``'http://localhost:9984'``) will be used.
                If node is passed as a dict, `endpoint` is a required key;
-              `headers` is an optional `dict` of headers.
+               `headers` is an optional `dict` of headers.
                transport_class: Optional transport class to use.
                Defaults to :class:`~bigchaindb_driver.transport.Transport`.
              headers (dict): Optional headers that will be passed with
