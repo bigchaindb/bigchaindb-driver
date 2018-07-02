@@ -17,7 +17,7 @@ class Transport:
         :class:`~bigchaindb_driver.transport.Transport`.
 
         Args:
-            nodes: each node is a dictionaty with the keys `endpoint` and
+            nodes: each node is a dictionary with the keys `endpoint` and
                    `headers`
             timeout (int): Optional timeout in seconds.
 
@@ -38,9 +38,9 @@ class Transport:
            by catching the corresponding
            exceptions and retrying `forward_request`.
 
-           Backoff time is tracked for every configured node.
-           Exponential backoff thus
-           works no matter how many times `forward_request` is called.
+           Exponential backoff is implemented individually for each node.
+           Backoff delays are expressed as timestamps stored on the object and
+           they are not reset in between multiple function calls.
 
            Times out when `self.timeout` is expired, if not `None`.
 

@@ -36,11 +36,22 @@ class Connection:
 
     def request(self, method, *, path=None, json=None,
                 params=None, headers=None, timeout=None, **kwargs):
-        """Performs an HTTP requests for the specified arguments.
+        """Performs an HTTP request with the given parameters.
 
-           If the node has backoff time attached, waits till the time is due.
+           Implements exponential backoff.
 
-           Backoff time is adjusted after the request is made.
+           If `ConnectionError` occurs, a timestamp equal to now +
+           the default delay (`BACKOFF_DELAY`) is assigned to the object.
+           The timestamp is in UTC. Next time the function is called, it either
+           waits till the timestamp is passed or raises `TimeoutError`.
+
+           If `ConnectionError` occurs two or more times in a row,
+           the retry count is incremented and the new timestamp is calculated
+           as now + the default delay multiplied by two to the power of the
+           number of retries.
+
+           If a request is successful, the backoff timestamp is removed,
+           the retry count is back to zero.
 
         Args:
             method (str): HTTP method (e.g.: ``'GET'``).
