@@ -37,6 +37,8 @@ Features
 Install
 ----------
 
+The instructions below were tested on Ubuntu 16.04 LTS. They should also work on other Linux distributions and on macOS. The driver might work on Windows as well, but we do not guarantee it. We recommend to set up (e.g. via Docker on Windows) an Ubuntu VM there.
+
 We recommend you use a virtual environment to install and update to the latest stable version using `pip` (or `pip3`):
 
 .. code-block:: text

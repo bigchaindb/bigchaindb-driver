@@ -2,6 +2,10 @@
 Quickstart / Installation
 =========================
 
+.. warning::
+
+	The instructions below were tested on Ubuntu 16.04 LTS. They should also work on other Linux distributions and on macOS. The driver might work on Windows as well, but we do not guarantee it. We recommend to set up (e.g. via Docker For Windows) an Ubuntu VM there.
+
 The BigchainDB Python Driver depends on:
 
 1. Python 3.5+
