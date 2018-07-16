@@ -18,21 +18,21 @@ class BigchainDB:
                  headers=None, timeout=None):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
-           Args:
-             *nodes (list of (str or dict)): BigchainDB nodes to connect to.
-               Currently, the full URL must be given. In the absence of any
-               node, the default(``'http://localhost:9984'``) will be used.
-               If node is passed as a dict, `endpoint` is a required key;
-               `headers` is an optional `dict` of headers.
-               transport_class: Optional transport class to use.
-               Defaults to :class:`~bigchaindb_driver.transport.Transport`.
-             headers (dict): Optional headers that will be passed with
-               each request. To pass headers only on a per-request
-               basis, you can pass the headers to the method of choice
-               (e.g. :meth:`BigchainDB().transactions.send_commit()
-               <.TransactionsEndpoint.send_commit>`).
-             timeout (int): Optional timeout in seconds that will be passed
-               to each request.
+        Args:
+            *nodes (list of (str or dict)): BigchainDB nodes to connect to.
+                Currently, the full URL must be given. In the absence of any
+                node, the default(``'http://localhost:9984'``) will be used.
+                If node is passed as a dict, `endpoint` is a required key;
+                `headers` is an optional `dict` of headers.
+            transport_class: Optional transport class to use.
+                Defaults to :class:`~bigchaindb_driver.transport.Transport`.
+            headers (dict): Optional headers that will be passed with
+                each request. To pass headers only on a per-request
+                basis, you can pass the headers to the method of choice
+                (e.g. :meth:`BigchainDB().transactions.send_commit()
+                <.TransactionsEndpoint.send_commit>`).
+            timeout (int): Optional timeout in seconds that will be passed
+                to each request.
         """
         self._nodes = normalize_nodes(*nodes, headers=headers)
         self._transport = transport_class(*self._nodes, timeout=timeout)
