@@ -1,30 +1,29 @@
 from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
-from .utils import _normalize_nodes
+from .utils import normalize_nodes
 from warnings import warn
 
 
 class BigchainDB:
-    """BigchainDB driver class.
+    """A :class:`~bigchaindb_driver.BigchainDB` driver is able to create, sign,
+       and submit transactions to one or more nodes in a Federation.
 
-    A :class:`~bigchaindb_driver.BigchainDB` driver is able to create, sign,
-    and submit transactions to one or more nodes in a Federation.
+       If initialized with ``>1`` nodes, the driver will send successive
+       requests to different nodes in a round-robin fashion (this will be
+       customizable in the future).
 
-    If initialized with ``>1`` nodes, the driver will send successive requests
-    to different nodes in a round-robin fashion (this will be customizable in
-    the future).
     """
 
-    def __init__(self, *nodes, timeout=20,
-                 transport_class=Transport, headers=None):
+    def __init__(self, *nodes, transport_class=Transport,
+                 headers=None, timeout=None):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
         Args:
-            *nodes (str): BigchainDB nodes to connect to. Currently, the full
-                URL must be given. In the absence of any node, the default
-                (``'http://localhost:9984'``) will be used.
-            timeout (int): timeout in seconds, specify how long to wait for
-                the response. default value is 20 secs.
+            *nodes (list of (str or dict)): BigchainDB nodes to connect to.
+                Currently, the full URL must be given. In the absence of any
+                node, the default(``'http://localhost:9984'``) will be used.
+                If node is passed as a dict, `endpoint` is a required key;
+                `headers` is an optional `dict` of headers.
             transport_class: Optional transport class to use.
                 Defaults to :class:`~bigchaindb_driver.transport.Transport`.
             headers (dict): Optional headers that will be passed with
@@ -32,9 +31,10 @@ class BigchainDB:
                 basis, you can pass the headers to the method of choice
                 (e.g. :meth:`BigchainDB().transactions.send_commit()
                 <.TransactionsEndpoint.send_commit>`).
-
+            timeout (int): Optional timeout in seconds that will be passed
+                to each request.
         """
-        self._nodes = _normalize_nodes(*nodes, headers=headers)
+        self._nodes = normalize_nodes(*nodes, headers=headers)
         self._transport = transport_class(*self._nodes, timeout=timeout)
         self._transactions = TransactionsEndpoint(self)
         self._outputs = OutputsEndpoint(self)

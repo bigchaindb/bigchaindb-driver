@@ -20,24 +20,55 @@ and :doc:`you have determined the BigchainDB Root URL <connect>`
 of the node or cluster you want to connect to.
 
 
-Getting Started
----------------
+Connect to Multiple Nodes
+-------------------------
 
-We begin by creating an object of class BigchainDB:
+You can optionally configure multiple nodes to connect to.
 
 .. ipython::
 
     In [0]: from bigchaindb_driver import BigchainDB
 
-    In [0]: bdb_root_url = 'https://example.com:9984'  # Use YOUR BigchainDB Root URL here
+    In [0]: first_node = 'https://first.example.com:9984'
 
-    In [0]: bdb = BigchainDB(bdb_root_url)
+    In [0]: second_node = 'https://second.example.com:9984'
 
-That last command instantiates an object ``bdb`` of class
-:class:`~bigchaindb_driver.BigchainDB`. When instantiating a
-:class:`~bigchaindb_driver.BigchainDB` object without arguments, it
-uses the default BigchainDB Root URL ``http://localhost:9984``.
+    In [0]: headers = {'app_id': 'your_app_id', 'app_key': 'your_app_key'}
 
+    In [0]: bdb = BigchainDB(first_node, second_node, headers=headers)
+
+Each node can have its specific headers in addition to headers specified for all nodes, if any.
+
+.. ipython::
+
+    In [0]: first_node = 'https://first.example.com:9984'
+
+    In [0]: second_node = 'https://second.example.com:9984'
+
+    In [0]: common_headers = {'app_id': 'your_app_id', 'app_key': 'your_app_key'}
+
+    In [0]: second_node_headers = {'node_header': 'node_header_value'}
+
+    In [0]: bdb = BigchainDB(first_node,
+       ...:                  {'endpoint': second_node, 'headers': second_node_headers},
+       ...:                  headers=common_headers)
+
+The driver switches nodes on connection failures in a round robin fashion. Connection failures are intermittent network issues like DNS failures or "refused connection" errors.
+
+The driver switches nodes and repeats requests until the specified timeout is expired. The default timeout is 20
+seconds. When timeout expires, an instance of ``bigchaindb_driver.exceptions.TimeoutError`` is raised. Specify
+``timeout=None`` to repeat connection errors indefinitely.
+
+.. ipython::
+
+    In [0]: bdb = BigchainDB(first_node, second_node, headers=headers, timeout=None)
+
+Also, the driver takes care of the exponential backoff. If a connection error occurs, the driver ensures at least half
+of a second is passed before the request to the same node is repeated. The intervals increase exponentially when
+multiple connection errors occur
+in a row. The user-specified timeout is always respected.
+
+.. warning:: Every node the driver communicates with is supposed to be trusted. The driver does not currently implement any light client protocols.
 
 Create a Digital Asset
 ----------------------

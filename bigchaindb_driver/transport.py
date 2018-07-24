@@ -1,50 +1,48 @@
-from .connection import Connection
-from .pool import Pool
-from .exceptions import TimeoutException, TransportError
-from datetime import datetime, timedelta
 from time import time
+
+from requests.exceptions import ConnectionError
+
+from .connection import Connection
+from .exceptions import TimeoutError
+from .pool import Pool
 
 
 class Transport:
-    """Transport class."""
+    """Transport class.
 
-    def __init__(self, *nodes, timeout=None, headers=None):
+    """
+
+    def __init__(self, *nodes, timeout=None):
         """Initializes an instance of
         :class:`~bigchaindb_driver.transport.Transport`.
 
         Args:
-            nodes: nodes
-            timeout: timeout
-            headers (dict): Optional headers to pass to the
-                :class:`~.connection.Connection` instances, which will
-                add it to the headers to be sent with each request.
+            nodes: each node is a dictionary with the keys `endpoint` and
+                   `headers`
+            timeout (int): Optional timeout in seconds.
 
         """
         self.nodes = nodes
         self.timeout = timeout
-        self.init_pool(nodes)
-
-    def init_pool(self, nodes):
-        """Initializes the pool of connections."""
-        connections = [
-            {
-                "node": Connection(
-                    node_url=node["endpoint"],
-                    headers=node["headers"]),
-                "time":datetime.utcnow()} for node in nodes]
-        self.pool = Pool(connections)
-
-    def get_connection(self, time_left):
-        """Gets a connection from the pool.
-
-        Returns:
-            A :class:`~bigchaindb_driver.connection.Connection` instance.
-        """
-        return self.pool.get_connection(time_left)
+        self.connection_pool = Pool([Connection(node_url=node['endpoint'],
+                                                headers=node['headers'])
+                                     for node in nodes])
 
     def forward_request(self, method, path=None,
                         json=None, params=None, headers=None):
-        """Forwards an http request to a connection.
+        """Makes HTTP requests to the configured nodes.
+
+           Retries connection errors
+           (e.g. DNS failures, refused connection, etc).
+           A user may choose to retry other errors
+           by catching the corresponding
+           exceptions and retrying `forward_request`.
+
+           Exponential backoff is implemented individually for each node.
+           Backoff delays are expressed as timestamps stored on the object and
+           they are not reset in between multiple function calls.
+
+           Times out when `self.timeout` is expired, if not `None`.
 
         Args:
             method (str): HTTP method name (e.g.: ``'GET'``).
@@ -58,36 +56,29 @@ class Transport:
             dict: Result of :meth:`requests.models.Response.json`
 
         """
+        error_trace = []
+        timeout = self.timeout
+        while timeout is None or timeout > 0:
+            connection = self.connection_pool.get_connection()
 
-        time_left = timedelta(seconds=self.timeout)
-        start = time()
-        exceptions = {}
-        while time_left.total_seconds() > 0:
+            start = time()
             try:
-                connection = self.get_connection(time_left)
                 response = connection.request(
                     method=method,
-                    timeout=time_left.seconds,
                     path=path,
                     params=params,
                     json=json,
-                    headers=headers
+                    headers=headers,
+                    timeout=timeout,
                 )
+            except ConnectionError as err:
+                error_trace.append(err)
+                continue
+            else:
                 return response.data
-            except TransportError as err:
-                end = time()
-                time_left -= timedelta(seconds=end - start)
-                self.pool.fail_node()
-                start = time()
-                exceptions[err.url] = (err.status_code, err.info)
-            except BaseException as err:
-                end = time()
-                time_left -= timedelta(seconds=end - start)
-                self.pool.fail_node()
-                start = time()
-                node = self.pool.picker.picked
-                exceptions[node] = err
-        if len(exceptions):
-            raise TimeoutException("Request timed out", exceptions)
-        else:
-            raise TimeoutException("Request timed out", None)
+            finally:
+                elapsed = time() - start
+                if timeout is not None:
+                    timeout -= elapsed
+
+        raise TimeoutError(error_trace)

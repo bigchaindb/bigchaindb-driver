@@ -59,7 +59,7 @@ def _get_default_port(scheme):
     return 443 if scheme == 'https' else 9984
 
 
-def _normalize_url(node):
+def normalize_url(node):
     """Normalizes the given node url"""
     if not node:
         node = DEFAULT_NODE
@@ -71,30 +71,24 @@ def _normalize_url(node):
     return urlunparse((parts.scheme, netloc, parts.path, '', '', ''))
 
 
-def _merge_headers(headers_a, headers_b):
-    """Merge 2 headers dictionaries"""
-    return {**headers_a, **headers_b}
-
-
-def _normalize_node(node, headers):
+def normalize_node(node, headers=None):
     """Normalizes given node as str or dict with headers"""
-    _headers = {} if headers is None else headers
-    if issubclass(node.__class__, str):
-        url = _normalize_url(node)
-        return {'endpoint': url, 'headers': _headers}
-    else:
-        url = _normalize_url(node['endpoint'])
-        node_headers = _merge_headers(node['headers'], _headers)
-        return {'endpoint': url, 'headers': node_headers}
+    headers = {} if headers is None else headers
+    if isinstance(node, str):
+        url = normalize_url(node)
+        return {'endpoint': url, 'headers': headers}
+
+    url = normalize_url(node['endpoint'])
+    node_headers = node.get('headers', {})
+    return {'endpoint': url, 'headers': {**headers, **node_headers}}
 
 
-def _normalize_nodes(*nodes, headers=None):
+def normalize_nodes(*nodes, headers=None):
     """Normalizes given dict or array of driver nodes"""
     if not nodes:
-        return (_normalize_node(DEFAULT_NODE, headers),)
-    else:
-        nodes_normalized = []
-        for node in nodes:
-            _node = _normalize_node(node, headers)
-            nodes_normalized.append(_node)
-        return tuple(nodes_normalized,)
+        return (normalize_node(DEFAULT_NODE, headers),)
+
+    normalized_nodes = ()
+    for node in nodes:
+        normalized_nodes += (normalize_node(node, headers),)
+    return normalized_nodes
