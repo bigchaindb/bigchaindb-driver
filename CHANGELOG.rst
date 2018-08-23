@@ -6,6 +6,14 @@
 Changelog
 =========
 
+0.5.1 (2018-08-23)
+---------------------
+Added
+^^^^^
+
+* Support for BigchainDB server v2.0.0.b5.
+* added round-robin strategy to connect to nodes of the BigchainDB network `BEP 14 <https://github.com/bigchaindb/BEPs/tree/master/14>`_
+
 0.5.0 (2018-06-14)
 ---------------------
 Added
