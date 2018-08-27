@@ -14,6 +14,7 @@ from .exceptions import HTTP_EXCEPTIONS, TransportError
 
 
 BACKOFF_DELAY = 0.5  # seconds
+NO_TIMEOUT_BACKOFF_CAP = 10  # seconds
 
 HttpResponse = namedtuple('HttpResponse', ('status_code', 'headers', 'data'))
 
@@ -100,13 +101,16 @@ class Connection:
 
         return (self.backoff_time - datetime.utcnow()).total_seconds()
 
-    def update_backoff_time(self, success):
+    def update_backoff_time(self, success, timeout=None):
         if success:
             self._retries = 0
             self.backoff_time = None
         else:
             utcnow = datetime.utcnow()
-            backoff_delta = BACKOFF_DELAY * 2 ** self._retries
+            backoff_delta = min(
+                BACKOFF_DELAY * 2 ** self._retries,
+                NO_TIMEOUT_BACKOFF_CAP if timeout is None else timeout / 2,
+            )
             self.backoff_time = utcnow + timedelta(seconds=backoff_delta)
             self._retries += 1
 
