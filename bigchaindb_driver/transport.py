@@ -11,6 +11,9 @@ from .exceptions import TimeoutError
 from .pool import Pool
 
 
+NO_TIMEOUT_BACKOFF_CAP = 10  # seconds
+
+
 class Transport:
     """Transport class.
 
@@ -62,6 +65,8 @@ class Transport:
         """
         error_trace = []
         timeout = self.timeout
+        backoff_cap = NO_TIMEOUT_BACKOFF_CAP if timeout is None \
+            else timeout / 2
         while timeout is None or timeout > 0:
             connection = self.connection_pool.get_connection()
 
@@ -74,6 +79,7 @@ class Transport:
                     json=json,
                     headers=headers,
                     timeout=timeout,
+                    backoff_cap=backoff_cap,
                 )
             except ConnectionError as err:
                 error_trace.append(err)
