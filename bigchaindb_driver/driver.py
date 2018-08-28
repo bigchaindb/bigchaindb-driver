@@ -19,7 +19,7 @@ class BigchainDB:
     """
 
     def __init__(self, *nodes, transport_class=Transport,
-                 headers=None, timeout=None):
+                 headers=None, timeout=20):
         """Initialize a :class:`~bigchaindb_driver.BigchainDB` driver instance.
 
         Args:
