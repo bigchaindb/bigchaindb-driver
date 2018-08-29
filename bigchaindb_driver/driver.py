@@ -276,6 +276,29 @@ class TransactionsEndpoint(NamespacedDriver):
         """
         return fulfill_transaction(transaction, private_keys=private_keys)
 
+
+    @staticmethod
+    def fulfill_unbound(transaction):
+        """Fulfills the given transaction using third party
+        key manager UNBOUND
+
+        Args:
+            transaction (dict): The transaction to be fulfilled.
+            private_keys (:obj:`str` | :obj:`list` | :obj:`tuple`): One or
+                more private keys to be used for fulfilling the
+                transaction.
+
+        Returns:
+            dict: The fulfilled transaction payload, ready to be sent to a
+            BigchainDB federation.
+
+        Raises:
+            :exc:`~.exceptions.MissingPrivateKeyError`: If a private
+                key is missing.
+
+        """
+        return fulfill_transaction_unbound(transaction)
+
     def get(self, *, asset_id, operation=None, headers=None):
         """Given an asset id, get its list of transactions (and
         optionally filter for only ``'CREATE'`` or ``'TRANSFER'``

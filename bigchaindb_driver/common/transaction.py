@@ -836,6 +836,56 @@ class Transaction(object):
 
         return self
 
+    def sign_unbound(self):
+        tx_dict = self.to_dict()
+        tx_dict = Transaction._remove_signatures(tx_dict)
+        tx_serialized = Transaction._to_str(tx_dict)
+        for i, input_ in enumerate(self.inputs):
+            self.inputs[i] = self._sign_input_unbound(input_, tx_serialized)
+
+        self._hash()
+
+        return self
+
+    @classmethod
+    def _sign_input_unbound(cls, input_, message):
+        """Signs a single Input.
+
+            Note:
+                This method works only for the following Cryptoconditions
+                currently:
+                    - Ed25519Fulfillment
+                    - ThresholdSha256.
+
+            Args:
+                input_ (:class:`~bigchaindb.common.transaction.
+                    Input`) The Input to be signed.
+                message (str): The message to be signed
+        """
+        if isinstance(input_.fulfillment, Ed25519Sha256):
+            # NOTE: To eliminate the dangers of accidentally signing a condition by
+            #       reference, we remove the reference of input_ here
+            #       intentionally. If the user of this class knows how to use it,
+            #       this should never happen, but then again, never say never.
+            input_ = deepcopy(input_)
+            public_key = input_.owners_before[0]
+            message = sha3_256(message.encode())
+            if input_.fulfills:
+                message.update('{}{}'.format(
+                    input_.fulfills.txid, input_.fulfills.output).encode())
+
+            try:
+                # Sign with unbound
+                pass
+            except KeyError:
+                raise KeypairMismatchException('Public key {} is not a pair to '
+                                            'any of the private keys'
+                                            .format(public_key))
+            return _input
+        else:
+            raise ValueError("Fulfillment couldn't be matched to "
+                             'Cryptocondition fulfillment type.')
+
     @classmethod
     def _sign_input(cls, input_, message, key_pairs):
         """Signs a single Input.

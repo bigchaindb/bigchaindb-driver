@@ -352,3 +352,25 @@ def fulfill_transaction(transaction, *, private_keys):
         raise MissingPrivateKeyError('A private key is missing!') from exc
 
     return signed_transaction.to_dict()
+
+
+def fulfill_transaction_unbound(transaction):
+    """Fulfills the given transaction using third party
+    key manager from UNBOUND
+
+    Args:
+        transaction (dict): The transaction to be fulfilled.
+        private_keys (:obj:`str` | :obj:`list` | :obj:`tuple`): One or
+            more private keys to be used for fulfilling the
+            transaction.
+
+    Returns:
+        dict: The fulfilled transaction payload, ready to be sent to a
+        BigchainDB federation.
+
+    Raises:
+        :exc:`~.exceptions.MissingPrivateKeyError`: If a private
+            key is missing.
+
+    """
+    transaction_obj = Transaction.from_dict(transaction)
