@@ -65,6 +65,8 @@ class Connection:
             params (dict): Dictionary of URL (query) parameters.
             headers (dict): Optional headers to pass to the request.
             timeout (int): Optional timeout in seconds.
+            backoff_cap (int): The maximal allowed backoff delay in seconds
+                               to be assigned to a node.
             kwargs: Optional keyword arguments.
 
         """
