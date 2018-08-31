@@ -11,8 +11,8 @@ Changelog
 Added
 ^^^^^
 
-* Cap exponential backoff depending on timeout value for reasoable waiting time in event of network recovery. `#470 <https://github.com/bigchaindb/bigchaindb-driver/pull/470>`
-* Update cryptoconditions depdency because of security vulnerability CVE-2018-10903. `#472 <https://github.com/bigchaindb/bigchaindb-driver/pull/472>`
+* Cap exponential backoff depending on timeout value for reasonable waiting time in event of network recovery. `#470 <https://github.com/bigchaindb/bigchaindb-driver/pull/470>`
+* Update cryptoconditions dependency because of security vulnerability CVE-2018-10903. `#472 <https://github.com/bigchaindb/bigchaindb-driver/pull/472>`
 
 
 0.5.1 (2018-08-23)
