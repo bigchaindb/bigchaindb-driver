@@ -185,37 +185,73 @@ class TestOutputsEndpoint:
             'output_index': 0
         } in outputs
 
-    @mark.parametrize('spent,outputs_qty', ((False, 1), (True, 1), (None, 2)))
-    def test_get_outputs_with_spent_query_param(
-            self, spent, outputs_qty, driver, carol_pubkey,
-            persisted_carol_bicycle_transaction,
-            persisted_carol_car_transaction,
-            persisted_transfer_carol_car_to_dimi):
-        outputs = driver.outputs.get(carol_pubkey, spent=spent)
-        assert len(outputs) == outputs_qty
+    def test_get_outputs_with_spent_query_param(self, driver):
+        from bigchaindb_driver.crypto import generate_keypair
+        import uuid
 
-        # Return only unspent outputs
-        if spent is False:
-            assert {
-                'transaction_id': persisted_carol_bicycle_transaction['id'],
-                'output_index': 0
-            } in outputs
-        # Return only spent outputs
-        elif spent is True:
-            assert {
-                'transaction_id': persisted_carol_car_transaction['id'],
-                'output_index': 0
-            } in outputs
-        # Return all outputs for carol
-        elif spent is None:
-            assert {
-                'transaction_id': persisted_carol_bicycle_transaction['id'],
-                'output_index': 0
-            } in outputs
-            assert {
-                'transaction_id': persisted_carol_car_transaction['id'],
-                'output_index': 0
-            } in outputs
+        def create_transaction():
+            return driver.transactions.prepare(
+                    operation='CREATE',
+                    signers=carol.public_key,
+                    asset={
+                        'data': {
+                            'asset': {
+                                'serial_number': str(uuid.uuid4()),
+                                'manufacturer': str(uuid.uuid4()),
+                            },
+                        },
+                    },
+            )
+
+        carol, dimi = generate_keypair(), generate_keypair()
+
+        assert len(driver.outputs.get(carol.public_key, spent=True)) == 0
+        assert len(driver.outputs.get(carol.public_key, spent=False)) == 0
+        assert len(driver.outputs.get(carol.public_key, spent=None)) == 0
+
+        # create the first transaction for carol
+        create_tx1 = create_transaction()
+        create_tx1 = driver.transactions.fulfill(
+            create_tx1, private_keys=carol.private_key)
+        driver.transactions.send_commit(create_tx1)
+        # create the second transaction for carol
+        create_tx2 = create_transaction()
+        create_tx2 = driver.transactions.fulfill(
+            create_tx2, private_keys=carol.private_key)
+        driver.transactions.send_commit(create_tx2)
+
+        assert len(driver.outputs.get(carol.public_key, spent=True)) == 0
+        assert len(driver.outputs.get(carol.public_key, spent=False)) == 2
+        assert len(driver.outputs.get(carol.public_key, spent=None)) == 2
+
+        # transfer second transaction to dimi
+        create_tx2 = driver.transactions.retrieve(create_tx2['id'])
+        transfer_asset = {
+            'id': create_tx2['id'],
+        }
+        output = create_tx2['outputs'][0]
+        transfer_input = {
+            'fulfillment': output['condition']['details'],
+            'fulfills': {
+                'output_index': 0,
+                'transaction_id': create_tx2['id'],
+            },
+            'owners_before': output['public_keys'],
+        }
+        transfer_tx = driver.transactions.prepare(
+            operation='TRANSFER',
+            asset=transfer_asset,
+            inputs=transfer_input,
+            recipients=dimi.public_key,
+        )
+        transfer_tx = driver.transactions.fulfill(
+            transfer_tx, private_keys=carol.private_key,
+        )
+        driver.transactions.send_commit(transfer_tx)
+
+        assert len(driver.outputs.get(carol.public_key, spent=True)) == 1
+        assert len(driver.outputs.get(carol.public_key, spent=False)) == 1
+        assert len(driver.outputs.get(carol.public_key, spent=None)) == 2
 
 
 class TestBlocksEndpoint:
