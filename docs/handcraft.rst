@@ -273,9 +273,13 @@ As for the details:
 
 .. ipython::
 
+    In [0]: def b58(key):
+       ...:     # convert key to a base58 string
+       ...:     return base58.b58encode(key).decode()
+
     In [0]: condition_details = {
        ...:     'type': ed25519.TYPE_NAME,
-       ...:     'public_key': base58.b58encode(ed25519.public_key),
+       ...:     'public_key': b58(ed25519.public_key),
        ...: }
 
 We can now easily assemble the ``dict`` for the output:
@@ -304,7 +308,7 @@ Let's recap and set the ``outputs`` key with our self-constructed condition:
        ...:     'condition': {
        ...:         'details': {
        ...:             'type': ed25519.TYPE_NAME,
-       ...:             'public_key': base58.b58encode(ed25519.public_key),
+       ...:             'public_key': b58(ed25519.public_key),
        ...:         },
        ...:         'uri': ed25519.condition_uri,
        ...:     },
@@ -459,7 +463,7 @@ Let's recap how we've put all the code together to generate the above payload:
         'condition': {
             'details': {
                 'type': ed25519.TYPE_NAME,
-                'public_key': base58.b58encode(ed25519.public_key),
+                'public_key': b58(ed25519.public_key),
             },
             'uri': ed25519.condition_uri,
         },
@@ -608,7 +612,7 @@ Handcrafting a ``CREATE`` transaction can be done as follows:
         'condition': {
             'details': {
                 'type': ed25519.TYPE_NAME,
-                'public_key': base58.b58encode(ed25519.public_key),
+                'public_key': b58(ed25519.public_key),
             },
             'uri': ed25519.condition_uri,
         },
@@ -816,7 +820,7 @@ outputs
        ...:     'condition': {
        ...:         'details': {
        ...:             'type': ed25519.TYPE_NAME,
-       ...:             'public_key': base58.b58encode(ed25519.public_key),
+       ...:             'public_key': b58(ed25519.public_key),
        ...:         },
        ...:         'uri': ed25519.condition_uri,
        ...:     },
@@ -932,7 +936,7 @@ Let's recap how we got here:
         'condition': {
             'details': {
                 'type': ed25519.TYPE_NAME,
-                'public_key': base58.b58encode(ed25519.public_key),
+                'public_key': b58(ed25519.public_key),
             },
             'uri': ed25519.condition_uri,
         },
@@ -1064,7 +1068,7 @@ In a nutshell
         'condition': {
             'details': {
                 'type': ed25519.TYPE_NAME,
-                'public_key': base58.b58encode(ed25519.public_key),
+                'public_key': b58(ed25519.public_key),
             },
             'uri': ed25519.condition_uri,
         },
@@ -1189,7 +1193,7 @@ Handcrafting the ``CREATE`` transaction for our :ref:`bicycle sharing example
     # CRYPTO-CONDITIONS: construct an unsigned fulfillment dictionary
     unsigned_fulfillment_dict = {
         'type': ed25519.TYPE_NAME,
-        'public_key': base58.b58encode(ed25519.public_key),
+        'public_key': b58(ed25519.public_key),
     }
 
     output = {
@@ -1300,12 +1304,12 @@ to Bob:
     # CRYPTO-CONDITIONS: get the unsigned fulfillment dictionary (details)
     bob_unsigned_fulfillment_dict = {
         'type': bob_ed25519.TYPE_NAME,
-        'public_key': base58.b58encode(bob_ed25519.public_key),
+        'public_key': b58(bob_ed25519.public_key),
     }
 
     carly_unsigned_fulfillment_dict = {
         'type': carly_ed25519.TYPE_NAME,
-        'public_key': base58.b58encode(carly_ed25519.public_key),
+        'public_key': b58(carly_ed25519.public_key),
     }
 
     bob_output = {
@@ -1554,7 +1558,7 @@ Generate the output condition:
     In [0]: condition_details = {
        ...:     'subconditions': [
        ...:         {'type': s['body'].TYPE_NAME,
-       ...:          'public_key': base58.b58encode(s['body'].public_key)}
+       ...:          'public_key': b58(s['body'].public_key)}
        ...:         for s in threshold_sha256.subconditions
        ...:         if (s['type'] == 'fulfillment' and
        ...:             s['body'].TYPE_NAME == 'ed25519-sha-256')
@@ -1673,7 +1677,7 @@ The transfer to Carol:
 
     In [0]: unsigned_fulfillments_dict = {
        ...:     'type': carol_ed25519.TYPE_NAME,
-       ...:     'public_key': base58.b58encode(carol_ed25519.public_key),
+       ...:     'public_key': b58(carol_ed25519.public_key),
        ...: }
 
     In [0]: condition_uri = carol_ed25519.condition.serialize_uri()
@@ -1820,7 +1824,7 @@ Handcrafting the ``'CREATE'`` transaction
     condition_details = {
         'subconditions': [
             {'type': s['body'].TYPE_NAME,
-             'public_key': base58.b58encode(s['body'].public_key)}
+             'public_key': b58(s['body'].public_key)}
             for s in threshold_sha256.subconditions
             if (s['type'] == 'fulfillment' and
                 s['body'].TYPE_NAME == 'ed25519-sha-256')
@@ -1921,7 +1925,7 @@ Handcrafting the ``'TRANSFER'`` transaction
 
     unsigned_fulfillments_dict = {
         'type': carol_ed25519.TYPE_NAME,
-        'public_key': base58.b58encode(carol_ed25519.public_key),
+        'public_key': b58(carol_ed25519.public_key),
     }
 
     condition_uri = carol_ed25519.condition.serialize_uri()
@@ -2077,7 +2081,7 @@ Handcrafting the ``'CREATE'`` transaction
     condition_details = {
         'subconditions': [
             {'type': s['body'].TYPE_NAME,
-             'public_key': base58.b58encode(s['body'].public_key)}
+             'public_key': b58(s['body'].public_key)}
             for s in threshold_sha256.subconditions
             if (s['type'] == 'fulfillment' and
                 s['body'].TYPE_NAME == 'ed25519-sha-256')
@@ -2187,7 +2191,7 @@ Handcrafting the ``'TRANSFER'`` transaction
         'condition': {
             'details': {
                 'type': carol_ed25519.TYPE_NAME,
-                'public_key': base58.b58encode(carol_ed25519.public_key),
+                'public_key': b58(carol_ed25519.public_key),
             },
             'uri': condition_uri,
         },
