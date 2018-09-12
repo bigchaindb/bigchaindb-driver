@@ -6,6 +6,14 @@
 Changelog
 =========
 
+0.5.3 (2018-09-12)
+------------------
+Changed
+^^^^^^^
+* Fixed a failing unit test
+* Pinned cryptoconditions==0.7.2 in setup.py
+* Fixed the Handcrafting Transactions page in the docs
+
 0.5.2 (2018-08-31)
 -------------------
 Added
