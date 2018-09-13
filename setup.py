@@ -38,8 +38,9 @@ dev_require = [
 ]
 
 docs_require = [
-    'Sphinx>=1.3.5',
+    'Sphinx~=1.0',
     'sphinx-autobuild',
+    'sphinxcontrib-autorun',
     'sphinxcontrib-napoleon>=0.4.4',
     'sphinx_rtd_theme',
     'sphinxcontrib-httpdomain',
