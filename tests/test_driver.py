@@ -118,10 +118,6 @@ class TestTransactionsEndpoint:
         fulfillment_uri = ed25519.serialize_uri()
         assert signed_transaction['inputs'][0]['fulfillment'] == fulfillment_uri   # noqa
 
-    def test_send(self, driver, persisted_random_transaction):
-        sent_tx = driver.transactions.send(persisted_random_transaction)
-        assert sent_tx == persisted_random_transaction
-
     def test_send_commit(self, driver, persisted_random_transaction):
         sent_tx = driver.transactions.send_commit(persisted_random_transaction)
         assert sent_tx == persisted_random_transaction
