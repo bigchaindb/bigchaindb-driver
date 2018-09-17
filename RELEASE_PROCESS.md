@@ -49,7 +49,12 @@ The following steps are what we do to release a new version of _BigchainDB Pytho
 1. On your local computer, make sure you're on the `master` branch and that it's up-to-date with the `master` branch in the bigchaindb/bigchaindb-driver repository (e.g. `git fetch upstream` and `git merge upstream/master`). We're going to use that to push a new `bigchaindb-driver` package to PyPI.
 1. Make sure you have a `~/.pypirc` file containing credentials for PyPI or just enter them manually.
 1. Do `make release` to build and publish the new `bigchaindb-driver` package on PyPI.
-    For this step you need to have `twine` installed
+    For this step you need to have `twine` installed.
+    If you get an error like `Makefile:116: recipe for target 'clean-pyc' failed`
+    then try doing
+    ```
+    sudo chown -R $(whoami):$(whoami) .
+    ```
 1. [Log in to readthedocs.org](https://readthedocs.org/accounts/login/) and go to the **BigchainDB Python Driver** project, then:
    - Go to Admin --> Advanced Settings
      and make sure that "Default branch:" (i.e. what "latest" points to)
