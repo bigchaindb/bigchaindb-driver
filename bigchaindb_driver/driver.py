@@ -5,7 +5,6 @@
 from .transport import Transport
 from .offchain import prepare_transaction, fulfill_transaction
 from .utils import normalize_nodes
-from warnings import warn
 
 
 class BigchainDB:
@@ -317,41 +316,6 @@ class TransactionsEndpoint(NamespacedDriver):
             params={'asset_id': asset_id, 'operation': operation},
             headers=headers,
         )
-
-    def send(self, transaction, mode='commit', headers=None):
-        """Submit a transaction to the Federation.
-
-        Args:
-            transaction (dict): the transaction to be sent
-                to the Federation node(s).
-            mode (str): the mode the transaction is sent to the Federation
-                node(s).
-            headers (dict): Optional headers to pass to the request.
-
-        Returns:
-            dict: The transaction sent to the Federation node(s).
-
-        .. warning::
-
-            The method .send will be deprecated in the next release
-            of the driver, please use ``.send_commit``, ``.send_sync``, or
-            ``.send_async`` instead. More info:
-            https://docs.bigchaindb.com/projects/py-driver/en/latest/handcraft.html#send-the-transaction
-        """
-
-        warn('The method .send will be deprecated in the next release of the '
-             'driver, please use .send_commit, .send_sync, or .send_async '
-             'instead. More info: '
-             'https://docs.bigchaindb.com/projects/py-driver/en/latest/'
-             'handcraft.html#send-the-transaction',
-             PendingDeprecationWarning, stacklevel=2)
-
-        return self.transport.forward_request(
-            method='POST',
-            path=self.path,
-            json=transaction,
-            params={'mode': mode},
-            headers=headers)
 
     def send_async(self, transaction, headers=None):
         """Submit a transaction to the Federation with the mode `async`.
