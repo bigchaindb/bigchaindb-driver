@@ -466,14 +466,14 @@ class BlocksEndpoint(NamespacedDriver):
         return block_list[0] if len(block_list) else None
 
     def retrieve(self, block_height, headers=None):
-        """Retrieves the transaction with the given id.
+        """Retrieves the block with the given ``block_height``.
 
         Args:
             block_height (str): height of the block to retrieve.
             headers (dict): Optional headers to pass to the request.
 
         Returns:
-            dict: The block with the given id.
+            dict: The block with the given ``block_height``.
 
         """
         path = self.path + block_height
