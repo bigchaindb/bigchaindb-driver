@@ -12,7 +12,7 @@ CryptoKeypair = namedtuple('CryptoKeypair', ('private_key', 'public_key'))
 
 def generate_keypair(seed=None):
     """Generates a cryptographic key pair.
-    
+
     Args:
         seed (str) : Optional Seed, defaults to `None`
 
