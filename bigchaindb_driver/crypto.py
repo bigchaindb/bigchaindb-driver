@@ -10,9 +10,12 @@ from cryptoconditions import crypto
 CryptoKeypair = namedtuple('CryptoKeypair', ('private_key', 'public_key'))
 
 
-def generate_keypair():
+def generate_keypair(seed=None):
     """Generates a cryptographic key pair.
 
+    Args:
+        seed (bytes): 32-byte seed for deterministic generation.
+                      Defaults to `None`.
     Returns:
         :class:`~bigchaindb_driver.crypto.CryptoKeypair`: A
         :obj:`collections.namedtuple` with named fields
@@ -21,4 +24,4 @@ def generate_keypair():
 
     """
     return CryptoKeypair(
-        *(k.decode() for k in crypto.ed25519_generate_key_pair()))
+        *(k.decode() for k in crypto.ed25519_generate_key_pair(seed)))
