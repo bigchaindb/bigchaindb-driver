@@ -6,6 +6,23 @@
 Changelog
 =========
 
+0.6.0 (2018-10-20)
+------------------
+Changed
+^^^^^^^
+* Added support for deterministic keypair generation from a 32-byte seed.
+  See pull request #487 by external contributor @excerebrose
+* Pinned cryptoconditions==0.8.0 in setup.py
+
+Removed
+^^^^^^^
+* The send() function was removed. See pull request #483.
+
+Known issues
+^^^^^^^^^^^^
+* Builds of the Handcrafting Transactions page started failing again,
+  in Travis CI and on ReadTheDocs.
+
 0.5.3 (2018-09-12)
 ------------------
 Changed
