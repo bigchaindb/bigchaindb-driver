@@ -14,7 +14,8 @@ def generate_keypair(seed=None):
     """Generates a cryptographic key pair.
 
     Args:
-        seed (bytes): 32-byte seed for deterministic generation. defaults to `None`
+        seed (bytes): 32-byte seed for deterministic generation.
+                      Defaults to `None`.
     Returns:
         :class:`~bigchaindb_driver.crypto.CryptoKeypair`: A
         :obj:`collections.namedtuple` with named fields
