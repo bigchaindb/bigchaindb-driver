@@ -9,7 +9,9 @@ Quickstart / Installation
 
 .. warning::
 
-	The instructions below were tested on Ubuntu 16.04 LTS. They should also work on other Linux distributions and on macOS. The driver might work on Windows as well, but we do not guarantee it. We recommend to set up (e.g. via Docker For Windows) an Ubuntu VM there.
+   The instructions below were tested on Ubuntu 16.04 LTS.
+   They should also work on other Linux distributions and on macOS.
+   For other operating systems, we recommend using an Ubuntu virtual machine (VM).
 
 The BigchainDB Python Driver depends on:
 
@@ -79,8 +81,7 @@ You can check your version of ``pip`` using:
 
 ``pip`` was at version 9.0.0 as of November 2016.
 If you need to upgrade your version of ``pip``,
-then see `the pip documentation <https://pip.pypa.io/en/stable/installing/>`_
-or our page about that in the `BigchainDB Server docs <https://docs.bigchaindb.com/projects/server/en/latest/appendices/install-latest-pip.html>`_.
+then see `the pip documentation <https://pip.pypa.io/en/stable/installing/>`_.
 
 
 Dependency 3: setuptools
@@ -112,14 +113,6 @@ On Ubuntu 14.04 and 16.04, this works:
     $ sudo apt-get update
 
     $ sudo apt-get install python3-dev libssl-dev libffi-dev
-
-On Fedora 23 and 24, this works:
-
-.. code-block:: bash
-
-    $ sudo dnf update
-
-    $ sudo dnf install python-devel openssl-devel libffi-devel
 
 For other operating systems, please refer to `the cryptography installation guide <https://cryptography.io/en/latest/installation/#installation>`_.
 
