@@ -6,6 +6,12 @@
 Changelog
 =========
 
+0.6.1 (2018-10-21)
+------------------
+Fixed
+^^^^^
+* Fixed the problem with a docs page (Handcrafting Transactions) that wouldn't build.
+
 0.6.0 (2018-10-20)
 ------------------
 Changed
