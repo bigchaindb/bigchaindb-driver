@@ -12,7 +12,7 @@ with open('CHANGELOG.rst') as changelog_file:
     changelog = changelog_file.read()
 
 install_requires = [
-    'requests>=2.11.0',
+    'requests>=2.20.0',
     'cryptoconditions==0.8.0',
     'pysha3~=1.0.2',
     'python-rapidjson~=0.6.0',
