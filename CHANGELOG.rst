@@ -6,6 +6,13 @@
 Changelog
 =========
 
+0.6.2 (2018-11-03)
+------------------
+Changed
+^^^^^^^
+* In setup.py, changed python-rapidjson==0.6.0 to ~=0.6.0,
+  and changed requests>=2.11.0 to >=2.20.0
+
 0.6.1 (2018-10-21)
 ------------------
 Fixed
