@@ -46,7 +46,7 @@ The following steps are what we do to release a new version of _BigchainDB Pytho
    - **Title:** Same as tag version above, e.g `v0.9.1`
    - **Description:** The body of the changelog entry (Added, Changed, etc.)
 1. Click "Publish release" to publish the release on GitHub.
-1. On your local computer, make sure you're on the `master` branch and that it's up-to-date with the `master` branch in the bigchaindb/bigchaindb-driver repository (e.g. `git fetch upstream` and `git merge upstream/master`). We're going to use that to push a new `bigchaindb-driver` package to PyPI.
+1. On your local computer, make sure you're on the `master` branch and that it's up-to-date with the `master` branch in the bigchaindb/bigchaindb-driver repository (e.g. `git pull upstream`). We're going to use that to push a new `bigchaindb-driver` package to PyPI.
 1. Make sure you have a `~/.pypirc` file containing credentials for PyPI or just enter them manually.
 1. Do `make release` to build and publish the new `bigchaindb-driver` package on PyPI.
     For this step you need to have `twine` installed.
@@ -56,19 +56,20 @@ The following steps are what we do to release a new version of _BigchainDB Pytho
     sudo chown -R $(whoami):$(whoami) .
     ```
 1. [Log in to readthedocs.org](https://readthedocs.org/accounts/login/) and go to the **BigchainDB Python Driver** project, then:
+   - Click on "Builds", select "latest" from the drop-down menu, then click the "Build Version:" button.
+   - Wait for the build of "latest" to finish. This can take a few minutes.
    - Go to Admin --> Advanced Settings
      and make sure that "Default branch:" (i.e. what "latest" points to)
      is set to the new release's tag, e.g. `v0.9.1`.
-     (Don't miss the `v` in front.)
+     (It won't be an option if you didn't wait for the build of "latest" to finish.)
+     Then scroll to the bottom and click "Save".
    - Go to Admin --> Versions
      and under **Choose Active Versions**, do these things:
      1. Make sure that the new version's tag is "Active" and "Public"
      1. Make sure the **stable** branch is _not_ active.
-     1. Scroll to the bottom of the page and click the "Submit" button.
+     1. Scroll to the bottom of the page and click "Save".
 
 Congratulations, you have released a new version of BigchainDB Python Driver!
 
 ## Post-Release Steps
 Update the BigchainDB Python Driver version in the `acceptance/python/Dockerfile` in the [BigchainDB Server](https://github.com/bigchaindb/bigchaindb).
-
-
