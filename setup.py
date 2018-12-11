@@ -53,7 +53,7 @@ setup(
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
-    author_email='dev@bigchaindb.com',
+    author_email='devs@bigchaindb.com',
     url='https://github.com/bigchaindb/bigchaindb-driver',
     packages=find_packages(exclude=['tests*']),
     package_dir={'bigchaindb_driver':
