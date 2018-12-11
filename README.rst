@@ -14,7 +14,7 @@
         :target: https://pypi.python.org/pypi/bigchaindb-driver
 
 .. image:: https://img.shields.io/travis/bigchaindb/bigchaindb-driver/master.svg
-        :target: https://travis-ci.org/bigchaindb/bigchaindb-driver
+        :target: https://travis-ci.com/bigchaindb/bigchaindb-driver
 
 .. image:: https://img.shields.io/codecov/c/github/bigchaindb/bigchaindb-driver/master.svg
     :target: https://codecov.io/github/bigchaindb/bigchaindb-driver?branch=master
