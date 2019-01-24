@@ -28,18 +28,5 @@ Once you have a copy of the source code, you can install it by going to the dire
 
     python setup.py install
 
-
-Installing latest master with pip
----------------------------------
-
-To work with the latest BigchainDB (server) master branch:
-
-.. code-block:: bash
-
-    $ pip install --process-dependency-links git+https://github.com/bigchaindb/bigchaindb-driver.git
-
-Then connect to some BigchainDB node which is running BigchainDB server ``master``.
-
-
 .. _Github repo: https://github.com/bigchaindb/bigchaindb-driver
 .. _tarball: https://github.com/bigchaindb/bigchaindb-driver/tarball/master
