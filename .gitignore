@@ -60,3 +60,5 @@ target/
 
 # bigchaindb configuration
 .bigchaindb
+
+.DS_Store
