@@ -836,6 +836,20 @@ class Transaction(object):
 
         return self
 
+    def delegate_signing(self, callback):
+        tx_dict = self.to_dict()
+        tx_dict = self._remove_signatures(tx_dict)
+        tx_serialized = self._to_str(tx_dict)
+        message = sha3_256(tx_serialized.encode())
+        for input_ in self.inputs:
+            if input_.fulfills:  # ??? What is this bit for?
+                message.update('{}{}'.format(
+                    input_.fulfills.txid, input_.fulfills.output).encode())
+            signature = callback(tx_dict, message.digest())
+            input_.fulfillment.signature = signature
+        self._hash()
+        return self
+
     @classmethod
     def _sign_input(cls, input_, message, key_pairs):
         """Signs a single Input.
