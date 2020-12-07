@@ -547,7 +547,7 @@ class Transaction(object):
                             ' property instance for \'{}\' '
                             'Transactions'.format(operation))
         elif (operation == Transaction.TRANSFER and
-                not (isinstance(asset, dict) and 'id' in asset)):
+              not (isinstance(asset, dict) and 'id' in asset)):
             raise TypeError('`asset` must be a dict holding an `id` property '
                             'for {} Transactions'.format(operation))
 
