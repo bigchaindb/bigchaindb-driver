@@ -358,4 +358,3 @@ def fulfill_with_signing_delegation(transaction, signing_callback):
     return (Transaction.from_dict(transaction)
             .delegate_signing(signing_callback)
             .to_dict())
-
