@@ -354,7 +354,7 @@ def fulfill_transaction(transaction, *, private_keys):
     return signed_transaction.to_dict()
 
 
-def fulfill_with_signing_delegation_alt(transaction, signing_callback):
+def fulfill_with_signing_delegation(transaction, signing_callback):
     return (Transaction.from_dict(transaction)
             .delegate_signing(signing_callback)
             .to_dict())
