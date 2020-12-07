@@ -138,7 +138,6 @@ def test_fulfill_transaction_raises(alice_transaction, bob_privkey):
 def test_transaction_fulfill_with_signingning_delegation(
         alice_privkey,
         alice_transaction,
-        signed_alice_transaction,
         alice_transaction_signature):
     from bigchaindb_driver.offchain import (
         fulfill_transaction,
