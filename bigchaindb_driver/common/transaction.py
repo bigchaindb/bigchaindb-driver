@@ -549,7 +549,7 @@ class Transaction(object):
         elif (operation == Transaction.TRANSFER and
                 not (isinstance(asset, dict) and 'id' in asset)):
             raise TypeError(('`asset` must be a dict holding an `id` property '
-                             "for 'TRANSFER' Transactions".format(operation)))
+                             "for {} Transactions".format(operation)))
 
         if outputs and not isinstance(outputs, list):
             raise TypeError('`outputs` must be a list instance or None')
