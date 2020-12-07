@@ -133,3 +133,24 @@ def test_fulfill_transaction_raises(alice_transaction, bob_privkey):
     from bigchaindb_driver.exceptions import MissingPrivateKeyError
     with raises(MissingPrivateKeyError):
         fulfill_transaction(alice_transaction, private_keys=bob_privkey)
+
+
+def test_transaction_fulfill_with_signingning_delegation(
+        alice_privkey,
+        alice_transaction,
+        signed_alice_transaction,
+        alice_transaction_signature):
+    from bigchaindb_driver.offchain import (
+        fulfill_transaction,
+        fulfill_with_signing_delegation
+    )
+
+    fulfilled_transaction = fulfill_transaction(
+        alice_transaction,
+        private_keys=alice_privkey)
+
+    fulfilled_transaction_with_delegation = fulfill_with_signing_delegation(
+        alice_transaction,
+        lambda x, y: alice_transaction_signature)
+
+    assert fulfilled_transaction == fulfilled_transaction_with_delegation
