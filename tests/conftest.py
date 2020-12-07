@@ -242,6 +242,12 @@ def signed_alice_transaction(alice_privkey, alice_transaction_obj):
     signed_transaction = alice_transaction_obj.sign([alice_privkey])
     return signed_transaction.to_dict()
 
+@fixture
+def alice_transaction_signature(signed_alice_transaction):
+    return Ed25519Sha256.from_uri(
+        signed_alice_transaction['inputs'][0]['fulfillment']
+    ).signature
+
 
 @fixture
 def persisted_alice_transaction(signed_alice_transaction,
