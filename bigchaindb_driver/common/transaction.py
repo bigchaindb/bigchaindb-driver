@@ -543,13 +543,13 @@ class Transaction(object):
         if (operation == Transaction.CREATE and
                 asset is not None and
                 not (isinstance(asset, dict) and 'data' in asset)):
-            raise TypeError(('`asset` must be None or a dict holding a `data` '
-                             " property instance for '{}' "
-                             "Transactions".format(operation)))
+            raise TypeError('`asset` must be None or a dict holding a `data` '
+                            ' property instance for \'{}\' '
+                            'Transactions'.format(operation))
         elif (operation == Transaction.TRANSFER and
                 not (isinstance(asset, dict) and 'id' in asset)):
-            raise TypeError(('`asset` must be a dict holding an `id` property '
-                             "for {} Transactions".format(operation)))
+            raise TypeError('`asset` must be a dict holding an `id` property '
+                            'for {} Transactions'.format(operation))
 
         if outputs and not isinstance(outputs, list):
             raise TypeError('`outputs` must be a list instance or None')
