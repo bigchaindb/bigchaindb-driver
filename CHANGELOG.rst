@@ -6,6 +6,14 @@
 Changelog
 =========
 
+0.6.3 (2020-12-08)
+------------------
+Changed
+^^^^^^^
+* Added option to delegate signing outside of bigchaindb_driver by passing
+  callback to fullfill_with_signing_delegation.
+
+
 0.6.2 (2018-11-03)
 ------------------
 Changed
