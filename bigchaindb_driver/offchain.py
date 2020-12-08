@@ -355,6 +355,17 @@ def fulfill_transaction(transaction, *, private_keys):
 
 
 def fulfill_with_signing_delegation(transaction, signing_callback):
+    """Fulfills the given transction with signing delegated to `signing_callback`.
+
+    Args:
+        transaction (dict): The transaction to be fulfilled.
+        signing_callback (function): Callback taking `transaction` and `message`
+            to sign and returning signature.  This signature is further used to
+            construct fulfillment.
+    Returns:
+        dict: The fulfilled transaction payload, ready to be sent to a
+        BigchainDB federation.
+    """
     return (Transaction.from_dict(transaction)
             .delegate_signing(signing_callback)
             .to_dict())
