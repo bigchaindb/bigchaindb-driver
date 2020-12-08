@@ -49,11 +49,11 @@ docs_require = [
 
 setup(
     name='bigchaindb_driver',
-    version='0.6.2',
+    version='0.6.3',
     description="Python driver for BigchainDB",
     long_description=readme + '\n\n' + changelog,
     author="BigchainDB",
-    author_email='devs@bigchaindb.com',
+    author_email='contact@ipdb.global',
     url='https://github.com/bigchaindb/bigchaindb-driver',
     packages=find_packages(exclude=['tests*']),
     package_dir={'bigchaindb_driver':
