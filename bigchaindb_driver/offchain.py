@@ -360,7 +360,7 @@ def fulfill_with_signing_delegation(transaction, signing_callback):
 
     Args:
         transaction (dict): The transaction to be fulfilled.
-        signing_callback (function): Callback taking `transaction` and
+        signing_callback (function): Callback taking `input` and
             `message` to sign and returning signature.  This signature is
             further used to construct fulfillment.
     Returns:
