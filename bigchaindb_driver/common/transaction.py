@@ -845,7 +845,7 @@ class Transaction(object):
                     - Ed25519Fulfillment
             Args:
                 callback (function): A callback used to sign inputs. Callback
-                    takes tx dict and message to sign as arguments and returns
+                    takes input dict and message to sign as arguments and returns
                     signature (bytes).
             Returns:
                 :class:`~bigchaindb.common.transaction.Transaction`
@@ -858,7 +858,7 @@ class Transaction(object):
             if input_.fulfills:
                 message.update('{}{}'.format(
                     input_.fulfills.txid, input_.fulfills.output).encode())
-            signature = callback(tx_dict, message.digest())
+            signature = callback(input_.to_dict(), message.digest())
             input_.fulfillment.signature = signature
         self._hash()
         return self
