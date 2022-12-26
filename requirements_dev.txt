@@ -1,6 +1,6 @@
 pip==21.1
 bumpversion==0.5.3
-wheel==0.29.0
+wheel==0.38.1
 git+https://github.com/bigchaindb/bigchaindb.git
 
 -e .[dev]
